@@ -1,4 +1,4 @@
-package framework
+package model
 
 import (
 	"net/http"

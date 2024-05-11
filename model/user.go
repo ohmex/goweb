@@ -7,7 +7,11 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type User struct{}
+type User struct {
+	ID   int
+	Name string
+	Role string
+}
 
 func (u User) List(c echo.Context) error {
 	return c.String(http.StatusOK, faker.Paragraph())

@@ -1,35 +1,31 @@
 package main
 
 import (
-	"gowebmvc/framework"
-	"gowebmvc/model"
-	"log"
-	"net/http"
+	"gowebmvc/server"
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/labstack/echo/v4"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
-func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+func init() {
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 
 	key := os.Getenv("KEY")
-	log.Printf("\n>>>> KEY: %s", key)
+	log.Info().Str("KEY", key).Send()
 
-	e := framework.New()
+	if err := godotenv.Load(); err != nil {
+		log.Error().Str("ERROR", "error loading .env file")
+	}
+}
 
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
-
-	e.Resource("/user", model.User{})
+func main() {
+	app := server.New()
 
 	//data, _ := json.MarshalIndent(e.Routes(), "", "  ")
 	//log.Printf("\n%s", data)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	app.Logger.Fatal(app.Start(":8080"))
 }
