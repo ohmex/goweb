@@ -10,12 +10,12 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-type App struct {
+type Server struct {
 	*echo.Echo
 	*casbin.Enforcer
 }
 
-func New() *App {
+func New() *Server {
 	adaptor, _ := gormadapter.NewAdapter("sqlite3", "casbin.db")
 	enforcer, _ := casbin.NewEnforcer("config/model.conf", adaptor)
 	enforcer.EnableLog(true)
@@ -39,14 +39,14 @@ func New() *App {
 	// c.SavePolicy()
 
 	e := echo.New()
-	a := &App{e, enforcer}
-	a.Pre(middleware.AddTrailingSlash())
-	a.InitializeRoutes()
-	return a
+	server := &Server{e, enforcer}
+	server.Pre(middleware.AddTrailingSlash())
+	server.InitializeRoutes()
+	return server
 }
 
-func (a *App) Authorize(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
+func (server *Server) Authorize(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(ctx echo.Context) error {
 		// path := c.Request().URL.Path
 		// method := c.Request().Method
 
@@ -72,17 +72,17 @@ func (a *App) Authorize(next echo.HandlerFunc) echo.HandlerFunc {
 		ok := false
 
 		if ok {
-			return next(c)
+			return next(ctx)
 		}
-		return c.String(http.StatusForbidden, "Access denied\n\n")
+		return ctx.String(http.StatusForbidden, "Access denied\n\n")
 	}
 }
 
-func (a *App) AddResource(p string, r model.Resource) {
-	g := a.Group(p, a.Authorize)
-	g.GET("/", r.List)         // Respond back with a the List of Resource
-	g.GET("/:id", r.Read)      // Read a single Resource identified by id
-	g.POST("/", r.Create)      // Create a new Resource
-	g.PUT("/:id", r.Update)    // Update an existing Resource identified by id
-	g.DELETE("/:id", r.Delete) // Delete a single Resource identified by id
+func (server *Server) AddResource(p string, r model.Resource) {
+	group := server.Group(p, server.Authorize)
+	group.GET("/", r.List)         // Respond back with a the List of Resource
+	group.GET("/:id", r.Read)      // Read a single Resource identified by id
+	group.POST("/", r.Create)      // Create a new Resource
+	group.PUT("/:id", r.Update)    // Update an existing Resource identified by id
+	group.DELETE("/:id", r.Delete) // Delete a single Resource identified by id
 }
