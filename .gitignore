@@ -20,3 +20,10 @@
 # Go workspace file
 go.work
 casbin.db
+
+# .env files
+.env
+.env.testing
+/.idea
+docs
+main
