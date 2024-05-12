@@ -7,17 +7,17 @@ import (
 	"goweb/docs"
 )
 
-//	@title			Echo Demo App
-//	@version		1.0
-//	@description	This is a demo version of Echo app.
+//	@title				Echo Web App
+//	@version			1.0
+//	@description	Echo based web application.
 
-//	@contact.name	NIX Solutions
-//	@contact.url	https://www.nixsolutions.com/
-//	@contact.email	ask@nixsolutions.com
+//	@contact.name		Sachin
+//	@contact.url		https://www.sachinsharma.com/
+//	@contact.email	trulysachin@gmail.com
 
 //	@securityDefinitions.apikey	ApiKeyAuth
-//	@in							header
-//	@name						Authorization
+//	@in													header
+//	@name												Authorization
 
 // @BasePath	/
 func main() {

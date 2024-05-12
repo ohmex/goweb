@@ -27,3 +27,4 @@ casbin.db
 /.idea
 docs
 main
+.DS_Store
