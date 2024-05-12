@@ -8,9 +8,10 @@ import (
 )
 
 type User struct {
-	ID   int
-	Name string
-	Role string
+	ID     int64
+	Name   string
+	Role   string
+	Domain string
 }
 
 func (u User) List(c echo.Context) error {

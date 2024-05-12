@@ -1,11 +1,16 @@
 package server
 
 import (
+	"gowebmvc/auth"
 	"gowebmvc/model"
-	"net/http"
+	"gowebmvc/mware"
+	"gowebmvc/service"
+	"os"
 
 	"github.com/casbin/casbin/v2"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
+	"github.com/golang-jwt/jwt/v5"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -13,6 +18,8 @@ import (
 type Server struct {
 	*echo.Echo
 	*casbin.Enforcer
+	*service.RedisClient
+	jwtValidator echo.MiddlewareFunc
 }
 
 func New() *Server {
@@ -39,47 +46,25 @@ func New() *Server {
 	// c.SavePolicy()
 
 	e := echo.New()
-	server := &Server{e, enforcer}
+
+	// Configure middleware with the custom claims type
+	config := echojwt.Config{
+		NewClaimsFunc: func(c echo.Context) jwt.Claims {
+			return new(auth.CustomClaims)
+		},
+		SigningKey: []byte(os.Getenv("ACCESS_SECRET")),
+	}
+
+	server := &Server{e, enforcer, service.NewRedisClient(), echojwt.WithConfig(config)}
 	server.Pre(middleware.AddTrailingSlash())
 	server.InitializeRoutes()
 	return server
 }
 
-func (server *Server) Authorize(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(ctx echo.Context) error {
-		// path := c.Request().URL.Path
-		// method := c.Request().Method
-
-		// userIDStr := c.QueryParam("user_id")
-		// userID, err := strconv.Atoi(userIDStr)
-		// if err != nil {
-		// 	return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-		// }
-
-		// objectIDStr := c.Param("patient_id")
-		// objectID, err := strconv.Atoi(objectIDStr)
-		// if err != nil {
-		// 	return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-		// }
-
-		// obj := Object{ID: objectID, Path: path}
-
-		// ok, err := enforcer.Enforce(User{ID: userID}, obj, method)
-		// if err != nil {
-		// 	return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-		// }
-
-		ok := false
-
-		if ok {
-			return next(ctx)
-		}
-		return ctx.String(http.StatusForbidden, "Access denied\n\n")
-	}
-}
-
 func (server *Server) AddResource(p string, r model.Resource) {
-	group := server.Group(p, server.Authorize)
+	group := server.Group(p)
+	group.Use(server.jwtValidator)
+	group.Use(mware.CasbinAuthorizer)
 	group.GET("/", r.List)         // Respond back with a the List of Resource
 	group.GET("/:id", r.Read)      // Read a single Resource identified by id
 	group.POST("/", r.Create)      // Create a new Resource
