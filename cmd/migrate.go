@@ -48,7 +48,7 @@ func GetDB() *gorm.DB {
 }
 
 func MigrateUp() {
-	db.AddMigrators(migrations.CreateTables{}, migrations.InsertData{})
+	db.AddMigrators(migrations.DatabaseTables{}, migrations.TableData{})
 
 	if err := db.Migrate(GetDB()); err != nil {
 		log.Fatal().Msg("Migrate UP failed")
@@ -56,7 +56,7 @@ func MigrateUp() {
 }
 
 func MigrateDown() {
-	db.AddMigrators(migrations.CreateTables{}, migrations.InsertData{})
+	db.AddMigrators(migrations.DatabaseTables{}, migrations.TableData{})
 
 	if err := db.MigrateDown(GetDB()); err != nil {
 		log.Fatal().Msg("Migrate DOWN failed")
