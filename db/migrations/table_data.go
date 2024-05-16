@@ -3,6 +3,7 @@ package migrations
 import (
 	"goweb/models"
 
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -13,8 +14,11 @@ func (TableData) Id() string {
 }
 
 func (TableData) Up(db *gorm.DB) {
-
-	user := models.User{Name: "Sachin", Email: "trylysachin@gmail.com", Password: "password"}
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
+	if err != nil {
+		panic(err)
+	}
+	user := models.User{Name: "Sachin", Email: "trulysachin@gmail.com", Password: string(hashedPassword)}
 
 	db.Create(&user)
 

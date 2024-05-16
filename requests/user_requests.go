@@ -10,8 +10,8 @@ const (
 )
 
 type BasicAuth struct {
-	Email    string `json:"email" validate:"required" example:"john.doe@example.com"`
-	Password string `json:"password" validate:"required" example:"11111111"`
+	Email    string `form:"email" json:"email" validate:"required" example:"username@gmail.com"`
+	Password string `form:"password" json:"password" validate:"required" example:"P@ssw0r6"`
 }
 
 func (ba BasicAuth) Validate() error {
