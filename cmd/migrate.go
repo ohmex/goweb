@@ -1,14 +1,13 @@
 package cmd
 
 import (
+	"goweb/config"
 	"goweb/db"
 	"goweb/db/migrations"
-	"os"
 
 	"github.com/rs/zerolog/log"
 
 	"github.com/spf13/cobra"
-	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -33,18 +32,8 @@ func init() {
 }
 
 func GetDB() *gorm.DB {
-	host := os.Getenv("DB_HOST")
-	port := os.Getenv("DB_PORT")
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWORD")
-	name := os.Getenv("DB_NAME")
-
-	dsn := user + ":" + password + "@tcp(" + host + ":" + port + ")/" + name + "?charset=utf8mb4&parseTime=True&loc=Local"
-	gorm, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
-	return gorm
+	cfg := config.NewConfig()
+	return db.InitDB(cfg)
 }
 
 func MigrateUp() {

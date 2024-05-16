@@ -19,7 +19,7 @@ type Server struct {
 func NewServer(cfg *config.Config) *Server {
 	return &Server{
 		Echo:   echo.New(),
-		DB:     db.Init(cfg),
+		DB:     db.InitDB(cfg),
 		Redis:  db.InitRedis(cfg),
 		Config: cfg,
 	}
