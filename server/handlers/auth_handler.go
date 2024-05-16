@@ -1,26 +1,27 @@
 package handlers
 
 import (
+	"context"
 	"fmt"
 	"goweb/models"
 	"goweb/repositories"
 	"goweb/requests"
 	"goweb/responses"
-	s "goweb/server"
+	"goweb/server"
 	tokenservice "goweb/services/token"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 
-	jwtGo "github.com/golang-jwt/jwt/v5"
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthHandler struct {
-	server *s.Server
+	server *server.Server
 }
 
-func NewAuthHandler(server *s.Server) *AuthHandler {
+func NewAuthHandler(server *server.Server) *AuthHandler {
 	return &AuthHandler{server: server}
 }
 
@@ -54,15 +55,10 @@ func (authHandler *AuthHandler) Login(c echo.Context) error {
 		return responses.ErrorResponse(c, http.StatusUnauthorized, "Invalid credentials")
 	}
 
-	tokenService := tokenservice.NewTokenService(authHandler.server.Config)
-	accessToken, exp, err := tokenService.CreateAccessToken(&user)
-	if err != nil {
-		return err
-	}
-	refreshToken, err := tokenService.CreateRefreshToken(&user)
-	if err != nil {
-		return err
-	}
+	tokenService := tokenservice.NewTokenService(authHandler.server)
+
+	accessToken, refreshToken, exp, _ := tokenService.GenerateTokenPair(&user)
+
 	res := responses.NewLoginResponse(accessToken, refreshToken, exp)
 
 	return responses.Response(c, http.StatusOK, res)
@@ -85,8 +81,8 @@ func (authHandler *AuthHandler) RefreshToken(c echo.Context) error {
 		return err
 	}
 
-	token, err := jwtGo.Parse(refreshRequest.Token, func(token *jwtGo.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwtGo.SigningMethodHMAC); !ok {
+	token, err := jwt.Parse(refreshRequest.Token, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(authHandler.server.Config.Auth.RefreshSecret), nil
@@ -96,7 +92,7 @@ func (authHandler *AuthHandler) RefreshToken(c echo.Context) error {
 		return responses.ErrorResponse(c, http.StatusUnauthorized, err.Error())
 	}
 
-	claims, ok := token.Claims.(jwtGo.MapClaims)
+	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok && !token.Valid {
 		return responses.ErrorResponse(c, http.StatusUnauthorized, "Invalid token")
 	}
@@ -108,16 +104,31 @@ func (authHandler *AuthHandler) RefreshToken(c echo.Context) error {
 		return responses.ErrorResponse(c, http.StatusUnauthorized, "User not found")
 	}
 
-	tokenService := tokenservice.NewTokenService(authHandler.server.Config)
-	accessToken, exp, err := tokenService.CreateAccessToken(user)
-	if err != nil {
-		return err
-	}
-	refreshToken, err := tokenService.CreateRefreshToken(user)
-	if err != nil {
-		return err
-	}
+	tokenService := tokenservice.NewTokenService(authHandler.server)
+
+	accessToken, refreshToken, exp, _ := tokenService.GenerateTokenPair(user)
+
 	res := responses.NewLoginResponse(accessToken, refreshToken, exp)
 
 	return responses.Response(c, http.StatusOK, res)
+}
+
+// Logout godoc
+// @Summary Logout
+// @Description Perform the user's logout
+// @ID user-logout
+// @Tags User Actions
+// @Accept json
+// @Produce json
+// @Success 200 {object} responses.Data
+// @Failure 401 {object} responses.Data
+// @Security ApiKeyAuth
+// @Router /logout [post]
+func (authHandler *AuthHandler) Logout(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(*tokenservice.JwtCustomClaims)
+
+	authHandler.server.Redis.Del(context.Background(), fmt.Sprintf("token-%d", claims.ID))
+
+	return responses.MessageResponse(c, http.StatusOK, "User logged out")
 }
