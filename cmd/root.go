@@ -8,7 +8,7 @@ import (
 	"goweb/server/routes"
 	"os"
 
-	"github.com/labstack/gommon/log"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +21,7 @@ var rootCmd = &cobra.Command{
 3. GORM implementation with migrations`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Info("Executing server port=", cmd.Flag("port").Value)
+		log.Info().Interface("Port", cmd.Flag("port").Value).Send()
 		StartServer()
 	},
 }
@@ -40,11 +40,11 @@ func Execute() {
 func StartServer() {
 	cfg := config.NewConfig()
 	// TODO: overide from cmdline options
-	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s", cfg.HTTP.Host, cfg.HTTP.ExposePort)
+	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s", cfg.HTTP.Host, cfg.HTTP.Port)
 	app := server.NewServer(cfg)
 	routes.ConfigureRoutes(app)
 	err := app.Start(cfg.HTTP.Port)
 	if err != nil {
-		log.Fatal("Port already used")
+		log.Fatal().Msg("Port already used")
 	}
 }

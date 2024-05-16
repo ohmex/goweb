@@ -3,7 +3,9 @@ package cmd
 import (
 	"goweb/db"
 	"goweb/db/migrations"
-	"log"
+	"os"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/spf13/cobra"
 	"gorm.io/driver/mysql"
@@ -30,28 +32,33 @@ func init() {
 	rootCmd.AddCommand(migrateCmd)
 }
 
-func MigrateUp() {
-	db.AddMigrators(migrations.CreateTables{}, migrations.InsertData{})
+func GetDB() *gorm.DB {
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	name := os.Getenv("DB_NAME")
 
-	dsn := "root:sachin@tcp(127.0.0.1:3306)/gowebmvc?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := user + ":" + password + "@tcp(" + host + ":" + port + ")/" + name + "?charset=utf8mb4&parseTime=True&loc=Local"
 	gorm, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
-	if err := db.Migrate(gorm); err != nil {
-		log.Fatal("Migrate UP failed")
+	return gorm
+}
+
+func MigrateUp() {
+	db.AddMigrators(migrations.CreateTables{}, migrations.InsertData{})
+
+	if err := db.Migrate(GetDB()); err != nil {
+		log.Fatal().Msg("Migrate UP failed")
 	}
 }
 
 func MigrateDown() {
 	db.AddMigrators(migrations.CreateTables{}, migrations.InsertData{})
 
-	dsn := "root:sachin@tcp(127.0.0.1:3306)/gowebmvc?charset=utf8mb4&parseTime=True&loc=Local"
-	gorm, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
-	if err := db.Migrate(gorm); err != nil {
-		log.Fatal("Migrate DOWN failed")
+	if err := db.MigrateDown(GetDB()); err != nil {
+		log.Fatal().Msg("Migrate DOWN failed")
 	}
 }
