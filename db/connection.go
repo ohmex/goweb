@@ -5,6 +5,7 @@ import (
 	"goweb/config"
 	"goweb/db/seeders"
 
+	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -28,4 +29,12 @@ func Init(cfg *config.Config) *gorm.DB {
 	userSeeder.SetUsers()
 
 	return db
+}
+
+func InitRedis(cfg *config.Config) *redis.Client {
+	addr := fmt.Sprintf("%s:%s", cfg.Redis.Host, cfg.Redis.Port)
+
+	return redis.NewClient(&redis.Options{
+		Addr: addr,
+	})
 }

@@ -21,7 +21,5 @@ func (userService *Service) Register(request *requests.RegisterRequest) error {
 		SetPassword(string(encryptedPassword)).
 		Build()
 
-	userService.DB.Create(&user)
-
-	return nil
+	return userService.DB.Create(&user).Error
 }
