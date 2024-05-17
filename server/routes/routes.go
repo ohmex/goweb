@@ -5,6 +5,7 @@ import (
 	"goweb/server"
 	"goweb/server/handlers"
 	"goweb/services/token"
+	"net/http"
 
 	"github.com/golang-jwt/jwt/v5"
 	echojwt "github.com/labstack/echo-jwt/v4"
@@ -21,6 +22,9 @@ func ConfigureRoutes(server *server.Server) {
 
 	server.Echo.Use(middleware.Logger())
 
+	server.Echo.GET("/", func(ctx echo.Context) error {
+		return ctx.String(http.StatusOK, "Hello, World!")
+	})
 	server.Echo.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	server.Echo.POST("/login", authHandler.Login)

@@ -27,7 +27,7 @@ func ValidateJWT(server *server.Server) echo.MiddlewareFunc {
 
 			user, err := tokenService.NewTokenService(server).ValidateToken(claims, false)
 			if err != nil {
-				return responses.MessageResponse(c, http.StatusUnauthorized, "Not authorized")
+				return responses.ErrorResponse(c, http.StatusUnauthorized, err.Error())
 			}
 
 			c.Set("currentUser", user)

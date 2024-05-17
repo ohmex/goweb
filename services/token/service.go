@@ -12,6 +12,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -76,6 +77,8 @@ func (tokenService *Service) GenerateTokenPair(user *models.User) (accessToken, 
 }
 
 func (tokenService *Service) ParseToken(tokenString, secret string) (claims *JwtCustomClaims, err error) {
+	str := "ParseToken"
+	log.Info().Msg("Inside function" + str)
 	token, err := jwt.ParseWithClaims(tokenString, &JwtCustomClaims{},
 		func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
