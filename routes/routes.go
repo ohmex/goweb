@@ -1,9 +1,9 @@
 package routes
 
 import (
+	"goweb/handlers"
 	"goweb/interceptor"
 	"goweb/server"
-	"goweb/server/handlers"
 	"goweb/services/token"
 	"net/http"
 
@@ -41,10 +41,10 @@ func ConfigureRoutes(server *server.Server) {
 
 	protectedGroup := server.Echo.Group("")
 	protectedGroup.Use(echojwt.WithConfig(config))
-	protectedGroup.POST("/logout", authHandler.Logout)
 
 	// Below APIs must validtae the JWT @ REDIS & DB
 	protectedGroup.Use(interceptor.ValidateJWT(server))
+	protectedGroup.POST("/logout", authHandler.Logout)
 	protectedGroup.GET("/posts", postHandler.GetPosts)
 	protectedGroup.POST("/posts", postHandler.CreatePost)
 	protectedGroup.DELETE("/posts/:id", postHandler.DeletePost)

@@ -2,7 +2,7 @@ package user
 
 import (
 	"goweb/models"
-	"goweb/server/requests"
+	"goweb/requests"
 
 	"golang.org/x/crypto/bcrypt"
 )

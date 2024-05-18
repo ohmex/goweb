@@ -4,9 +4,9 @@ import (
 	"goweb/api"
 	"goweb/models"
 	"goweb/repositories"
-	s "goweb/server"
-	"goweb/server/requests"
-	"goweb/server/responses"
+	"goweb/requests"
+	"goweb/responses"
+	"goweb/server"
 	postservice "goweb/services/post"
 	"goweb/services/token"
 	"net/http"
@@ -17,10 +17,10 @@ import (
 )
 
 type PostHandlers struct {
-	server *s.Server
+	server *server.Server
 }
 
-func NewPostHandlers(server *s.Server) *PostHandlers {
+func NewPostHandlers(server *server.Server) *PostHandlers {
 	return &PostHandlers{server: server}
 }
 

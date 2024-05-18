@@ -56,14 +56,6 @@ func USER_NOT_FOUND(s ...string) Response {
 	return Response{Code: 100004, Err: data, Msg: ""}
 }
 
-func USER_LOGGED_OUT(s ...string) Response {
-	data := "User logged out"
-	if s != nil {
-		data = s[0]
-	}
-	return Response{Code: 100005, Err: data, Msg: ""}
-}
-
 func TOKEN_EXPIRED(s ...string) Response {
 	data := "Token expired"
 	if s != nil {
@@ -119,4 +111,12 @@ func RESOURCE_CREATED(s ...string) Response {
 		data = s[0]
 	}
 	return Response{Code: 200001, Err: "", Msg: data}
+}
+
+func USER_LOGGED_OUT(s ...string) Response {
+	data := "User logged out"
+	if s != nil {
+		data = s[0]
+	}
+	return Response{Code: 200002, Err: "", Msg: data}
 }

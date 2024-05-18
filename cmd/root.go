@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"goweb/config"
 	"goweb/docs"
+	"goweb/routes"
 	"goweb/server"
-	"goweb/server/routes"
 	"os"
 
 	"github.com/rs/zerolog/log"

@@ -4,8 +4,8 @@ import (
 	"goweb/api"
 	"goweb/models"
 	"goweb/repositories"
-	s "goweb/server"
-	"goweb/server/requests"
+	"goweb/requests"
+	"goweb/server"
 	"goweb/services/user"
 	"net/http"
 
@@ -13,10 +13,10 @@ import (
 )
 
 type RegisterHandler struct {
-	server *s.Server
+	server *server.Server
 }
 
-func NewRegisterHandler(server *s.Server) *RegisterHandler {
+func NewRegisterHandler(server *server.Server) *RegisterHandler {
 	return &RegisterHandler{server: server}
 }
 

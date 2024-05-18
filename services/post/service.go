@@ -2,7 +2,7 @@ package post
 
 import (
 	"goweb/models"
-	"goweb/server/requests"
+	"goweb/requests"
 
 	"gorm.io/gorm"
 )

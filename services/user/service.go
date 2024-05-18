@@ -1,7 +1,7 @@
 package user
 
 import (
-	"goweb/server/requests"
+	"goweb/requests"
 
 	"gorm.io/gorm"
 )

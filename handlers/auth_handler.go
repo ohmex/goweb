@@ -6,9 +6,9 @@ import (
 	"goweb/api"
 	"goweb/models"
 	"goweb/repositories"
+	"goweb/requests"
+	"goweb/responses"
 	"goweb/server"
-	"goweb/server/requests"
-	"goweb/server/responses"
 	tokenservice "goweb/services/token"
 	"net/http"
 
