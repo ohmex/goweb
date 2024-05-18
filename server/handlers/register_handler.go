@@ -1,11 +1,11 @@
 package handlers
 
 import (
+	"goweb/api"
 	"goweb/models"
 	"goweb/repositories"
-	"goweb/requests"
-	"goweb/responses"
 	s "goweb/server"
+	"goweb/server/requests"
 	"goweb/services/user"
 	"net/http"
 
@@ -39,7 +39,7 @@ func (registerHandler *RegisterHandler) Register(c echo.Context) error {
 	}
 
 	if err := registerRequest.Validate(); err != nil {
-		return responses.ErrorResponse(c, http.StatusBadRequest, "Required fields are empty or not valid")
+		return api.WebResponse(c, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
 
 	existUser := models.User{}
@@ -47,13 +47,13 @@ func (registerHandler *RegisterHandler) Register(c echo.Context) error {
 	userRepository.GetUserByEmail(&existUser, registerRequest.Email)
 
 	if existUser.ID != 0 {
-		return responses.ErrorResponse(c, http.StatusBadRequest, "User already exists")
+		return api.WebResponse(c, http.StatusBadRequest, api.USER_EXISTS())
 	}
 
 	userService := user.NewUserService(registerHandler.server.DB)
 	if err := userService.Register(registerRequest); err != nil {
-		return responses.ErrorResponse(c, http.StatusInternalServerError, "Server error")
+		return api.WebResponse(c, http.StatusInternalServerError, api.INTERNAL_SERVICE_ERROR())
 	}
 
-	return responses.MessageResponse(c, http.StatusCreated, "User successfully created")
+	return api.WebResponse(c, http.StatusCreated, api.RESOURCE_CREATED("User successfully created"))
 }

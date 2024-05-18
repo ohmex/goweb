@@ -3,11 +3,12 @@ package handlers
 import (
 	"context"
 	"fmt"
+	"goweb/api"
 	"goweb/models"
 	"goweb/repositories"
-	"goweb/requests"
-	"goweb/responses"
 	"goweb/server"
+	"goweb/server/requests"
+	"goweb/server/responses"
 	tokenservice "goweb/services/token"
 	"net/http"
 
@@ -44,7 +45,7 @@ func (authHandler *AuthHandler) Login(c echo.Context) error {
 	}
 
 	if err := loginRequest.Validate(); err != nil {
-		return responses.ErrorResponse(c, http.StatusBadRequest, "Required fields are empty or not valid")
+		return api.WebResponse(c, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
 
 	user := models.User{}
@@ -52,7 +53,7 @@ func (authHandler *AuthHandler) Login(c echo.Context) error {
 	userRepository.GetUserByEmail(&user, loginRequest.Email)
 
 	if user.ID == 0 || (bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginRequest.Password)) != nil) {
-		return responses.ErrorResponse(c, http.StatusUnauthorized, "Invalid credentials")
+		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_CREDENTIALS())
 	}
 
 	tokenService := tokenservice.NewTokenService(authHandler.server)
@@ -61,7 +62,7 @@ func (authHandler *AuthHandler) Login(c echo.Context) error {
 
 	res := responses.NewLoginResponse(accessToken, refreshToken, exp)
 
-	return responses.Response(c, http.StatusOK, res)
+	return api.WebResponse(c, http.StatusOK, res)
 }
 
 // Refresh godoc
@@ -89,19 +90,19 @@ func (authHandler *AuthHandler) RefreshToken(c echo.Context) error {
 	})
 
 	if err != nil {
-		return responses.ErrorResponse(c, http.StatusUnauthorized, err.Error())
+		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_SIGNING_METHOD(err.Error()))
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok && !token.Valid {
-		return responses.ErrorResponse(c, http.StatusUnauthorized, "Invalid token")
+		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_TOKEN())
 	}
 
 	user := new(models.User)
 	authHandler.server.DB.First(&user, int(claims["id"].(float64)))
 
 	if user.ID == 0 {
-		return responses.ErrorResponse(c, http.StatusUnauthorized, "User not found")
+		return api.WebResponse(c, http.StatusUnauthorized, api.USER_NOT_FOUND())
 	}
 
 	tokenService := tokenservice.NewTokenService(authHandler.server)
@@ -110,7 +111,7 @@ func (authHandler *AuthHandler) RefreshToken(c echo.Context) error {
 
 	res := responses.NewLoginResponse(accessToken, refreshToken, exp)
 
-	return responses.Response(c, http.StatusOK, res)
+	return api.WebResponse(c, http.StatusOK, res)
 }
 
 // Logout godoc
@@ -130,5 +131,5 @@ func (authHandler *AuthHandler) Logout(c echo.Context) error {
 
 	authHandler.server.Redis.Del(context.Background(), fmt.Sprintf("token-%d", claims.ID))
 
-	return responses.MessageResponse(c, http.StatusOK, "User logged out")
+	return api.WebResponse(c, http.StatusOK, api.USER_LOGGED_OUT())
 }

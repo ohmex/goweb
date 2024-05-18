@@ -3,8 +3,8 @@ package token
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"goweb/api"
 	"goweb/models"
 	"goweb/repositories"
 	"goweb/server"
@@ -12,7 +12,6 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"github.com/rs/zerolog/log"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -77,8 +76,6 @@ func (tokenService *Service) GenerateTokenPair(user *models.User) (accessToken, 
 }
 
 func (tokenService *Service) ParseToken(tokenString, secret string) (claims *JwtCustomClaims, err error) {
-	str := "ParseToken"
-	log.Info().Msg("Inside function" + str)
 	token, err := jwt.ParseWithClaims(tokenString, &JwtCustomClaims{},
 		func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -113,7 +110,7 @@ func (tokenService *Service) ValidateToken(claims *JwtCustomClaims, isRefresh bo
 		}
 
 		if err != nil || tokenUID != claims.UUID {
-			return errors.New("token not found")
+			return api.TOKEN_EXPIRED()
 		}
 
 		return nil
@@ -124,7 +121,7 @@ func (tokenService *Service) ValidateToken(claims *JwtCustomClaims, isRefresh bo
 		userRepository := repositories.NewUserRepository(tokenService.server.DB)
 		userRepository.GetUser(user, int(claims.ID))
 		if user.ID == 0 {
-			return errors.New("user not found")
+			return api.USER_NOT_FOUND()
 		}
 
 		return nil

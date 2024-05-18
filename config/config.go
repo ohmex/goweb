@@ -1,9 +1,8 @@
 package config
 
 import (
-	"log"
-
 	"github.com/joho/godotenv"
+	"github.com/rs/zerolog/log"
 )
 
 type Config struct {
@@ -16,7 +15,7 @@ type Config struct {
 func NewConfig() *Config {
 	err := godotenv.Load()
 	if err != nil {
-		log.Println("Error loading .env file")
+		log.Info().Msg("Error loading .env file")
 	}
 
 	return &Config{

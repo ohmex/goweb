@@ -1,11 +1,12 @@
 package handlers
 
 import (
+	"goweb/api"
 	"goweb/models"
 	"goweb/repositories"
-	"goweb/requests"
-	"goweb/responses"
 	s "goweb/server"
+	"goweb/server/requests"
+	"goweb/server/responses"
 	postservice "goweb/services/post"
 	"goweb/services/token"
 	"net/http"
@@ -43,7 +44,7 @@ func (p *PostHandlers) CreatePost(c echo.Context) error {
 	}
 
 	if err := createPostRequest.Validate(); err != nil {
-		return responses.ErrorResponse(c, http.StatusBadRequest, "Required fields are empty")
+		return api.WebResponse(c, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
 
 	user := c.Get("user").(*jwt.Token)
@@ -58,7 +59,7 @@ func (p *PostHandlers) CreatePost(c echo.Context) error {
 	postService := postservice.NewPostService(p.server.DB)
 	postService.Create(&post)
 
-	return responses.MessageResponse(c, http.StatusCreated, "Post successfully created")
+	return api.WebResponse(c, http.StatusCreated, api.RESOURCE_CREATED("Post successfully created"))
 }
 
 // DeletePost godoc
@@ -80,13 +81,13 @@ func (p *PostHandlers) DeletePost(c echo.Context) error {
 	postRepository.GetPost(&post, id)
 
 	if post.ID == 0 {
-		return responses.ErrorResponse(c, http.StatusNotFound, "Post not found")
+		return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Post not found"))
 	}
 
 	postService := postservice.NewPostService(p.server.DB)
 	postService.Delete(&post)
 
-	return responses.MessageResponse(c, http.StatusNoContent, "Post deleted successfully")
+	return api.WebResponse(c, http.StatusNoContent, api.RESOURCE_DELETED("Post deleted successfully"))
 }
 
 // GetPosts godoc
@@ -105,7 +106,7 @@ func (p *PostHandlers) GetPosts(c echo.Context) error {
 	postRepository.GetPosts(&posts)
 
 	response := responses.NewPostResponse(posts)
-	return responses.Response(c, http.StatusOK, response)
+	return api.WebResponse(c, http.StatusOK, response)
 }
 
 // UpdatePost godoc
@@ -131,7 +132,7 @@ func (p *PostHandlers) UpdatePost(c echo.Context) error {
 	}
 
 	if err := updatePostRequest.Validate(); err != nil {
-		return responses.ErrorResponse(c, http.StatusBadRequest, "Required fields are empty")
+		return api.WebResponse(c, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
 
 	post := models.Post{}
@@ -140,11 +141,11 @@ func (p *PostHandlers) UpdatePost(c echo.Context) error {
 	postRepository.GetPost(&post, id)
 
 	if post.ID == 0 {
-		return responses.ErrorResponse(c, http.StatusNotFound, "Post not found")
+		return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Post not found"))
 	}
 
 	postService := postservice.NewPostService(p.server.DB)
 	postService.Update(&post, updatePostRequest)
 
-	return responses.MessageResponse(c, http.StatusOK, "Post successfully updated")
+	return api.WebResponse(c, http.StatusOK, api.RESOURCE_CREATED("Post successfully updated"))
 }

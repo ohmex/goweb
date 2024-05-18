@@ -3,7 +3,7 @@ package interceptor
 import (
 	"context"
 	"fmt"
-	"goweb/responses"
+	"goweb/api"
 	"goweb/server"
 	"net/http"
 	"time"
@@ -27,7 +27,7 @@ func ValidateJWT(server *server.Server) echo.MiddlewareFunc {
 
 			user, err := tokenService.NewTokenService(server).ValidateToken(claims, false)
 			if err != nil {
-				return responses.ErrorResponse(c, http.StatusUnauthorized, err.Error())
+				return api.WebResponse(c, http.StatusUnauthorized, err)
 			}
 
 			c.Set("currentUser", user)

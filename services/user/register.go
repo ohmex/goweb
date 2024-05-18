@@ -1,8 +1,8 @@
 package user
 
 import (
-	"goweb/requests"
-	"goweb/server/builders"
+	"goweb/models"
+	"goweb/server/requests"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -16,10 +16,11 @@ func (userService *Service) Register(request *requests.RegisterRequest) error {
 		return err
 	}
 
-	user := builders.NewUserBuilder().SetEmail(request.Email).
-		SetName(request.Name).
-		SetPassword(string(encryptedPassword)).
-		Build()
+	user := models.User{
+		Name:     request.Name,
+		Email:    request.Email,
+		Password: string(encryptedPassword),
+	}
 
 	return userService.DB.Create(&user).Error
 }

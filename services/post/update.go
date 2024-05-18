@@ -2,7 +2,7 @@ package post
 
 import (
 	"goweb/models"
-	"goweb/requests"
+	"goweb/server/requests"
 )
 
 func (postService *Service) Update(post *models.Post, updatePostRequest *requests.UpdatePostRequest) {
