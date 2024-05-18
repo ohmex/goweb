@@ -6,7 +6,7 @@ import (
 	"goweb/repositories"
 	"goweb/requests"
 	"goweb/server"
-	"goweb/services/user"
+	"goweb/services"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -50,7 +50,7 @@ func (registerHandler *RegisterHandler) Register(c echo.Context) error {
 		return api.WebResponse(c, http.StatusBadRequest, api.USER_EXISTS())
 	}
 
-	userService := user.NewUserService(registerHandler.server.DB)
+	userService := services.NewUserService(registerHandler.server.DB)
 	if err := userService.Register(registerRequest); err != nil {
 		return api.WebResponse(c, http.StatusInternalServerError, api.INTERNAL_SERVICE_ERROR())
 	}

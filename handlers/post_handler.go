@@ -7,7 +7,7 @@ import (
 	"goweb/requests"
 	"goweb/responses"
 	"goweb/server"
-	postservice "goweb/services/post"
+	"goweb/services"
 	"goweb/services/token"
 	"net/http"
 	"strconv"
@@ -56,7 +56,7 @@ func (p *PostHandlers) CreatePost(c echo.Context) error {
 		Content: createPostRequest.Content,
 		UserID:  id,
 	}
-	postService := postservice.NewPostService(p.server.DB)
+	postService := services.NewPostService(p.server.DB)
 	postService.Create(&post)
 
 	return api.WebResponse(c, http.StatusCreated, api.RESOURCE_CREATED("Post successfully created"))
@@ -84,7 +84,7 @@ func (p *PostHandlers) DeletePost(c echo.Context) error {
 		return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Post not found"))
 	}
 
-	postService := postservice.NewPostService(p.server.DB)
+	postService := services.NewPostService(p.server.DB)
 	postService.Delete(&post)
 
 	return api.WebResponse(c, http.StatusNoContent, api.RESOURCE_DELETED("Post deleted successfully"))
@@ -144,7 +144,7 @@ func (p *PostHandlers) UpdatePost(c echo.Context) error {
 		return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Post not found"))
 	}
 
-	postService := postservice.NewPostService(p.server.DB)
+	postService := services.NewPostService(p.server.DB)
 	postService.Update(&post, updatePostRequest)
 
 	return api.WebResponse(c, http.StatusOK, api.RESOURCE_CREATED("Post successfully updated"))

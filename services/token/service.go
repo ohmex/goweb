@@ -36,12 +36,6 @@ type CachedTokens struct {
 	RefreshUID string `json:"refresh"`
 }
 
-type ServiceWrapper interface {
-	GenerateTokenPair(user *models.User) (accessToken, refreshToken string, exp int64, err error)
-	ParseToken(tokenString, secret string) (claims *jwt.MapClaims, err error)
-	ValidateToken(claims *JwtCustomClaims, isRefresh bool) error
-}
-
 type Service struct {
 	server *server.Server
 }

@@ -1,11 +1,16 @@
-package user
+package services
 
 import (
 	"goweb/models"
 	"goweb/requests"
 
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
+
+func NewUserService(db *gorm.DB) *Service {
+	return &Service{DB: db}
+}
 
 func (userService *Service) Register(request *requests.RegisterRequest) error {
 	encryptedPassword, err := bcrypt.GenerateFromPassword(
