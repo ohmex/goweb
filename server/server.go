@@ -27,11 +27,12 @@ func NewServer(cfg *config.Config) *Server {
 	adaptor, _ := gormadapter.NewAdapter("sqlite3", "casbin.db")
 	enforcer, _ := casbin.NewEnforcer("casbin/model.conf", adaptor)
 	enforcer.EnableLog(true)
+	enforcer.LoadPolicy()
+	//CreateDefaultPolicy(enforcer)
 
 	e := echo.New()
 	e.Pre(middleware.RemoveTrailingSlash())
 
-	enforcer.LoadPolicy()
 	return &Server{
 		Echo:   e,
 		DB:     db.InitDB(cfg),
@@ -43,4 +44,22 @@ func NewServer(cfg *config.Config) *Server {
 
 func (server *Server) Start(addr string) error {
 	return server.Echo.Start(":" + addr)
+}
+
+func CreateDefaultPolicy(casbin *casbin.Enforcer) {
+	casbin.AddRoleForUserInDomain("Sachin", "Admin", "Reliance")
+	casbin.AddRoleForUserInDomain("Sachin", "Admin", "More2Store")
+
+	casbin.AddRoleForUserInDomain("Anant", "Operator", "Reliance")
+	casbin.AddRoleForUserInDomain("Aditya", "Operator", "More2Store")
+
+	casbin.AddPolicy("Admin", "Reliance", "User", "Read")
+	casbin.AddPolicy("Admin", "Reliance", "User", "Write")
+	casbin.AddPolicy("Admin", "More2Store", "User", "Read")
+	casbin.AddPolicy("Admin", "More2Store", "User", "Write")
+
+	casbin.AddPolicy("Operator", "Reliance", "User", "Read")
+	casbin.AddPolicy("Operator", "More2Store", "User", "Read")
+
+	casbin.SavePolicy()
 }
