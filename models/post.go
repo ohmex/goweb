@@ -1,6 +1,13 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"goweb/api"
+	"net/http"
+
+	"github.com/go-faker/faker/v4"
+	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
+)
 
 type Post struct {
 	gorm.Model
@@ -8,4 +15,28 @@ type Post struct {
 	Content string `json:"content" gorm:"type:text"`
 	UserID  uint
 	User    User `gorm:"foreignkey:UserID"`
+}
+
+func (u Post) List(c echo.Context) error {
+	return c.String(http.StatusOK, faker.Paragraph())
+}
+
+func (u Post) Create(c echo.Context) error {
+	// do work
+	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Create post not implemented"))
+}
+
+func (u Post) Read(c echo.Context) error {
+	// do work
+	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Read post not implemented"))
+}
+
+func (u Post) Update(c echo.Context) error {
+	// do work
+	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Update post not implemented"))
+}
+
+func (u Post) Delete(c echo.Context) error {
+	// do work
+	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Delete post not implemented"))
 }

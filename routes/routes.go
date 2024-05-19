@@ -3,6 +3,7 @@ package routes
 import (
 	"goweb/handlers"
 	"goweb/interceptor"
+	"goweb/models"
 	"goweb/server"
 	"goweb/services"
 	"net/http"
@@ -15,7 +16,18 @@ import (
 )
 
 func ConfigureRoutes(server *server.Server) {
-	postHandler := handlers.NewPostHandlers(server)
+	// Configure middleware with the custom claims type
+	config := echojwt.Config{
+		NewClaimsFunc: func(c echo.Context) jwt.Claims {
+			return new(services.JwtCustomClaims)
+		},
+		SigningKey: []byte(server.Config.Auth.AccessSecret),
+	}
+	server.JwtAuthenticationMw = echojwt.WithConfig(config)
+	server.JwtAuthorizationMw = interceptor.ValidateJWT(server)
+	server.CasbinAuthorizationMw = interceptor.CasbinAuthorizer
+
+	//postHandler := handlers.NewPostHandlers(server)
 	authHandler := handlers.NewAuthHandler(server)
 	registerHandler := handlers.NewRegisterHandler(server)
 
@@ -33,27 +45,22 @@ func ConfigureRoutes(server *server.Server) {
 	server.Echo.POST("/register", registerHandler.Register)
 	server.Echo.POST("/refresh", authHandler.RefreshToken)
 
-	// Configure middleware with the custom claims type
-	config := echojwt.Config{
-		NewClaimsFunc: func(c echo.Context) jwt.Claims {
-			return new(services.JwtCustomClaims)
-		},
-		SigningKey: []byte(server.Config.Auth.AccessSecret),
-	}
-
 	protectedGroup := server.Echo.Group("")
-	protectedGroup.Use(echojwt.WithConfig(config))
-
-	protectedGroup.Use(interceptor.ValidateJWT(server))
+	protectedGroup.Use(server.JwtAuthenticationMw)
+	protectedGroup.Use(server.JwtAuthorizationMw)
 	protectedGroup.POST("/logout", authHandler.Logout)
 
-	apiGroup := server.Echo.Group("/api")
-	apiGroup.Use(echojwt.WithConfig(config))
-	apiGroup.Use(interceptor.ValidateJWT(server))
-	apiGroup.Use(interceptor.CasbinAuthorizer)
+	AddResource(server, "/post", models.Post{})
+}
 
-	apiGroup.GET("/posts", postHandler.GetPosts)
-	apiGroup.POST("/posts", postHandler.CreatePost)
-	apiGroup.DELETE("/posts/:id", postHandler.DeletePost)
-	apiGroup.PUT("/posts/:id", postHandler.UpdatePost)
+func AddResource(server *server.Server, p string, r models.Resource) {
+	group := server.Echo.Group("/api" + p)
+	group.Use(server.JwtAuthenticationMw)
+	group.Use(server.JwtAuthorizationMw)
+	group.Use(server.CasbinAuthorizationMw)
+	group.GET("", r.List)          // Respond back with a the List of Resource
+	group.GET("/:id", r.Read)      // Read a single Resource identified by id
+	group.POST("", r.Create)       // Create a new Resource
+	group.PUT("/:id", r.Update)    // Update an existing Resource identified by id
+	group.DELETE("/:id", r.Delete) // Delete a single Resource identified by id
 }
