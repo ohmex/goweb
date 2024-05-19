@@ -88,12 +88,12 @@ func RESOURCE_NOT_FOUND(s ...string) Response {
 	return Response{Code: 100009, Err: data, Msg: ""}
 }
 
-func RESOURCE_DELETED(s ...string) Response {
-	data := "Resource deleted"
+func CASBIN_UNAUTHORIZED(s ...string) Response {
+	data := "Access denied - resource authorization failed"
 	if s != nil {
 		data = s[0]
 	}
-	return Response{Code: 100010, Err: data, Msg: ""}
+	return Response{Code: 100011, Err: data, Msg: ""}
 }
 
 // SUCCESS Responses Start from 200000
@@ -113,10 +113,18 @@ func RESOURCE_CREATED(s ...string) Response {
 	return Response{Code: 200001, Err: "", Msg: data}
 }
 
+func RESOURCE_DELETED(s ...string) Response {
+	data := "Resource deleted"
+	if s != nil {
+		data = s[0]
+	}
+	return Response{Code: 200002, Err: "", Msg: data}
+}
+
 func USER_LOGGED_OUT(s ...string) Response {
 	data := "User logged out"
 	if s != nil {
 		data = s[0]
 	}
-	return Response{Code: 200002, Err: "", Msg: data}
+	return Response{Code: 200003, Err: "", Msg: data}
 }

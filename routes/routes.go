@@ -10,7 +10,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
-
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
@@ -22,7 +21,10 @@ func ConfigureRoutes(server *server.Server) {
 
 	server.Echo.Use(middleware.Logger())
 
-	server.Echo.GET("/", func(ctx echo.Context) error {
+	server.Echo.GET("", func(ctx echo.Context) error {
+		return ctx.String(http.StatusOK, "Welcome to HOME!")
+	})
+	server.Echo.GET("/hello", func(ctx echo.Context) error {
 		return ctx.String(http.StatusOK, "Hello, World!")
 	})
 	server.Echo.GET("/swagger/*", echoSwagger.WrapHandler)
@@ -42,11 +44,16 @@ func ConfigureRoutes(server *server.Server) {
 	protectedGroup := server.Echo.Group("")
 	protectedGroup.Use(echojwt.WithConfig(config))
 
-	// Below APIs must validtae the JWT @ REDIS & DB
 	protectedGroup.Use(interceptor.ValidateJWT(server))
 	protectedGroup.POST("/logout", authHandler.Logout)
-	protectedGroup.GET("/posts", postHandler.GetPosts)
-	protectedGroup.POST("/posts", postHandler.CreatePost)
-	protectedGroup.DELETE("/posts/:id", postHandler.DeletePost)
-	protectedGroup.PUT("/posts/:id", postHandler.UpdatePost)
+
+	apiGroup := server.Echo.Group("/api")
+	apiGroup.Use(echojwt.WithConfig(config))
+	apiGroup.Use(interceptor.ValidateJWT(server))
+	apiGroup.Use(interceptor.CasbinAuthorizer)
+
+	apiGroup.GET("/posts", postHandler.GetPosts)
+	apiGroup.POST("/posts", postHandler.CreatePost)
+	apiGroup.DELETE("/posts/:id", postHandler.DeletePost)
+	apiGroup.PUT("/posts/:id", postHandler.UpdatePost)
 }
