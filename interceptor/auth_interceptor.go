@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"goweb/api"
 	"goweb/server"
+	"goweb/services"
 	"net/http"
 	"time"
-
-	tokenService "goweb/services/token"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
@@ -23,9 +22,9 @@ func ValidateJWT(server *server.Server) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			token := c.Get("user").(*jwt.Token)
-			claims := token.Claims.(*tokenService.JwtCustomClaims)
+			claims := token.Claims.(*services.JwtCustomClaims)
 
-			user, err := tokenService.NewTokenService(server).ValidateToken(claims, false)
+			user, err := services.NewTokenService(server).ValidateToken(claims, false)
 			if err != nil {
 				return api.WebResponse(c, http.StatusUnauthorized, err)
 			}
@@ -33,7 +32,7 @@ func ValidateJWT(server *server.Server) echo.MiddlewareFunc {
 			c.Set("currentUser", user)
 
 			go func() {
-				server.Redis.Expire(context.Background(), fmt.Sprintf("token-%d", claims.ID), time.Minute*tokenService.AutoLogoffMinutes)
+				server.Redis.Expire(context.Background(), fmt.Sprintf("token-%d", claims.ID), time.Minute*services.AutoLogoffMinutes)
 			}()
 
 			return next(c)

@@ -8,7 +8,6 @@ import (
 	"goweb/responses"
 	"goweb/server"
 	"goweb/services"
-	"goweb/services/token"
 	"net/http"
 	"strconv"
 
@@ -48,7 +47,7 @@ func (p *PostHandlers) CreatePost(c echo.Context) error {
 	}
 
 	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(*token.JwtCustomClaims)
+	claims := user.Claims.(*services.JwtCustomClaims)
 	id := claims.ID
 
 	post := models.Post{

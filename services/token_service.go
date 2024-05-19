@@ -1,4 +1,4 @@
-package token
+package services
 
 import (
 	"context"
@@ -36,17 +36,17 @@ type CachedTokens struct {
 	RefreshUID string `json:"refresh"`
 }
 
-type Service struct {
+type TokenService struct {
 	server *server.Server
 }
 
-func NewTokenService(server *server.Server) *Service {
-	return &Service{
+func NewTokenService(server *server.Server) *TokenService {
+	return &TokenService{
 		server: server,
 	}
 }
 
-func (tokenService *Service) GenerateTokenPair(user *models.User) (accessToken, refreshToken string, exp int64, err error) {
+func (tokenService *TokenService) GenerateTokenPair(user *models.User) (accessToken, refreshToken string, exp int64, err error) {
 	var accessUID, refreshUID string
 
 	if accessToken, accessUID, exp, err = tokenService.createToken(user, ExpireAccessMinutes,
@@ -69,7 +69,7 @@ func (tokenService *Service) GenerateTokenPair(user *models.User) (accessToken, 
 	return
 }
 
-func (tokenService *Service) ParseToken(tokenString, secret string) (claims *JwtCustomClaims, err error) {
+func (tokenService *TokenService) ParseToken(tokenString, secret string) (claims *JwtCustomClaims, err error) {
 	token, err := jwt.ParseWithClaims(tokenString, &JwtCustomClaims{},
 		func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -88,7 +88,7 @@ func (tokenService *Service) ParseToken(tokenString, secret string) (claims *Jwt
 	return nil, err
 }
 
-func (tokenService *Service) ValidateToken(claims *JwtCustomClaims, isRefresh bool) (user *models.User, err error) {
+func (tokenService *TokenService) ValidateToken(claims *JwtCustomClaims, isRefresh bool) (user *models.User, err error) {
 	var g errgroup.Group
 
 	g.Go(func() error {
@@ -126,7 +126,7 @@ func (tokenService *Service) ValidateToken(claims *JwtCustomClaims, isRefresh bo
 	return user, err
 }
 
-func (tokenService *Service) createToken(user *models.User, expireMinutes int, secret string) (token, uid string, exp int64, err error) {
+func (tokenService *TokenService) createToken(user *models.User, expireMinutes int, secret string) (token, uid string, exp int64, err error) {
 	expiry := time.Now().Add(time.Minute * time.Duration(expireMinutes))
 	uid = uuid.New().String()
 

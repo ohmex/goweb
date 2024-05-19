@@ -8,11 +8,15 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewUserService(db *gorm.DB) *Service {
-	return &Service{DB: db}
+type UserService struct {
+	DB *gorm.DB
 }
 
-func (userService *Service) Register(request *requests.RegisterRequest) error {
+func NewUserService(db *gorm.DB) *UserService {
+	return &UserService{DB: db}
+}
+
+func (userService *UserService) Register(request *requests.RegisterRequest) error {
 	encryptedPassword, err := bcrypt.GenerateFromPassword(
 		[]byte(request.Password),
 		bcrypt.DefaultCost,

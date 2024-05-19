@@ -4,7 +4,7 @@ import (
 	"goweb/handlers"
 	"goweb/interceptor"
 	"goweb/server"
-	"goweb/services/token"
+	"goweb/services"
 	"net/http"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -34,7 +34,7 @@ func ConfigureRoutes(server *server.Server) {
 	// Configure middleware with the custom claims type
 	config := echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
-			return new(token.JwtCustomClaims)
+			return new(services.JwtCustomClaims)
 		},
 		SigningKey: []byte(server.Config.Auth.AccessSecret),
 	}

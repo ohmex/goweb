@@ -7,19 +7,23 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewPostService(db *gorm.DB) *Service {
-	return &Service{DB: db}
+type PostService struct {
+	DB *gorm.DB
 }
 
-func (postService *Service) Create(post *models.Post) {
+func NewPostService(db *gorm.DB) *PostService {
+	return &PostService{DB: db}
+}
+
+func (postService *PostService) Create(post *models.Post) {
 	postService.DB.Create(post)
 }
 
-func (postService *Service) Delete(post *models.Post) {
+func (postService *PostService) Delete(post *models.Post) {
 	postService.DB.Delete(post)
 }
 
-func (postService *Service) Update(post *models.Post, updatePostRequest *requests.UpdatePostRequest) {
+func (postService *PostService) Update(post *models.Post, updatePostRequest *requests.UpdatePostRequest) {
 	post.Content = updatePostRequest.Content
 	post.Title = updatePostRequest.Title
 	postService.DB.Save(post)

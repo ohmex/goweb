@@ -9,12 +9,11 @@ import (
 	"goweb/requests"
 	"goweb/responses"
 	"goweb/server"
-	tokenservice "goweb/services/token"
+	"goweb/services"
 	"net/http"
 
-	"github.com/labstack/echo/v4"
-
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -56,7 +55,7 @@ func (authHandler *AuthHandler) Login(c echo.Context) error {
 		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_CREDENTIALS())
 	}
 
-	tokenService := tokenservice.NewTokenService(authHandler.server)
+	tokenService := services.NewTokenService(authHandler.server)
 
 	accessToken, refreshToken, exp, _ := tokenService.GenerateTokenPair(&user)
 
@@ -105,7 +104,7 @@ func (authHandler *AuthHandler) RefreshToken(c echo.Context) error {
 		return api.WebResponse(c, http.StatusUnauthorized, api.USER_NOT_FOUND())
 	}
 
-	tokenService := tokenservice.NewTokenService(authHandler.server)
+	tokenService := services.NewTokenService(authHandler.server)
 
 	accessToken, refreshToken, exp, _ := tokenService.GenerateTokenPair(user)
 
@@ -127,7 +126,7 @@ func (authHandler *AuthHandler) RefreshToken(c echo.Context) error {
 // @Router /logout [post]
 func (authHandler *AuthHandler) Logout(c echo.Context) error {
 	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(*tokenservice.JwtCustomClaims)
+	claims := user.Claims.(*services.JwtCustomClaims)
 
 	authHandler.server.Redis.Del(context.Background(), fmt.Sprintf("token-%d", claims.ID))
 
