@@ -1,6 +1,7 @@
 package models
 
 import (
+	"goweb/api"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -18,25 +19,25 @@ type BaseResource struct{}
 
 // List default implementation. Returns a 404
 func (v BaseResource) List(c echo.Context) error {
-	return echo.NewHTTPError(http.StatusNotFound, "resource not implemented")
+	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Resource not implemented"))
 }
 
 // Create default implementation. Returns a 404
 func (v BaseResource) Create(c echo.Context) error {
-	return echo.NewHTTPError(http.StatusNotFound, "resource not implemented")
+	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Resource not implemented"))
 }
 
 // Show default implementation. Returns a 404
 func (v BaseResource) Read(c echo.Context) error {
-	return echo.NewHTTPError(http.StatusNotFound, "resource not implemented")
+	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Resource not implemented"))
 }
 
 // Update default implementation. Returns a 404
 func (v BaseResource) Update(c echo.Context) error {
-	return echo.NewHTTPError(http.StatusNotFound, "resource not implemented")
+	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Resource not implemented"))
 }
 
 // Delete default implementation. Returns a 404
 func (v BaseResource) Delete(c echo.Context) error {
-	return echo.NewHTTPError(http.StatusNotFound, "resource not implemented")
+	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Resource not implemented"))
 }
