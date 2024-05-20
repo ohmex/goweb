@@ -4,7 +4,7 @@ import (
 	"goweb/api"
 	"net/http"
 
-	"github.com/go-faker/faker/v4"
+	"github.com/brianvoe/gofakeit/v7"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
@@ -18,7 +18,7 @@ type Post struct {
 }
 
 func (u Post) List(c echo.Context) error {
-	return c.String(http.StatusOK, faker.Paragraph())
+	return c.String(http.StatusOK, gofakeit.Paragraph(100, 10, 10, " "))
 }
 
 func (u Post) Create(c echo.Context) error {

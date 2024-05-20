@@ -3,9 +3,9 @@ module goweb
 go 1.22.2
 
 require (
+	github.com/brianvoe/gofakeit/v7 v7.0.3
 	github.com/casbin/casbin/v2 v2.89.0
 	github.com/casbin/gorm-adapter/v3 v3.24.0
-	github.com/go-faker/faker/v4 v4.4.1
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/uuid v1.6.0
