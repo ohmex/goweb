@@ -19,10 +19,16 @@ const ExpireAccessMinutes = 30
 const ExpireRefreshMinutes = 2 * 60
 const AutoLogoffMinutes = 10
 
+type Domain struct {
+	UUID string
+	Name string
+}
+
 type JwtCustomClaims struct {
-	ID   uint   `json:"id"`
-	UUID string `json:"uuid"`
-	Name string `json:"name"`
+	ID      uint     `json:"id"`
+	UUID    string   `json:"uuid"`
+	Name    string   `json:"name"`
+	Tenants []Domain `json:"tenants"`
 	jwt.RegisteredClaims
 }
 
@@ -126,14 +132,22 @@ func (tokenService *TokenService) ValidateToken(claims *JwtCustomClaims, isRefre
 	return user, err
 }
 
-func (tokenService *TokenService) createToken(user *models.User, expireMinutes int, secret string) (token, uid string, exp int64, err error) {
+func (tokenService *TokenService) createToken(user *models.User, expireMinutes int, secret string) (token, tokenUuid string, exp int64, err error) {
 	expiry := time.Now().Add(time.Minute * time.Duration(expireMinutes))
-	uid = uuid.New().String()
+	tokenUuid = uuid.New().String()
+
+	tokenService.server.DB.Preload("Tenants").Where(user).Find(user)
+
+	var tenants []Domain
+	for _, e := range user.Tenants {
+		tenants = append(tenants, Domain{e.Name, e.UUID.String()})
+	}
 
 	claims := &JwtCustomClaims{
 		user.ID,
-		uid,
+		tokenUuid,
 		user.Name,
+		tenants,
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiry),
 		},
