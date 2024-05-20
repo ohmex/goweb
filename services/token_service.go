@@ -139,7 +139,7 @@ func (tokenService *TokenService) createToken(user *models.User, expireMinutes i
 		},
 	}
 	exp = expiry.Unix()
-	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 	token, err = jwtToken.SignedString([]byte(secret))
 
 	return

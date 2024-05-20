@@ -21,8 +21,9 @@ func ConfigureRoutes(server *server.Server) {
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return new(services.JwtCustomClaims)
 		},
-		ContextKey: "token",
-		SigningKey: []byte(server.Config.Auth.AccessSecret),
+		ContextKey:    "token",
+		SigningMethod: jwt.SigningMethodHS512.Name,
+		SigningKey:    []byte(server.Config.Auth.AccessSecret),
 	}
 	server.JwtAuthenticationMw = echojwt.WithConfig(config)
 	server.JwtAuthorizationMw = interceptor.ValidateJWT(server)
