@@ -14,14 +14,14 @@ import (
 )
 
 // Middleware for additional steps:
-// 1. Check the user exists in DB
-// 2. Check the token info exists in Redis
-// 3. Add the user DB data to Context
+// 1. Check the token info exists in Redis
+// 2. Check the user exists in DB
+// 3. Add the user data to Echo Context
 // 4. Prolong the Redis TTL of the current token pair
 func ValidateJWT(server *server.Server) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			token := c.Get("user").(*jwt.Token)
+			token := c.Get("token").(*jwt.Token)
 			claims := token.Claims.(*services.JwtCustomClaims)
 
 			user, err := services.NewTokenService(server).ValidateToken(claims, false)
@@ -29,7 +29,7 @@ func ValidateJWT(server *server.Server) echo.MiddlewareFunc {
 				return api.WebResponse(c, http.StatusUnauthorized, err)
 			}
 
-			c.Set("currentUser", user)
+			c.Set("user", user)
 
 			go func() {
 				server.Redis.Expire(context.Background(), fmt.Sprintf("token-%d", claims.ID), time.Minute*services.AutoLogoffMinutes)

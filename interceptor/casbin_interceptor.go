@@ -34,7 +34,7 @@ func CasbinAuthorizer(next echo.HandlerFunc) echo.HandlerFunc {
 		// 	return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		// }
 
-		user := c.Get("user").(*jwt.Token)
+		user := c.Get("token").(*jwt.Token)
 		claims := user.Claims.(*services.JwtCustomClaims)
 
 		log.Info().Interface("Claims", claims).Send()
