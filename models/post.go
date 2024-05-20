@@ -6,11 +6,10 @@ import (
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/labstack/echo/v4"
-	"gorm.io/gorm"
 )
 
 type Post struct {
-	gorm.Model
+	Base
 	Title   string `json:"title" gorm:"type:text"`
 	Content string `json:"content" gorm:"type:text"`
 	UserID  uint

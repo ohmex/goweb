@@ -6,11 +6,10 @@ import (
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/labstack/echo/v4"
-	"gorm.io/gorm"
 )
 
 type Tenant struct {
-	gorm.Model
+	Base
 	Name  string  `json:"name" gorm:"type:text"`
 	Users []*User `json:"users" gorm:"many2many:tenant_user;"`
 }
