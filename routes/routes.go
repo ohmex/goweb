@@ -27,9 +27,8 @@ func ConfigureRoutes(server *server.Server) {
 	}
 	server.JwtAuthenticationMw = echojwt.WithConfig(config)
 	server.JwtAuthorizationMw = interceptor.ValidateJWT(server)
-	server.CasbinAuthorizationMw = interceptor.CasbinAuthorizer
+	server.CasbinAuthorizationMw = interceptor.CasbinAuthorizer(server)
 
-	//postHandler := handlers.NewPostHandlers(server)
 	authHandler := handlers.NewAuthHandler(server)
 	registerHandler := handlers.NewRegisterHandler(server)
 
@@ -37,9 +36,6 @@ func ConfigureRoutes(server *server.Server) {
 
 	server.Echo.GET("", func(ctx echo.Context) error {
 		return ctx.String(http.StatusOK, "Welcome to HOME!")
-	})
-	server.Echo.GET("/hello", func(ctx echo.Context) error {
-		return ctx.String(http.StatusOK, "Hello, World!")
 	})
 	server.Echo.GET("/swagger/*", echoSwagger.WrapHandler)
 
