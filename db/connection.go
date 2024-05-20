@@ -3,10 +3,14 @@ package db
 import (
 	"fmt"
 	"goweb/config"
+	"log"
+	"os"
+	"time"
 
 	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func InitDB(cfg *config.Config) *gorm.DB {
@@ -17,7 +21,18 @@ func InitDB(cfg *config.Config) *gorm.DB {
 		cfg.DB.Port,
 		cfg.DB.Name)
 
-	db, err := gorm.Open(mysql.Open(dataSourceName), &gorm.Config{})
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+		logger.Config{
+			SlowThreshold:             time.Second,   // Slow SQL threshold
+			LogLevel:                  logger.Silent, // Log level: Silent, Error, Warn, Info
+			IgnoreRecordNotFoundError: true,          // Ignore ErrRecordNotFound error for logger
+			ParameterizedQueries:      false,         // Don't include params in the SQL log
+			Colorful:                  true,          // Disable color
+		},
+	)
+
+	db, err := gorm.Open(mysql.Open(dataSourceName), &gorm.Config{Logger: newLogger})
 	if err != nil {
 		panic(err.Error())
 	}

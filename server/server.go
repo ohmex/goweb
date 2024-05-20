@@ -3,6 +3,7 @@ package server
 import (
 	"goweb/config"
 	"goweb/db"
+	"goweb/models"
 
 	"github.com/casbin/casbin/v2"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
@@ -27,10 +28,8 @@ type Server struct {
 func NewServer(cfg *config.Config) *Server {
 	adaptor, _ := gormadapter.NewAdapter("sqlite3", "casbin.db")
 	enforcer, _ := casbin.NewEnforcer("casbin/model.conf", adaptor)
-	enforcer.EnableLog(true)
+	//enforcer.EnableLog(true)
 	enforcer.LoadPolicy()
-	//CreateDefaultPolicy(enforcer)
-	//TestPolicy(enforcer)
 
 	e := echo.New()
 	e.Pre(middleware.RemoveTrailingSlash())
@@ -45,6 +44,10 @@ func NewServer(cfg *config.Config) *Server {
 }
 
 func (server *Server) Start(addr string) error {
+	//CreateDefaultPolicy(enforcer)
+	//TestPolicy(enforcer)
+	TestTableData(server.DB)
+
 	return server.Echo.Start(":" + addr)
 }
 
@@ -115,4 +118,16 @@ func TestPolicy(casbin *casbin.Enforcer) {
 	log.Info().Interface("UserF", permissions).Send()
 	permissions = casbin.GetPermissionsForUserInDomain("UserF", "DMart")
 	log.Info().Interface("UserF", permissions).Send()
+}
+
+func TestTableData(db *gorm.DB) {
+	var users []*models.User
+
+	//db.Find(&users, "name = ?", "Sachin")
+	//db.Where("name = ?", "Sachin").Find(&users)
+	//db.Preload("Tenants").Where("name = ?", "Sachin").Find(&users)
+
+	db.Preload("Tenants").Where("name = ?", "Sachin").Find(&users)
+
+	log.Info().Interface("USERS", users).Send()
 }
