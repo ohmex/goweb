@@ -19,9 +19,15 @@ const ExpireAccessMinutes = 30
 const ExpireRefreshMinutes = 2 * 60
 const AutoLogoffMinutes = 10
 
+type Permission struct {
+	Obj string
+	Act string
+}
+
 type Domain struct {
-	UUID string
-	Name string
+	UUID        string
+	Name        string
+	Permissions []Permission
 }
 
 type JwtCustomClaims struct {
@@ -140,7 +146,12 @@ func (tokenService *TokenService) createToken(user *models.User, expireMinutes i
 
 	var tenants []Domain
 	for _, e := range user.Tenants {
-		tenants = append(tenants, Domain{e.Name, e.UUID.String()})
+		permissions := tokenService.server.Casbin.GetPermissionsForUserInDomain(user.Name, e.Name)
+		var perms []Permission
+		for _, p := range permissions {
+			perms = append(perms, Permission{p[2], p[3]})
+		}
+		tenants = append(tenants, Domain{e.UUID.String(), e.Name, perms})
 	}
 
 	claims := &JwtCustomClaims{
