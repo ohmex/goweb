@@ -18,7 +18,7 @@ type Post struct {
 }
 
 func (u Post) List(c echo.Context) error {
-	return c.String(http.StatusOK, gofakeit.Paragraph(100, 10, 10, " "))
+	return api.WebResponse(c, http.StatusOK, api.STATUS_OK(gofakeit.Paragraph(100, 10, 10, " ")))
 }
 
 func (u Post) Create(c echo.Context) error {
