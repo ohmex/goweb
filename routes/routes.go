@@ -49,7 +49,7 @@ func ConfigureRoutes(server *server.Server) {
 	protectedGroup.POST("/logout", authHandler.Logout)
 
 	AddResource(server, "/user", models.User{})
-	AddResource(server, "/post", models.Post{})
+	//AddResource(server, "/post", models.Post{})
 }
 
 func AddResource(server *server.Server, p string, r models.Resource) {
@@ -57,9 +57,9 @@ func AddResource(server *server.Server, p string, r models.Resource) {
 	group.Use(server.JwtAuthenticationMw)
 	group.Use(server.JwtAuthorizationMw)
 	group.Use(server.CasbinAuthorizationMw)
-	group.GET("", r.List)          // Respond back with a the List of Resource
-	group.GET("/:id", r.Read)      // Read a single Resource identified by id
-	group.POST("", r.Create)       // Create a new Resource
-	group.PUT("/:id", r.Update)    // Update an existing Resource identified by id
-	group.DELETE("/:id", r.Delete) // Delete a single Resource identified by id
+	group.GET("", r.List(server), interceptor.AuthorizeResource(server, r.Type(), "List"))            // Respond back with a the List of Resource
+	group.GET("/:id", r.Read(server), interceptor.AuthorizeResource(server, r.Type(), "Read"))        // Read a single Resource identified by id
+	group.POST("", r.Create(server), interceptor.AuthorizeResource(server, r.Type(), "Create"))       // Create a new Resource
+	group.PUT("/:id", r.Update(server), interceptor.AuthorizeResource(server, r.Type(), "Update"))    // Update an existing Resource identified by id
+	group.DELETE("/:id", r.Delete(server), interceptor.AuthorizeResource(server, r.Type(), "Delete")) // Delete a single Resource identified by id
 }

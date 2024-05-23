@@ -1,43 +1,16 @@
 package models
 
 import (
-	"goweb/api"
-	"net/http"
+	"goweb/server"
 
 	"github.com/labstack/echo/v4"
 )
 
 type Resource interface {
-	List(echo.Context) error
-	Create(echo.Context) error
-	Read(echo.Context) error
-	Update(echo.Context) error
-	Delete(echo.Context) error
-}
-
-type BaseResource struct{}
-
-// List default implementation. Returns a 404
-func (v BaseResource) List(c echo.Context) error {
-	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Resource not implemented"))
-}
-
-// Create default implementation. Returns a 404
-func (v BaseResource) Create(c echo.Context) error {
-	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Resource not implemented"))
-}
-
-// Show default implementation. Returns a 404
-func (v BaseResource) Read(c echo.Context) error {
-	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Resource not implemented"))
-}
-
-// Update default implementation. Returns a 404
-func (v BaseResource) Update(c echo.Context) error {
-	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Resource not implemented"))
-}
-
-// Delete default implementation. Returns a 404
-func (v BaseResource) Delete(c echo.Context) error {
-	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Resource not implemented"))
+	Type() string
+	List(server *server.Server) func(echo.Context) error
+	Create(server *server.Server) func(echo.Context) error
+	Read(server *server.Server) func(echo.Context) error
+	Update(server *server.Server) func(echo.Context) error
+	Delete(server *server.Server) func(echo.Context) error
 }

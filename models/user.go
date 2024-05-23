@@ -2,8 +2,10 @@ package models
 
 import (
 	"goweb/api"
+	"goweb/server"
 	"net/http"
 
+	"github.com/brianvoe/gofakeit/v7"
 	"github.com/labstack/echo/v4"
 )
 
@@ -16,26 +18,36 @@ type User struct {
 	Posts    []*Post   `json:"posts"`
 }
 
-func (u User) List(c echo.Context) error {
-	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("List users not implemented"))
+func (u User) Type() string {
+	return "User"
 }
 
-func (u User) Create(c echo.Context) error {
-	// do work
-	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Create user not implemented"))
+func (u User) List(server *server.Server) func(echo.Context) error {
+	return func(e echo.Context) error {
+		return api.WebResponse(e, http.StatusOK, api.STATUS_OK(gofakeit.Sentence(100)))
+	}
 }
 
-func (u User) Read(c echo.Context) error {
-	// do work
-	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Read user not implemented"))
+func (u User) Create(server *server.Server) func(echo.Context) error {
+	return func(e echo.Context) error {
+		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Create user not implemented"))
+	}
 }
 
-func (u User) Update(c echo.Context) error {
-	// do work
-	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Update user not implemented"))
+func (u User) Read(server *server.Server) func(echo.Context) error {
+	return func(e echo.Context) error {
+		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Read user not implemented"))
+	}
 }
 
-func (u User) Delete(c echo.Context) error {
-	// do work
-	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Delete user not implemented"))
+func (u User) Update(server *server.Server) func(echo.Context) error {
+	return func(e echo.Context) error {
+		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Update user not implemented"))
+	}
+}
+
+func (u User) Delete(server *server.Server) func(echo.Context) error {
+	return func(e echo.Context) error {
+		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Delete user not implemented"))
+	}
 }

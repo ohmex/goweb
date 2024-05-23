@@ -2,6 +2,7 @@ package models
 
 import (
 	"goweb/api"
+	"goweb/server"
 	"net/http"
 
 	"github.com/brianvoe/gofakeit/v7"
@@ -16,26 +17,32 @@ type Post struct {
 	User    User `gorm:"foreignkey:UserID"`
 }
 
-func (u Post) List(c echo.Context) error {
-	return api.WebResponse(c, http.StatusOK, api.STATUS_OK(gofakeit.Paragraph(100, 10, 10, " ")))
+func (p Post) List(server *server.Server) func(echo.Context) error {
+	return func(e echo.Context) error {
+		return api.WebResponse(e, http.StatusOK, api.STATUS_OK(gofakeit.Paragraph(100, 10, 10, " ")))
+	}
 }
 
-func (u Post) Create(c echo.Context) error {
-	// do work
-	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Create post not implemented"))
+func (p Post) Create(server *server.Server) func(echo.Context) error {
+	return func(e echo.Context) error {
+		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Create post not implemented"))
+	}
 }
 
-func (u Post) Read(c echo.Context) error {
-	// do work
-	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Read post not implemented"))
+func (p Post) Read(server *server.Server) func(echo.Context) error {
+	return func(e echo.Context) error {
+		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Read post not implemented"))
+	}
 }
 
-func (u Post) Update(c echo.Context) error {
-	// do work
-	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Update post not implemented"))
+func (p Post) Update(server *server.Server) func(echo.Context) error {
+	return func(e echo.Context) error {
+		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Update post not implemented"))
+	}
 }
 
-func (u Post) Delete(c echo.Context) error {
-	// do work
-	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Delete post not implemented"))
+func (p Post) Delete(server *server.Server) func(echo.Context) error {
+	return func(e echo.Context) error {
+		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Delete post not implemented"))
+	}
 }

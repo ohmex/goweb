@@ -125,7 +125,7 @@ func (authHandler *AuthHandler) RefreshToken(c echo.Context) error {
 // @Security ApiKeyAuth
 // @Router /logout [post]
 func (authHandler *AuthHandler) Logout(c echo.Context) error {
-	user := c.Get("user").(*jwt.Token)
+	user := c.Get("token").(*jwt.Token)
 	claims := user.Claims.(*services.JwtCustomClaims)
 
 	authHandler.server.Redis.Del(context.Background(), fmt.Sprintf("token-%d", claims.ID))

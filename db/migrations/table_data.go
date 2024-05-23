@@ -27,10 +27,12 @@ func (TableData) Up(db *gorm.DB) {
 	reliance := models.Tenant{Name: "Reliance"}
 	db.Create(&reliance)
 	relianceUUID := reliance.UUID.String() //Get UUID port creating table
+	casbin.AddPolicy("Admin", relianceUUID, "User", "List")
 	casbin.AddPolicy("Admin", relianceUUID, "User", "Read")
 	casbin.AddPolicy("Admin", relianceUUID, "User", "Create")
 	casbin.AddPolicy("Admin", relianceUUID, "User", "Update")
 	casbin.AddPolicy("Admin", relianceUUID, "User", "Delete")
+	casbin.AddPolicy("Manager", relianceUUID, "User", "List")
 	casbin.AddPolicy("Manager", relianceUUID, "User", "Read")
 	casbin.AddPolicy("Manager", relianceUUID, "User", "Update")
 	casbin.AddPolicy("Operator", relianceUUID, "User", "Read")
@@ -38,10 +40,12 @@ func (TableData) Up(db *gorm.DB) {
 	dmart := models.Tenant{Name: "DMart"}
 	db.Create(&dmart)
 	dmartUUID := dmart.UUID.String() //Get UUID port creating table
+	casbin.AddPolicy("Admin", dmartUUID, "User", "List")
 	casbin.AddPolicy("Admin", dmartUUID, "User", "Read")
 	casbin.AddPolicy("Admin", dmartUUID, "User", "Create")
 	casbin.AddPolicy("Admin", dmartUUID, "User", "Update")
 	casbin.AddPolicy("Admin", dmartUUID, "User", "Delete")
+	casbin.AddPolicy("Manager", dmartUUID, "User", "List")
 	casbin.AddPolicy("Manager", dmartUUID, "User", "Read")
 	casbin.AddPolicy("Manager", dmartUUID, "User", "Update")
 	casbin.AddPolicy("Operator", dmartUUID, "User", "Read")
