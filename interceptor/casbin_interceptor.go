@@ -13,11 +13,11 @@ import (
 func CasbinAuthorizer(server *server.Server) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			// Get tenant from header, LATER this must be UUID
+			// Get tenant from header identified by UUID
 			tenant := c.Request().Header.Get("tenant")
 
-			// Get user name, LATER this must UUID
-			user := c.Get("user").(*models.User).Name
+			// Get user name as UUID
+			user := c.Get("user").(*models.User).UUID.String()
 
 			// Check, user though mabe assiciated with a tenant in DB
 			// Does he has casbin domain assigned to him or not
