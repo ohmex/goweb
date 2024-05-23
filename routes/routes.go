@@ -48,6 +48,7 @@ func ConfigureRoutes(server *server.Server) {
 	protectedGroup.Use(server.JwtAuthorizationMw)
 	protectedGroup.POST("/logout", authHandler.Logout)
 
+	AddResource(server, "/user", models.User{})
 	AddResource(server, "/post", models.Post{})
 }
 

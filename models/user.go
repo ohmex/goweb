@@ -17,7 +17,7 @@ type User struct {
 }
 
 func (u User) List(c echo.Context) error {
-	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Create user not implemented"))
+	return api.WebResponse(c, http.StatusNotFound, api.RESOURCE_NOT_FOUND("List users not implemented"))
 }
 
 func (u User) Create(c echo.Context) error {
