@@ -52,6 +52,9 @@ func (server *Server) Start(addr string) error {
 }
 
 func CreateDefaultPolicy(casbin *casbin.Enforcer) {
+	// Admin on a domain can have all rights
+	// These are added automatically as a tenant is added
+	// Also as a tenant is added, its Admin has to be added with these permissions
 	casbin.AddPolicy("Admin", "DMart", "User", "Read")
 	casbin.AddPolicy("Admin", "DMart", "User", "Create")
 	casbin.AddPolicy("Admin", "DMart", "User", "Update")
@@ -61,6 +64,7 @@ func CreateDefaultPolicy(casbin *casbin.Enforcer) {
 	casbin.AddPolicy("Admin", "Reliance", "User", "Update")
 	casbin.AddPolicy("Admin", "Reliance", "User", "Delete")
 
+	// This gets added as default for Manager of Tenant
 	casbin.AddPolicy("Manager", "Reliance", "User", "Read")
 	casbin.AddPolicy("Manager", "Reliance", "User", "Update")
 	casbin.AddPolicy("Manager", "DMart", "User", "Read")
@@ -69,6 +73,7 @@ func CreateDefaultPolicy(casbin *casbin.Enforcer) {
 	casbin.AddPolicy("Operator", "Reliance", "User", "Read")
 	casbin.AddPolicy("Operator", "DMart", "User", "Read")
 
+	// These will have to be added when a user for a tenant is added
 	casbin.AddRoleForUserInDomain("Sachin", "Admin", "Reliance")
 	casbin.AddRoleForUserInDomain("Sachin", "Admin", "DMart")
 
