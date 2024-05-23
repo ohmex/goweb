@@ -26,8 +26,8 @@ func ConfigureRoutes(server *server.Server) {
 		SigningKey:    []byte(server.Config.Auth.AccessSecret),
 	}
 	server.JwtAuthenticationMw = echojwt.WithConfig(config)
-	server.JwtAuthorizationMw = interceptor.ValidateJWT(server)
-	server.CasbinAuthorizationMw = interceptor.CasbinAuthorizer(server)
+	server.JwtAuthorizationMw = interceptor.JwtAuthorization(server)
+	server.CasbinAuthorizationMw = interceptor.CasbinAuthorization(server)
 
 	authHandler := handlers.NewAuthHandler(server)
 	registerHandler := handlers.NewRegisterHandler(server)
@@ -57,9 +57,9 @@ func AddResource(server *server.Server, p string, r models.Resource) {
 	group.Use(server.JwtAuthenticationMw)
 	group.Use(server.JwtAuthorizationMw)
 	group.Use(server.CasbinAuthorizationMw)
-	group.GET("", r.List(server), interceptor.AuthorizeResource(server, r.Type(), "List"))            // Respond back with a the List of Resource
-	group.GET("/:id", r.Read(server), interceptor.AuthorizeResource(server, r.Type(), "Read"))        // Read a single Resource identified by id
-	group.POST("", r.Create(server), interceptor.AuthorizeResource(server, r.Type(), "Create"))       // Create a new Resource
-	group.PUT("/:id", r.Update(server), interceptor.AuthorizeResource(server, r.Type(), "Update"))    // Update an existing Resource identified by id
-	group.DELETE("/:id", r.Delete(server), interceptor.AuthorizeResource(server, r.Type(), "Delete")) // Delete a single Resource identified by id
+	group.GET("", r.List(server), interceptor.ResourceAuthorization(server, r.Type(), "List"))            // Respond back with a the List of Resource
+	group.GET("/:id", r.Read(server), interceptor.ResourceAuthorization(server, r.Type(), "Read"))        // Read a single Resource identified by id
+	group.POST("", r.Create(server), interceptor.ResourceAuthorization(server, r.Type(), "Create"))       // Create a new Resource
+	group.PUT("/:id", r.Update(server), interceptor.ResourceAuthorization(server, r.Type(), "Update"))    // Update an existing Resource identified by id
+	group.DELETE("/:id", r.Delete(server), interceptor.ResourceAuthorization(server, r.Type(), "Delete")) // Delete a single Resource identified by id
 }

@@ -15,7 +15,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func CasbinAuthorizer(server *server.Server) echo.MiddlewareFunc {
+func CasbinAuthorization(server *server.Server) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			// Get tenant from header identified by UUID
@@ -43,7 +43,7 @@ func CasbinAuthorizer(server *server.Server) echo.MiddlewareFunc {
 // 2. Check the user exists in DB
 // 3. Add the user data to Echo Context
 // 4. Prolong the Redis TTL of the current token pair
-func ValidateJWT(server *server.Server) echo.MiddlewareFunc {
+func JwtAuthorization(server *server.Server) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			token := c.Get("token").(*jwt.Token)
@@ -66,7 +66,7 @@ func ValidateJWT(server *server.Server) echo.MiddlewareFunc {
 }
 
 // Check if resource action can be done
-func AuthorizeResource(server *server.Server, resource string, action string) echo.MiddlewareFunc {
+func ResourceAuthorization(server *server.Server, resource string, action string) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(e echo.Context) error {
 			user := e.Get("user").(*models.User).UUID.String()
