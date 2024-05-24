@@ -19,7 +19,8 @@ func CasbinAuthorization(server *server.Server) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			// Get tenant from header identified by UUID
-			tenant := c.Request().Header.Get("tenant")
+			//tenant := c.Request().Header.Get("tenant")
+			tenant := c.Get("tenant").(*models.Tenant).UUID.String()
 
 			// Get user name as UUID
 			user := c.Get("user").(*models.User).UUID.String()
@@ -48,13 +49,22 @@ func JwtAuthorization(server *server.Server) echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 			token := c.Get("token").(*jwt.Token)
 			claims := token.Claims.(*services.JwtCustomClaims)
+			tenantuuid := c.Request().Header.Get("tenant")
 
 			user, err := services.NewTokenService(server).ValidateToken(claims, false)
 			if err != nil {
-				return api.WebResponse(c, http.StatusUnauthorized, err)
+				return api.WebResponse(c, http.StatusUnauthorized, err) // TODO: Change this return statement
 			}
 
 			c.Set("user", user)
+
+			tenant := new(models.Tenant)
+			services.NewTenantService(server.DB).GetTenantByUUID(tenant, tenantuuid)
+			if user.ID == 0 {
+				return api.WebResponse(c, http.StatusUnauthorized, err) // TODO: Change this return statement
+			}
+
+			c.Set("tenant", tenant)
 
 			go func() {
 				server.Redis.Expire(context.Background(), fmt.Sprintf("token-%d", claims.ID), time.Minute*services.AutoLogoffMinutes)

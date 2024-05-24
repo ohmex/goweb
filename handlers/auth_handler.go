@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"goweb/api"
 	"goweb/models"
-	"goweb/repositories"
 	"goweb/requests"
 	"goweb/responses"
 	"goweb/server"
@@ -48,7 +47,7 @@ func (authHandler *AuthHandler) Login(c echo.Context) error {
 	}
 
 	user := models.User{}
-	userRepository := repositories.NewUserRepository(authHandler.server.DB)
+	userRepository := services.NewUserService(authHandler.server.DB)
 	userRepository.GetUserByEmail(&user, loginRequest.Email)
 
 	if user.ID == 0 || (bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginRequest.Password)) != nil) {

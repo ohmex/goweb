@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"goweb/api"
 	"goweb/models"
-	"goweb/repositories"
 	"goweb/server"
 	"time"
 
@@ -118,7 +117,7 @@ func (tokenService *TokenService) ValidateToken(claims *JwtCustomClaims, isRefre
 
 	g.Go(func() error {
 		user = new(models.User)
-		userRepository := repositories.NewUserRepository(tokenService.server.DB)
+		userRepository := NewUserService(tokenService.server.DB)
 		userRepository.GetUser(user, int(claims.ID))
 		if user.ID == 0 {
 			return api.USER_NOT_FOUND()

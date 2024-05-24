@@ -3,7 +3,6 @@ package routes
 import (
 	"goweb/handlers"
 	"goweb/interceptor"
-	"goweb/models"
 	"goweb/server"
 	"goweb/services"
 	"net/http"
@@ -52,18 +51,18 @@ func ConfigureRoutes(server *server.Server) {
 	protectedGroup.Use(server.JwtAuthorizationMw)
 	protectedGroup.POST("/logout", authHandler.Logout)
 
-	AddResource(server, "/user", models.User{})
-	AddResource(server, "/post", models.Post{})
+	AddResource(server, "/user", handlers.NewUserHandler(server))
+	AddResource(server, "/post", handlers.NewPostHandler(server))
 }
 
-func AddResource(server *server.Server, p string, r models.Resource) {
+func AddResource(server *server.Server, p string, h handlers.BaseInterface) {
 	group := server.Echo.Group("/api" + p)
 	group.Use(server.JwtAuthenticationMw)
 	group.Use(server.JwtAuthorizationMw)
 	group.Use(server.CasbinAuthorizationMw)
-	group.GET("", r.List(server), interceptor.ResourceAuthorization(server, r.Type(), "List"))            // Respond back with a the List of Resource
-	group.GET("/:id", r.Read(server), interceptor.ResourceAuthorization(server, r.Type(), "Read"))        // Read a single Resource identified by id
-	group.POST("", r.Create(server), interceptor.ResourceAuthorization(server, r.Type(), "Create"))       // Create a new Resource
-	group.PUT("/:id", r.Update(server), interceptor.ResourceAuthorization(server, r.Type(), "Update"))    // Update an existing Resource identified by id
-	group.DELETE("/:id", r.Delete(server), interceptor.ResourceAuthorization(server, r.Type(), "Delete")) // Delete a single Resource identified by id
+	group.GET("", h.List, interceptor.ResourceAuthorization(server, h.Type(), "List"))            // Respond back with a the List of Resource
+	group.GET("/:id", h.Read, interceptor.ResourceAuthorization(server, h.Type(), "Read"))        // Read a single Resource identified by id
+	group.POST("", h.Create, interceptor.ResourceAuthorization(server, h.Type(), "Create"))       // Create a new Resource
+	group.PUT("/:id", h.Update, interceptor.ResourceAuthorization(server, h.Type(), "Update"))    // Update an existing Resource identified by id
+	group.DELETE("/:id", h.Delete, interceptor.ResourceAuthorization(server, h.Type(), "Delete")) // Delete a single Resource identified by id
 }

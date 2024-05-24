@@ -3,7 +3,6 @@ package handlers
 import (
 	"goweb/api"
 	"goweb/models"
-	"goweb/repositories"
 	"goweb/requests"
 	"goweb/server"
 	"goweb/services"
@@ -43,7 +42,7 @@ func (registerHandler *RegisterHandler) Register(c echo.Context) error {
 	}
 
 	existUser := models.User{}
-	userRepository := repositories.NewUserRepository(registerHandler.server.DB)
+	userRepository := services.NewUserService(registerHandler.server.DB)
 	userRepository.GetUserByEmail(&existUser, registerRequest.Email)
 
 	if existUser.ID != 0 {
