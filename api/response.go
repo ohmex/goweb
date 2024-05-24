@@ -96,6 +96,14 @@ func CASBIN_UNAUTHORIZED(s ...string) Response {
 	return Response{Code: 100011, Err: data, Msg: ""}
 }
 
+func RESOURCE_CREATION_FAILED(s ...string) Response {
+	data := "Resource creation failed"
+	if s != nil {
+		data = s[0]
+	}
+	return Response{Code: 100012, Err: data, Msg: ""}
+}
+
 // SUCCESS Responses Start from 200000
 func STATUS_OK(s ...string) Response {
 	data := "Ok"

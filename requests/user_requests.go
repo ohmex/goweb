@@ -27,7 +27,7 @@ type LoginRequest struct {
 
 type RegisterRequest struct {
 	BasicAuth
-	Name string `json:"name" validate:"required" example:"John Doe"`
+	Name string `form:"name" json:"name" validate:"required" example:"John Doe"`
 }
 
 func (rr RegisterRequest) Validate() error {

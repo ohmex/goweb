@@ -2,10 +2,8 @@ package handlers
 
 import (
 	"goweb/api"
-	"goweb/models"
 	"goweb/requests"
 	"goweb/server"
-	"goweb/services"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -39,18 +37,8 @@ func (registerHandler *RegisterHandler) Register(c echo.Context) error {
 		return api.WebResponse(c, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
 
-	existUser := models.User{}
-	userRepository := services.NewUserService(registerHandler.server.DB)
-	userRepository.GetUserByEmail(&existUser, registerRequest.Email)
-
-	if existUser.ID != 0 {
-		return api.WebResponse(c, http.StatusBadRequest, api.USER_EXISTS())
-	}
-
-	userService := services.NewUserService(registerHandler.server.DB)
-	if err := userService.Register(registerRequest); err != nil {
-		return api.WebResponse(c, http.StatusInternalServerError, api.INTERNAL_SERVICE_ERROR())
-	}
+	//tenant := c.Get("tenant").(*models.Tenant)
+	//return services.NewUserService(u.Server.DB).Register(e, registerRequest, tenant)
 
 	return api.WebResponse(c, http.StatusCreated, api.RESOURCE_CREATED("User successfully created"))
 }

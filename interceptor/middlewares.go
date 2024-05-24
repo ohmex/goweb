@@ -19,8 +19,7 @@ func CasbinAuthorization(server *server.Server) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			// Get tenant from header identified by UUID
-			//tenant := c.Request().Header.Get("tenant")
-			tenant := c.Get("tenant").(*models.Tenant).UUID.String()
+			tenant := c.Request().Header.Get("tenant")
 
 			// Get user name as UUID
 			user := c.Get("user").(*models.User).UUID.String()
@@ -60,7 +59,7 @@ func JwtAuthorization(server *server.Server) echo.MiddlewareFunc {
 
 			tenant := new(models.Tenant)
 			services.NewTenantService(server.DB).GetTenantByUUID(tenant, tenantuuid)
-			if user.ID == 0 {
+			if tenant.ID == 0 {
 				return api.WebResponse(c, http.StatusUnauthorized, err) // TODO: Change this return statement
 			}
 

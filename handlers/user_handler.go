@@ -3,6 +3,7 @@ package handlers
 import (
 	"goweb/api"
 	"goweb/models"
+	"goweb/requests"
 	"goweb/server"
 	"goweb/services"
 	"net/http"
@@ -34,11 +35,25 @@ func (u UserHandler) List(e echo.Context) error {
 }
 
 func (u UserHandler) Create(e echo.Context) error {
-	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Create User not implemented"))
+	registerRequest := new(requests.RegisterRequest)
+
+	if err := e.Bind(registerRequest); err != nil {
+		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
+	}
+
+	if err := registerRequest.Validate(); err != nil {
+		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
+	}
+
+	tenant := e.Get("tenant").(*models.Tenant)
+	return services.NewUserService(u.Server.DB).Register(e, registerRequest, tenant)
 }
 
 func (u UserHandler) Read(e echo.Context) error {
-	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Read User not implemented"))
+	var user models.User
+	id := e.Param("id")
+	services.NewUserService(u.Server.DB).GetUserByUUID(&user, id)
+	return api.WebResponse(e, http.StatusOK, user)
 }
 
 func (u UserHandler) Update(e echo.Context) error {

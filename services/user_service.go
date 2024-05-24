@@ -1,9 +1,12 @@
 package services
 
 import (
+	"goweb/api"
 	"goweb/models"
 	"goweb/requests"
+	"net/http"
 
+	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -16,26 +19,46 @@ func NewUserService(db *gorm.DB) *UserService {
 	return &UserService{DB: db}
 }
 
-func (userService *UserService) Register(request *requests.RegisterRequest) error {
+func (service *UserService) Register(e echo.Context, request *requests.RegisterRequest, tenant *models.Tenant) error {
+	user := models.User{}
+
+	service.GetUserByEmail(&user, request.Email)
+
+	if user.ID != 0 {
+		return api.WebResponse(e, http.StatusBadRequest, api.USER_EXISTS())
+	}
+
 	encryptedPassword, err := bcrypt.GenerateFromPassword(
 		[]byte(request.Password),
 		bcrypt.DefaultCost,
 	)
+
 	if err != nil {
-		return err
+		return api.WebResponse(e, http.StatusInternalServerError, api.RESOURCE_CREATION_FAILED("Resource creation failed - error creating password"))
 	}
 
-	user := models.User{
+	newUser := models.User{
 		Name:     request.Name,
 		Email:    request.Email,
 		Password: string(encryptedPassword),
+		Tenants:  []*models.Tenant{tenant},
 	}
 
-	return userService.DB.Create(&user).Error
+	ok := service.DB.Create(&newUser).Error
+
+	if ok != nil {
+		return api.WebResponse(e, http.StatusInternalServerError, api.RESOURCE_CREATION_FAILED())
+	}
+
+	return api.WebResponse(e, http.StatusCreated, api.RESOURCE_CREATED("User created"))
 }
 
 func (service *UserService) GetUser(user *models.User, id int) {
 	service.DB.First(user, id)
+}
+
+func (service *UserService) GetUserByUUID(user *models.User, uuid string) {
+	service.DB.Where("uuid = ?", uuid).Find(user)
 }
 
 func (service *UserService) GetUserByEmail(user *models.User, email string) {
