@@ -6,6 +6,7 @@ import (
 	"goweb/server"
 	"goweb/services"
 	"net/http"
+	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
 	echojwt "github.com/labstack/echo-jwt/v4"
@@ -32,6 +33,9 @@ func ConfigureRoutes(server *server.Server) {
 	registerHandler := handlers.NewRegisterHandler(server)
 
 	server.Echo.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+		Skipper: func(c echo.Context) bool {
+			return strings.Contains(c.Request().URL.Path, "swagger")
+		},
 		Level:     5,
 		MinLength: 64,
 	}))

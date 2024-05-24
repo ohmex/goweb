@@ -27,8 +27,6 @@ func NewRegisterHandler(server *server.Server) *RegisterHandler {
 // @Accept json
 // @Produce json
 // @Param params body requests.RegisterRequest true "User's email, user's password"
-// @Success 201 {object} responses.Data
-// @Failure 400 {object} responses.Error
 // @Router /register [post]
 func (registerHandler *RegisterHandler) Register(c echo.Context) error {
 	registerRequest := new(requests.RegisterRequest)

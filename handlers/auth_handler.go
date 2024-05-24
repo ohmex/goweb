@@ -32,8 +32,6 @@ func NewAuthHandler(server *server.Server) *AuthHandler {
 // @Accept json
 // @Produce json
 // @Param params body requests.LoginRequest true "User's credentials"
-// @Success 200 {object} responses.LoginResponse
-// @Failure 401 {object} responses.Error
 // @Router /login [post]
 func (authHandler *AuthHandler) Login(c echo.Context) error {
 	loginRequest := new(requests.LoginRequest)
@@ -71,8 +69,6 @@ func (authHandler *AuthHandler) Login(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param params body requests.RefreshRequest true "Refresh token"
-// @Success 200 {object} responses.LoginResponse
-// @Failure 401 {object} responses.Error
 // @Router /refresh [post]
 func (authHandler *AuthHandler) RefreshToken(c echo.Context) error {
 	refreshRequest := new(requests.RefreshRequest)
@@ -119,8 +115,6 @@ func (authHandler *AuthHandler) RefreshToken(c echo.Context) error {
 // @Tags User Actions
 // @Accept json
 // @Produce json
-// @Success 200 {object} responses.Data
-// @Failure 401 {object} responses.Data
 // @Security ApiKeyAuth
 // @Router /logout [post]
 func (authHandler *AuthHandler) Logout(c echo.Context) error {
