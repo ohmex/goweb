@@ -135,7 +135,7 @@ func (tokenService *TokenService) createToken(user *models.User, expireMinutes i
 	expiry := time.Now().Add(time.Minute * time.Duration(expireMinutes))
 	tokenUuid = uuid.New().String()
 
-	tokenService.server.DB.Preload("Tenants").Where(user).Find(user)
+	tokenService.server.DB.Preload("Tenants").First(user)
 
 	var tenants []Domain
 	for _, e := range user.Tenants {

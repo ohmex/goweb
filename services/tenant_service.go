@@ -15,5 +15,5 @@ func NewTenantService(db *gorm.DB) *TenantService {
 }
 
 func (service *TenantService) GetTenantByUUID(tenant *models.Tenant, id string) {
-	service.DB.Where("uuid = ?", id).Find(tenant)
+	service.DB.Where("uuid = ?", id).First(tenant)
 }

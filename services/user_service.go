@@ -58,11 +58,11 @@ func (service *UserService) GetUser(user *models.User, id int) {
 }
 
 func (service *UserService) GetUserByUUID(user *models.User, uuid string) {
-	service.DB.Where("uuid = ?", uuid).Find(user)
+	service.DB.Where("uuid = ?", uuid).First(user)
 }
 
 func (service *UserService) GetUserByEmail(user *models.User, email string) {
-	service.DB.Where("email = ?", email).Find(user)
+	service.DB.Where("email = ?", email).First(user)
 }
 
 func (service *UserService) GetUsersByTenant(users *[]*models.User, tenant *models.Tenant) {
