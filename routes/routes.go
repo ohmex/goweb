@@ -32,6 +32,10 @@ func ConfigureRoutes(server *server.Server) {
 	authHandler := handlers.NewAuthHandler(server)
 	registerHandler := handlers.NewRegisterHandler(server)
 
+	server.Echo.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+		Level:     5,
+		MinLength: 64,
+	}))
 	server.Echo.Use(middleware.Logger())
 
 	server.Echo.GET("", func(ctx echo.Context) error {
@@ -49,7 +53,7 @@ func ConfigureRoutes(server *server.Server) {
 	protectedGroup.POST("/logout", authHandler.Logout)
 
 	AddResource(server, "/user", models.User{})
-	//AddResource(server, "/post", models.Post{})
+	AddResource(server, "/post", models.Post{})
 }
 
 func AddResource(server *server.Server, p string, r models.Resource) {
