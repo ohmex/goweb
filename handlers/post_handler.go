@@ -21,21 +21,21 @@ func (u PostHandler) Type() string {
 }
 
 func (u PostHandler) List(e echo.Context) error {
-	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("List posts not implemented"))
+	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("List Posts not implemented"))
 }
 
 func (u PostHandler) Create(e echo.Context) error {
-	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Create post not implemented"))
+	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Create Post not implemented"))
 }
 
 func (u PostHandler) Read(e echo.Context) error {
-	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Read post not implemented"))
+	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Read Post not implemented"))
 }
 
 func (u PostHandler) Update(e echo.Context) error {
-	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Update post not implemented"))
+	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Update Post not implemented"))
 }
 
 func (u PostHandler) Delete(e echo.Context) error {
-	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Delete post not implemented"))
+	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Delete Post not implemented"))
 }

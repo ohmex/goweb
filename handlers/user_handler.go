@@ -34,17 +34,17 @@ func (u UserHandler) List(e echo.Context) error {
 }
 
 func (u UserHandler) Create(e echo.Context) error {
-	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Create user not implemented"))
+	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Create User not implemented"))
 }
 
 func (u UserHandler) Read(e echo.Context) error {
-	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Read user not implemented"))
+	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Read User not implemented"))
 }
 
 func (u UserHandler) Update(e echo.Context) error {
-	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Update user not implemented"))
+	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Update User not implemented"))
 }
 
 func (u UserHandler) Delete(e echo.Context) error {
-	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Delete user not implemented"))
+	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Delete User not implemented"))
 }

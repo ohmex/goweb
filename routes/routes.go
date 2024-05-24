@@ -53,6 +53,7 @@ func ConfigureRoutes(server *server.Server) {
 
 	AddResource(server, "/user", handlers.NewUserHandler(server))
 	AddResource(server, "/post", handlers.NewPostHandler(server))
+	AddResource(server, "/tenant", handlers.NewTenantHandler(server))
 }
 
 func AddResource(server *server.Server, p string, h handlers.BaseInterface) {
