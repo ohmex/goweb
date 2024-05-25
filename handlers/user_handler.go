@@ -60,12 +60,12 @@ func (u UserHandler) Read(e echo.Context) error {
 	return api.WebResponse(e, http.StatusOK, user)
 }
 
-// TODO: Check requested user belongs to current domain
+// TODO: Check the resource being accessed belongs to the domain that user have access to
 func (u UserHandler) Update(e echo.Context) error {
 	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Update User not implemented"))
 }
 
-// TODO: Check requested user belongs to current domain
+// TODO: Check the resource being accessed belongs to the domain that user have access to
 func (u UserHandler) Delete(e echo.Context) error {
 	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Delete User not implemented"))
 }
