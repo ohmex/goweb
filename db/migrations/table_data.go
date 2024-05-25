@@ -24,7 +24,7 @@ func (TableData) Up(db *gorm.DB) {
 		panic(err)
 	}
 
-	reliance := models.Tenant{Name: "Reliance"}
+	reliance := models.Domain{Name: "Reliance"}
 	db.Create(&reliance)
 	relianceUUID := reliance.UUID.String() //Get UUID port creating table
 	casbin.AddPolicy("Admin", relianceUUID, "User", "List")
@@ -37,7 +37,7 @@ func (TableData) Up(db *gorm.DB) {
 	casbin.AddPolicy("Manager", relianceUUID, "User", "Update")
 	casbin.AddPolicy("Operator", relianceUUID, "User", "Read")
 
-	dmart := models.Tenant{Name: "DMart"}
+	dmart := models.Domain{Name: "DMart"}
 	db.Create(&dmart)
 	dmartUUID := dmart.UUID.String() //Get UUID port creating table
 	casbin.AddPolicy("Admin", dmartUUID, "User", "List")
@@ -51,34 +51,34 @@ func (TableData) Up(db *gorm.DB) {
 	casbin.AddPolicy("Operator", dmartUUID, "User", "Read")
 
 	// Setting Super User
-	user := models.User{Name: "Sachin", Email: "trulysachin@gmail.com", Password: string(hashedPassword), Tenants: []*models.Tenant{&reliance, &dmart}}
+	user := models.User{Name: "Sachin", Email: "trulysachin@gmail.com", Password: string(hashedPassword), Domains: []*models.Domain{&reliance, &dmart}}
 	db.Create(&user)
 	casbin.AddRoleForUserInDomain(user.UUID.String(), "Admin", relianceUUID) // Sachin is Admin of Reliance
 	casbin.AddRoleForUserInDomain(user.UUID.String(), "Admin", dmartUUID)    // Sachin is Admin of DMart
 
 	// Setting Users of Reliance
-	user = models.User{Name: "UserA", Email: "usera@gmail.com", Password: string(hashedPassword), Tenants: []*models.Tenant{&reliance}}
+	user = models.User{Name: "UserA", Email: "usera@gmail.com", Password: string(hashedPassword), Domains: []*models.Domain{&reliance}}
 	db.Create(&user)
 	casbin.AddRoleForUserInDomain(user.UUID.String(), "Admin", relianceUUID)
 
-	user = models.User{Name: "UserB", Email: "userb@gmail.com", Password: string(hashedPassword), Tenants: []*models.Tenant{&reliance}}
+	user = models.User{Name: "UserB", Email: "userb@gmail.com", Password: string(hashedPassword), Domains: []*models.Domain{&reliance}}
 	db.Create(&user)
 	casbin.AddRoleForUserInDomain(user.UUID.String(), "Manager", relianceUUID)
 
-	user = models.User{Name: "UserC", Email: "userc@gmail.com", Password: string(hashedPassword), Tenants: []*models.Tenant{&reliance}}
+	user = models.User{Name: "UserC", Email: "userc@gmail.com", Password: string(hashedPassword), Domains: []*models.Domain{&reliance}}
 	db.Create(&user)
 	casbin.AddRoleForUserInDomain(user.UUID.String(), "Operator", relianceUUID)
 
 	// Setting Users of DMart
-	user = models.User{Name: "UserD", Email: "userd@gmail.com", Password: string(hashedPassword), Tenants: []*models.Tenant{&dmart}}
+	user = models.User{Name: "UserD", Email: "userd@gmail.com", Password: string(hashedPassword), Domains: []*models.Domain{&dmart}}
 	db.Create(&user)
 	casbin.AddRoleForUserInDomain(user.UUID.String(), "Admin", dmartUUID)
 
-	user = models.User{Name: "UserE", Email: "usere@gmail.com", Password: string(hashedPassword), Tenants: []*models.Tenant{&dmart}}
+	user = models.User{Name: "UserE", Email: "usere@gmail.com", Password: string(hashedPassword), Domains: []*models.Domain{&dmart}}
 	db.Create(&user)
 	casbin.AddRoleForUserInDomain(user.UUID.String(), "Manager", dmartUUID)
 
-	user = models.User{Name: "UserF", Email: "userf@gmail.com", Password: string(hashedPassword), Tenants: []*models.Tenant{&dmart}}
+	user = models.User{Name: "UserF", Email: "userf@gmail.com", Password: string(hashedPassword), Domains: []*models.Domain{&dmart}}
 	db.Create(&user)
 	casbin.AddRoleForUserInDomain(user.UUID.String(), "Operator", dmartUUID)
 }

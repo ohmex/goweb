@@ -26,7 +26,7 @@ func NewRegisterHandler(server *server.Server) *RegisterHandler {
 // @Produce json
 // @Param params body requests.RegisterRequest true "User's email, user's password"
 // @Router /register [post]
-// Register function creates Tenant & User - together as pair
+// Register function creates Domain & User - together as pair
 func (registerHandler *RegisterHandler) Register(c echo.Context) error {
 	registerRequest := new(requests.RegisterRequest)
 
@@ -38,8 +38,8 @@ func (registerHandler *RegisterHandler) Register(c echo.Context) error {
 		return api.WebResponse(c, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
 
-	//tenant := c.Get("tenant").(*models.Tenant)
-	//return services.NewUserService(u.Server.DB).Register(e, registerRequest, tenant)
+	//domain := c.Get("domain").(*models.Domain)
+	//return services.NewUserService(u.Server.DB).Register(e, registerRequest, domain)
 
 	return api.WebResponse(c, http.StatusCreated, api.RESOURCE_CREATED("User successfully created"))
 }

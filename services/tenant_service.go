@@ -6,14 +6,14 @@ import (
 	"gorm.io/gorm"
 )
 
-type TenantService struct {
+type DomainService struct {
 	DB *gorm.DB
 }
 
-func NewTenantService(db *gorm.DB) *TenantService {
-	return &TenantService{DB: db}
+func NewDomainService(db *gorm.DB) *DomainService {
+	return &DomainService{DB: db}
 }
 
-func (service *TenantService) GetTenantByUUID(tenant *models.Tenant, id string) {
-	service.DB.Where("uuid = ?", id).First(tenant)
+func (service *DomainService) GetDomainByUUID(domain *models.Domain, id string) {
+	service.DB.Where("uuid = ?", id).First(domain)
 }

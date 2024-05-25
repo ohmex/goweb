@@ -27,7 +27,7 @@ type JwtCustomClaims struct {
 	ID      uint     `json:"id"`
 	UUID    string   `json:"uuid"`
 	Name    string   `json:"name"`
-	Tenants []Domain `json:"tenants"`
+	Domains []Domain `json:"domains"`
 	jwt.RegisteredClaims
 }
 
@@ -135,18 +135,18 @@ func (tokenService *TokenService) createToken(user *models.User, expireMinutes i
 	expiry := time.Now().Add(time.Minute * time.Duration(expireMinutes))
 	tokenUuid = uuid.New().String()
 
-	tokenService.server.DB.Preload("Tenants").First(user)
+	tokenService.server.DB.Preload("Domains").First(user)
 
-	var tenants []Domain
-	for _, e := range user.Tenants {
-		tenants = append(tenants, Domain{e.UUID.String(), e.Name})
+	var domains []Domain
+	for _, e := range user.Domains {
+		domains = append(domains, Domain{e.UUID.String(), e.Name})
 	}
 
 	claims := &JwtCustomClaims{
 		user.ID,
 		tokenUuid,
 		user.Name,
-		tenants,
+		domains,
 		jwt.RegisteredClaims{
 			Issuer:    "Ohmex",
 			ExpiresAt: jwt.NewNumericDate(expiry),

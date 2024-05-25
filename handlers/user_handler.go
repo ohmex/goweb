@@ -28,9 +28,9 @@ func (u UserHandler) Type() string {
 }
 
 func (u UserHandler) List(e echo.Context) error {
-	tenant := e.Get("tenant").(*models.Tenant)
+	domain := e.Get("domain").(*models.Domain)
 	var users []*models.User
-	services.NewUserService(u.Server.DB).GetUsersByTenant(&users, tenant)
+	services.NewUserService(u.Server.DB).GetUsersByDomain(&users, domain)
 	return api.WebResponse(e, http.StatusOK, users)
 }
 
@@ -45,27 +45,27 @@ func (u UserHandler) Create(e echo.Context) error {
 		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
 
-	tenant := e.Get("tenant").(*models.Tenant)
-	return services.NewUserService(u.Server.DB).Register(e, registerRequest, tenant)
+	domain := e.Get("domain").(*models.Domain)
+	return services.NewUserService(u.Server.DB).Register(e, registerRequest, domain)
 }
 
 func (u UserHandler) Read(e echo.Context) error {
 	var user models.User
-	tenant := e.Get("tenant").(*models.Tenant)
+	domain := e.Get("domain").(*models.Domain)
 	uuid := e.Param("uuid")
-	services.NewUserService(u.Server.DB).GetUserByTenantAndUUID(&user, tenant, uuid)
+	services.NewUserService(u.Server.DB).GetUserByDomainAndUUID(&user, domain, uuid)
 	if user.ID == 0 {
 		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("User not found"))
 	}
 	return api.WebResponse(e, http.StatusOK, user)
 }
 
-// TODO: Check requested user belongs to current tenant
+// TODO: Check requested user belongs to current domain
 func (u UserHandler) Update(e echo.Context) error {
 	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Update User not implemented"))
 }
 
-// TODO: Check requested user belongs to current tenant
+// TODO: Check requested user belongs to current domain
 func (u UserHandler) Delete(e echo.Context) error {
 	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Delete User not implemented"))
 }

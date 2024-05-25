@@ -25,7 +25,7 @@ func JwtAuthorization(server *server.Server) echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 			token := c.Get("token").(*jwt.Token)
 			claims := token.Claims.(*services.JwtCustomClaims)
-			tenantuuid := c.Request().Header.Get("tenant")
+			domainuuid := c.Request().Header.Get("domain")
 
 			user, err := services.NewTokenService(server).ValidateToken(claims, false)
 			if err != nil {
@@ -34,13 +34,13 @@ func JwtAuthorization(server *server.Server) echo.MiddlewareFunc {
 
 			c.Set("user", user)
 
-			tenant := new(models.Tenant)
-			services.NewTenantService(server.DB).GetTenantByUUID(tenant, tenantuuid)
-			if tenant.ID == 0 {
+			domain := new(models.Domain)
+			services.NewDomainService(server.DB).GetDomainByUUID(domain, domainuuid)
+			if domain.ID == 0 {
 				return api.WebResponse(c, http.StatusUnauthorized, err) // TODO: Change this return statement
 			}
 
-			c.Set("tenant", tenant)
+			c.Set("domain", domain)
 
 			go func() {
 				server.Redis.Expire(context.Background(), fmt.Sprintf("token-%d", claims.ID), time.Minute*services.AutoLogoffMinutes)
@@ -54,16 +54,16 @@ func JwtAuthorization(server *server.Server) echo.MiddlewareFunc {
 func CasbinAuthorization(server *server.Server) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			// Get tenant from header identified by UUID
-			tenant := c.Request().Header.Get("tenant")
+			// Get domain from header identified by UUID
+			domain := c.Request().Header.Get("domain")
 
 			// Get user name as UUID
 			user := c.Get("user").(*models.User).UUID.String()
 
-			// Check, user though mabe assiciated with a tenant in DB
+			// Check, user though mabe assiciated with a domain in DB
 			// Does he has casbin domain assigned to him or not
 			domains, _ := server.Casbin.GetDomainsForUser(user)
-			ok := util.Contains[string](domains, tenant)
+			ok := util.Contains[string](domains, domain)
 
 			if ok {
 				return next(c)
@@ -79,10 +79,10 @@ func ResourceAuthorization(server *server.Server, resource string, action string
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(e echo.Context) error {
 			user := e.Get("user").(*models.User).UUID.String()
-			tenant := e.Request().Header.Get("tenant")
+			domain := e.Request().Header.Get("domain")
 
 			// Enforce used nomentlature (sub, dom, obj, act)
-			ok, _ := server.Casbin.Enforce(user, tenant, resource, action)
+			ok, _ := server.Casbin.Enforce(user, domain, resource, action)
 
 			if !ok {
 				return api.WebResponse(e, http.StatusForbidden, api.CASBIN_UNAUTHORIZED())

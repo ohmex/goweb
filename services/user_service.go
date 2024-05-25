@@ -19,7 +19,7 @@ func NewUserService(db *gorm.DB) *UserService {
 	return &UserService{DB: db}
 }
 
-func (service *UserService) Register(e echo.Context, request *requests.RegisterRequest, tenant *models.Tenant) error {
+func (service *UserService) Register(e echo.Context, request *requests.RegisterRequest, domain *models.Domain) error {
 	user := models.User{}
 
 	service.GetUserByEmail(&user, request.Email)
@@ -41,7 +41,7 @@ func (service *UserService) Register(e echo.Context, request *requests.RegisterR
 		Name:     request.Name,
 		Email:    request.Email,
 		Password: string(encryptedPassword),
-		Tenants:  []*models.Tenant{tenant},
+		Domains:  []*models.Domain{domain},
 	}
 
 	ok := service.DB.Create(&newUser).Error
@@ -65,19 +65,19 @@ func (service *UserService) GetUserByEmail(user *models.User, email string) {
 	service.DB.Where("email = ?", email).First(user)
 }
 
-func (service *UserService) GetUsersByTenant(users *[]*models.User, tenant *models.Tenant) {
+func (service *UserService) GetUsersByDomain(users *[]*models.User, domain *models.Domain) {
 	service.DB.
-		Joins("JOIN tenant_user ON tenant_user.user_id = users.id").
-		Where("tenant_user.tenant_id = ?", tenant.ID).
-		Preload("Tenants").
+		Joins("JOIN domain_user ON domain_user.user_id = users.id").
+		Where("domain_user.domain_id = ?", domain.ID).
+		Preload("Domains").
 		Find(users)
 }
 
-func (service *UserService) GetUserByTenantAndUUID(user *models.User, tenant *models.Tenant, uuid string) {
+func (service *UserService) GetUserByDomainAndUUID(user *models.User, domain *models.Domain, uuid string) {
 	service.DB.
-		Joins("JOIN tenant_user ON tenant_user.user_id = users.id").
-		Where("tenant_user.tenant_id = ?", tenant.ID).
+		Joins("JOIN domain_user ON domain_user.user_id = users.id").
+		Where("domain_user.domain_id = ?", domain.ID).
 		Where("uuid = ?", uuid).
-		Preload("Tenants").
+		Preload("Domains").
 		First(user)
 }

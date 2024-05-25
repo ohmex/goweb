@@ -25,5 +25,5 @@ func (base *Base) BeforeCreate(tx *gorm.DB) (err error) {
 // All resource other than user should use this.
 type BaseResource struct {
 	Base
-	Tenant uuid.UUID `json:"tenant" gorm:"type:char(36);"`
+	Domain uuid.UUID `json:"domain" gorm:"type:char(36);"`
 }
