@@ -30,7 +30,7 @@ func (u UserHandler) Type() string {
 func (u UserHandler) List(e echo.Context) error {
 	domain := e.Get("domain").(*models.Domain)
 	var users []*models.User
-	services.NewUserService(u.Server.DB).GetUsersByDomain(&users, domain)
+	services.NewUserService(u.Server.DB).GetUsersInDomain(&users, domain)
 	return api.WebResponse(e, http.StatusOK, users)
 }
 
@@ -53,7 +53,7 @@ func (u UserHandler) Read(e echo.Context) error {
 	var user models.User
 	domain := e.Get("domain").(*models.Domain)
 	uuid := e.Param("uuid")
-	services.NewUserService(u.Server.DB).GetUserByDomainAndUUID(&user, domain, uuid)
+	services.NewUserService(u.Server.DB).GetUserByUuidInDomain(&user, uuid, domain)
 	if user.ID == 0 {
 		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("User not found"))
 	}

@@ -37,7 +37,7 @@ func JwtAuthorization(server *server.Server) echo.MiddlewareFunc {
 			domain := new(models.Domain)
 			services.NewDomainService(server.DB).GetDomainByUUID(domain, domainuuid)
 			if domain.ID == 0 {
-				return api.WebResponse(c, http.StatusUnauthorized, err) // TODO: Change this return statement
+				return api.WebResponse(c, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR("Missing or incorrect domain"))
 			}
 
 			c.Set("domain", domain)

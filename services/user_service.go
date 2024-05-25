@@ -65,19 +65,17 @@ func (service *UserService) GetUserByEmail(user *models.User, email string) {
 	service.DB.Where("email = ?", email).First(user)
 }
 
-func (service *UserService) GetUsersByDomain(users *[]*models.User, domain *models.Domain) {
+func (service *UserService) GetUsersInDomain(users *[]*models.User, domain *models.Domain) {
 	service.DB.
 		Joins("JOIN domain_user ON domain_user.user_id = users.id").
 		Where("domain_user.domain_id = ?", domain.ID).
-		Preload("Domains").
 		Find(users)
 }
 
-func (service *UserService) GetUserByDomainAndUUID(user *models.User, domain *models.Domain, uuid string) {
+func (service *UserService) GetUserByUuidInDomain(user *models.User, uuid string, domain *models.Domain) {
 	service.DB.
 		Joins("JOIN domain_user ON domain_user.user_id = users.id").
 		Where("domain_user.domain_id = ?", domain.ID).
 		Where("uuid = ?", uuid).
-		Preload("Domains").
 		First(user)
 }
