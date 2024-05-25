@@ -65,9 +65,9 @@ func AddResource(server *server.Server, p string, h handlers.BaseInterface) {
 	group.Use(server.JwtAuthenticationMw)
 	group.Use(server.JwtAuthorizationMw)
 	group.Use(server.CasbinAuthorizationMw)
-	group.GET("", h.List, interceptor.ResourceAuthorization(server, h.Type(), "List"))            // Respond back with a the List of Resource
-	group.GET("/:id", h.Read, interceptor.ResourceAuthorization(server, h.Type(), "Read"))        // Read a single Resource identified by id
-	group.POST("", h.Create, interceptor.ResourceAuthorization(server, h.Type(), "Create"))       // Create a new Resource
-	group.PUT("/:id", h.Update, interceptor.ResourceAuthorization(server, h.Type(), "Update"))    // Update an existing Resource identified by id
-	group.DELETE("/:id", h.Delete, interceptor.ResourceAuthorization(server, h.Type(), "Delete")) // Delete a single Resource identified by id
+	group.GET("", h.List, interceptor.ResourceAuthorization(server, h.Type(), "List"))              // Respond back with a the List of Resource
+	group.GET("/:uuid", h.Read, interceptor.ResourceAuthorization(server, h.Type(), "Read"))        // Read a single Resource identified by id
+	group.POST("", h.Create, interceptor.ResourceAuthorization(server, h.Type(), "Create"))         // Create a new Resource
+	group.PUT("/:uuid", h.Update, interceptor.ResourceAuthorization(server, h.Type(), "Update"))    // Update an existing Resource identified by id
+	group.DELETE("/:uuid", h.Delete, interceptor.ResourceAuthorization(server, h.Type(), "Delete")) // Delete a single Resource identified by id
 }
