@@ -53,7 +53,7 @@ func (u UserHandler) Read(e echo.Context) error {
 	var user models.User
 	tenant := e.Get("tenant").(*models.Tenant)
 	uuid := e.Param("uuid")
-	services.NewUserService(u.Server.DB).GetUserByIdForTenant(&user, tenant, uuid)
+	services.NewUserService(u.Server.DB).GetUserByTenantAndUUID(&user, tenant, uuid)
 	if user.ID == 0 {
 		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("User not found"))
 	}
