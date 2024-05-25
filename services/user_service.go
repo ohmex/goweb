@@ -66,14 +66,16 @@ func (service *UserService) GetUserByEmail(user *models.User, email string) {
 }
 
 func (service *UserService) GetUsersByTenant(users *[]*models.User, tenant *models.Tenant) {
-	service.DB.Joins("JOIN tenant_user ON tenant_user.user_id = users.id").
+	service.DB.
+		Joins("JOIN tenant_user ON tenant_user.user_id = users.id").
 		Where("tenant_user.tenant_id = ?", tenant.ID).
 		Preload("Tenants").
 		Find(users)
 }
 
 func (service *UserService) GetUserByTenantAndUUID(user *models.User, tenant *models.Tenant, uuid string) {
-	service.DB.Joins("JOIN tenant_user ON tenant_user.user_id = users.id").
+	service.DB.
+		Joins("JOIN tenant_user ON tenant_user.user_id = users.id").
 		Where("tenant_user.tenant_id = ?", tenant.ID).
 		Where("uuid = ?", uuid).
 		Preload("Tenants").
