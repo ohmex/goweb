@@ -71,3 +71,11 @@ func (service *UserService) GetUsersByTenant(users *[]*models.User, tenant *mode
 		Preload("Tenants").
 		Find(users)
 }
+
+func (service *UserService) GetUserByIdForTenant(user *models.User, tenant *models.Tenant, uuid string) {
+	service.DB.Joins("JOIN tenant_user ON tenant_user.user_id = users.id").
+		Where("tenant_user.tenant_id = ?", tenant.ID).
+		Where("uuid = ?", uuid).
+		Preload("Tenants").
+		First(user)
+}

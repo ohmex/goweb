@@ -26,6 +26,7 @@ func NewRegisterHandler(server *server.Server) *RegisterHandler {
 // @Produce json
 // @Param params body requests.RegisterRequest true "User's email, user's password"
 // @Router /register [post]
+// Register function creates Tenant & User - together as pair
 func (registerHandler *RegisterHandler) Register(c echo.Context) error {
 	registerRequest := new(requests.RegisterRequest)
 

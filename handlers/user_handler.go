@@ -51,15 +51,21 @@ func (u UserHandler) Create(e echo.Context) error {
 
 func (u UserHandler) Read(e echo.Context) error {
 	var user models.User
+	tenant := e.Get("tenant").(*models.Tenant)
 	id := e.Param("id")
-	services.NewUserService(u.Server.DB).GetUserByUUID(&user, id)
+	services.NewUserService(u.Server.DB).GetUserByIdForTenant(&user, tenant, id)
+	if user.ID == 0 {
+		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("User not found"))
+	}
 	return api.WebResponse(e, http.StatusOK, user)
 }
 
+// TODO: Check requested user belongs to current tenant
 func (u UserHandler) Update(e echo.Context) error {
 	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Update User not implemented"))
 }
 
+// TODO: Check requested user belongs to current tenant
 func (u UserHandler) Delete(e echo.Context) error {
 	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Delete User not implemented"))
 }
