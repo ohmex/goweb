@@ -32,6 +32,7 @@ func ConfigureRoutes(server *server.Server) {
 	authHandler := handlers.NewAuthHandler(server)
 	registerHandler := handlers.NewRegisterHandler(server)
 
+	server.Echo.Use(middleware.Recover())
 	server.Echo.Use(middleware.GzipWithConfig(middleware.GzipConfig{
 		Skipper: func(c echo.Context) bool {
 			return strings.Contains(c.Request().URL.Path, "swagger")
@@ -40,6 +41,7 @@ func ConfigureRoutes(server *server.Server) {
 		MinLength: 64,
 	}))
 	server.Echo.Use(middleware.Logger())
+	server.Echo.Use(middleware.RequestID())
 
 	server.Echo.GET("", func(ctx echo.Context) error {
 		return ctx.String(http.StatusOK, "Welcome to HOME!")
