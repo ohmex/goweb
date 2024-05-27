@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"goweb/api"
 	"goweb/models"
 	"goweb/requests"
@@ -78,4 +79,25 @@ func (service *UserService) GetUserByUuidInDomain(user *models.User, uuid string
 		Where("domain_user.domain_id = ?", domain.ID).
 		Where("uuid = ?", uuid).
 		First(user)
+}
+
+func (service *UserService) DeleteUserByUuidInDomain(user *models.User, uuid string, domain *models.Domain) error {
+	// delete the user only if User.uuid == uuid & User.domains contains selected domain
+	// get the domains of the user that we want to delete
+	// check if the seleted domain is contained in domains above
+	service.DB.
+		Joins("JOIN domain_user ON domain_user.user_id = users.id").
+		Where("domain_user.domain_id = ?", domain.ID).
+		Where("uuid = ?", uuid).
+		Preload("Domains").
+		First(user)
+	if user.ID != 0 {
+		for _, d := range user.Domains {
+			if d.UUID.String() == domain.UUID.String() {
+				service.DB.Delete(user)
+				return nil
+			}
+		}
+	}
+	return errors.New("user not found")
 }

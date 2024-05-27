@@ -67,5 +67,12 @@ func (u UserHandler) Update(e echo.Context) error {
 
 // TODO: Check the resource being accessed belongs to the domain that user have access to
 func (u UserHandler) Delete(e echo.Context) error {
-	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Delete User not implemented"))
+	var user models.User
+	domain := e.Get("domain").(*models.Domain)
+	uuid := e.Param("uuid")
+	err := services.NewUserService(u.Server.DB).DeleteUserByUuidInDomain(&user, uuid, domain)
+	if err == nil {
+		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_CREATION_FAILED("User deleted"))
+	}
+	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("User not found"))
 }
