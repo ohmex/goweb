@@ -12,3 +12,8 @@ Swag will parse comments and generate required files(docs folder and docs/doc.go
 
 $ swag init
 
+# Goal - to build a web framework that supports:
+1. Multi tenant ecosystem
+2. REST API based resource management
+3. RBAC access controls based on Casbin
+4. JWT based authentication with custom claims
