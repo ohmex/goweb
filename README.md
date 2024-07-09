@@ -4,6 +4,9 @@ A sample web MVC framework
 ## Get the echo swagger
 go get -u github.com/swaggo/echo-swagger
 
+## Insomnia
+(metadata, body) => JSON.parse(atob(JSON.parse(body).accessToken.split(`.`)[1])).domains[0].UUID
+
 ## Install swag command
 go install github.com/swaggo/swag/cmd/swag@latest
 
