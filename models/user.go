@@ -12,5 +12,5 @@ type User struct {
 type DomainUser struct {
 	DomainID int  `gorm:"primaryKey"`
 	UserID   int  `gorm:"primaryKey"`
-	Default  bool `gorm:"default:false"`
+	Active   bool `gorm:"default:false"`
 }
