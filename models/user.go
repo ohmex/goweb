@@ -5,6 +5,12 @@ type User struct {
 	Email    string    `json:"email" gorm:"type:varchar(200);"`
 	Name     string    `json:"name" gorm:"type:varchar(200);"`
 	Password string    `json:"-" gorm:"type:varchar(200);"`
-	Domains  []*Domain `json:"domains,omitempty" gorm:"many2many:domain_user;"`
+	Domains  []*Domain `json:"domains,omitempty" gorm:"many2many:domain_users;"`
 	Posts    []*Post   `json:"posts,omitempty"`
+}
+
+type DomainUser struct {
+	DomainID int  `gorm:"primaryKey"`
+	UserID   int  `gorm:"primaryKey"`
+	Default  bool `gorm:"default:false"`
 }

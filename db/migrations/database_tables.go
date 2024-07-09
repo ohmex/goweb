@@ -12,6 +12,7 @@ func (DatabaseTables) Id() string {
 	return "UserMigration"
 }
 func (DatabaseTables) Up(db *gorm.DB) {
+	db.SetupJoinTable(&models.Domain{}, "Users", &models.DomainUser{})
 	db.Migrator().AutoMigrate(&models.User{}, &models.Domain{}, &models.Post{})
 }
 

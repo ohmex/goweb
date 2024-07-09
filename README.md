@@ -17,3 +17,7 @@ $ swag init
 2. REST API based resource management
 3. RBAC access controls based on Casbin
 4. JWT based authentication with custom claims
+
+## TODO:
+1. Token should be unique for the User & Domain, No need to send domain explicitly, it can be the part of token
+
