@@ -68,15 +68,15 @@ func (service *UserService) GetUserByEmail(user *models.User, email string) {
 
 func (service *UserService) GetUsersInDomain(users *[]*models.User, domain *models.Domain) {
 	service.DB.
-		Joins("JOIN domain_user ON domain_user.user_id = users.id").
-		Where("domain_user.domain_id = ?", domain.ID).
+		Joins("JOIN domain_users ON domain_users.user_id = users.id").
+		Where("domain_users.domain_id = ?", domain.ID).
 		Find(users)
 }
 
 func (service *UserService) GetUserByUuidInDomain(user *models.User, uuid string, domain *models.Domain) {
 	service.DB.
-		Joins("JOIN domain_user ON domain_user.user_id = users.id").
-		Where("domain_user.domain_id = ?", domain.ID).
+		Joins("JOIN domain_users ON domain_users.user_id = users.id").
+		Where("domain_users.domain_id = ?", domain.ID).
 		Where("uuid = ?", uuid).
 		First(user)
 }
@@ -86,8 +86,8 @@ func (service *UserService) DeleteUserByUuidInDomain(user *models.User, uuid str
 	// get the domains of the user that we want to delete
 	// check if the seleted domain is contained in domains above
 	service.DB.
-		Joins("JOIN domain_user ON domain_user.user_id = users.id").
-		Where("domain_user.domain_id = ?", domain.ID).
+		Joins("JOIN domain_users ON domain_users.user_id = users.id").
+		Where("domain_users.domain_id = ?", domain.ID).
 		Where("uuid = ?", uuid).
 		Preload("Domains").
 		First(user)
