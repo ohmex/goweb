@@ -51,6 +51,8 @@ func (service *UserService) Register(e echo.Context, request *requests.RegisterR
 		return api.WebResponse(e, http.StatusInternalServerError, api.RESOURCE_CREATION_FAILED())
 	}
 
+	service.DB.Save(&models.DomainUser{UserID: int(newUser.ID), DomainID: int(domain.ID), Active: true})
+
 	return api.WebResponse(e, http.StatusCreated, api.RESOURCE_CREATED("User created"))
 }
 
