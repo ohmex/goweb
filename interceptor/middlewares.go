@@ -51,6 +51,7 @@ func JwtAuthorization(server *server.Server) echo.MiddlewareFunc {
 	}
 }
 
+// Domain Authorization: Check if user belongs to domain
 func CasbinAuthorization(server *server.Server) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -74,7 +75,7 @@ func CasbinAuthorization(server *server.Server) echo.MiddlewareFunc {
 	}
 }
 
-// Check if resource action can be done
+// Resource Authorization: Check if resource action can be done
 func ResourceAuthorization(server *server.Server, resource string, action string) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(e echo.Context) error {

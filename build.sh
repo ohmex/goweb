@@ -1,1 +1,1 @@
-go build -ldflags "-s -w" -o app .
+go build -ldflags "-s -w" -o goweb .
