@@ -32,6 +32,8 @@ func NewServer(cfg *config.Config) *Server {
 	enforcer.LoadPolicy()
 
 	e := echo.New()
+	//e.HideBanner = true
+	//e.HidePort = true
 	e.Pre(middleware.RemoveTrailingSlash())
 
 	return &Server{

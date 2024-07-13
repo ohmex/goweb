@@ -62,7 +62,28 @@ func (u UserHandler) Read(e echo.Context) error {
 
 // TODO: Check the resource being accessed belongs to the domain that user have access to
 func (u UserHandler) Update(e echo.Context) error {
-	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Update User not implemented"))
+	var user models.User
+
+	updateRequest := new(requests.UpdateRequest)
+
+	if err := e.Bind(updateRequest); err != nil {
+		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
+	}
+
+	if err := updateRequest.Validate(); err != nil {
+		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
+	}
+
+	domain := e.Get("domain").(*models.Domain)
+	uuid := e.Param("uuid")
+	services.NewUserService(u.Server.DB).GetUserByUuidInDomain(&user, uuid, domain)
+	if user.ID == 0 {
+		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("User not found"))
+	}
+	user.Name = updateRequest.Name
+	services.NewUserService(u.Server.DB).UpdateUser(&user)
+
+	return api.WebResponse(e, http.StatusOK, user)
 }
 
 // TODO: Check the resource being accessed belongs to the domain that user have access to

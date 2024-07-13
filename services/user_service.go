@@ -56,6 +56,10 @@ func (service *UserService) Register(e echo.Context, request *requests.RegisterR
 	return api.WebResponse(e, http.StatusCreated, api.RESOURCE_CREATED("User created"))
 }
 
+func (service *UserService) UpdateUser(user *models.User) {
+	service.DB.Save(user)
+}
+
 func (service *UserService) GetUser(user *models.User, id int) {
 	service.DB.First(user, id)
 }
