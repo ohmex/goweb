@@ -1,5 +1,11 @@
 package models
 
+type Role struct {
+	Base
+	Name     string `json:"name" gorm:"type:varchar(64);"`
+	DomainID int
+}
+
 type User struct {
 	Base
 	Email    string    `json:"email" gorm:"type:varchar(200);"`

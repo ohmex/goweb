@@ -104,6 +104,14 @@ func RESOURCE_CREATION_FAILED(s ...string) Response {
 	return Response{Code: 100012, Err: data, Msg: ""}
 }
 
+func RESOURCE_EXISTS(s ...string) Response {
+	data := "Resource already exists"
+	if s != nil {
+		data = s[0]
+	}
+	return Response{Code: 100013, Err: "", Msg: data}
+}
+
 // SUCCESS Responses Start from 200000
 func STATUS_OK(s ...string) Response {
 	data := "Ok"

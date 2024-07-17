@@ -24,6 +24,13 @@ func (TableData) Up(db *gorm.DB) {
 		panic(err)
 	}
 
+	role := models.Role{Name: "Admin", DomainID: -1}
+	db.Create(&role)
+	role = models.Role{Name: "Manager", DomainID: -1}
+	db.Create(&role)
+	role = models.Role{Name: "Operator", DomainID: -1}
+	db.Create(&role)
+
 	reliance := models.Domain{Name: "Reliance"}
 	db.Create(&reliance)
 	relianceUUID := reliance.UUID.String() //Get UUID port creating table
@@ -32,9 +39,16 @@ func (TableData) Up(db *gorm.DB) {
 	casbin.AddPolicy("Admin", relianceUUID, "User", "Create")
 	casbin.AddPolicy("Admin", relianceUUID, "User", "Update")
 	casbin.AddPolicy("Admin", relianceUUID, "User", "Delete")
+	casbin.AddPolicy("Admin", relianceUUID, "Role", "List")
+	casbin.AddPolicy("Admin", relianceUUID, "Role", "Read")
+	casbin.AddPolicy("Admin", relianceUUID, "Role", "Create")
+	casbin.AddPolicy("Admin", relianceUUID, "Role", "Update")
+	casbin.AddPolicy("Admin", relianceUUID, "Role", "Delete")
 	casbin.AddPolicy("Manager", relianceUUID, "User", "List")
 	casbin.AddPolicy("Manager", relianceUUID, "User", "Read")
 	casbin.AddPolicy("Manager", relianceUUID, "User", "Update")
+	casbin.AddPolicy("Manager", relianceUUID, "Role", "List")
+	casbin.AddPolicy("Manager", relianceUUID, "Role", "Read")
 	casbin.AddPolicy("Operator", relianceUUID, "User", "Read")
 
 	dmart := models.Domain{Name: "DMart"}
@@ -45,9 +59,16 @@ func (TableData) Up(db *gorm.DB) {
 	casbin.AddPolicy("Admin", dmartUUID, "User", "Create")
 	casbin.AddPolicy("Admin", dmartUUID, "User", "Update")
 	casbin.AddPolicy("Admin", dmartUUID, "User", "Delete")
+	casbin.AddPolicy("Admin", dmartUUID, "Role", "List")
+	casbin.AddPolicy("Admin", dmartUUID, "Role", "Read")
+	casbin.AddPolicy("Admin", dmartUUID, "Role", "Create")
+	casbin.AddPolicy("Admin", dmartUUID, "Role", "Update")
+	casbin.AddPolicy("Admin", dmartUUID, "Role", "Delete")
 	casbin.AddPolicy("Manager", dmartUUID, "User", "List")
 	casbin.AddPolicy("Manager", dmartUUID, "User", "Read")
 	casbin.AddPolicy("Manager", dmartUUID, "User", "Update")
+	casbin.AddPolicy("Manager", dmartUUID, "Role", "List")
+	casbin.AddPolicy("Manager", dmartUUID, "Role", "Read")
 	casbin.AddPolicy("Operator", dmartUUID, "User", "Read")
 
 	// Setting Super User
