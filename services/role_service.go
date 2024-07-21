@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"goweb/api"
 	"goweb/models"
 	"goweb/requests"
@@ -59,7 +60,13 @@ func (service *RoleService) UpdateRole(role *models.Role) error {
 }
 
 func (service *RoleService) DeleteRoleByUuidInDomain(role *models.Role, uuid string, domain *models.Domain) error {
-	return service.DB.
+	records := service.DB.
 		Where("domain_id = ? AND uuid = ?", domain.ID, uuid).
-		Delete(role).Error
+		Delete(role)
+
+	if records.RowsAffected > 0 {
+		return nil
+	}
+
+	return errors.New("Failed")
 }
