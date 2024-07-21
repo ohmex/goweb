@@ -46,7 +46,14 @@ func (h RoleHandler) Create(e echo.Context) error {
 }
 
 func (h RoleHandler) Read(e echo.Context) error {
-	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Read Role not implemented"))
+	var role models.Role
+	domain := e.Get("domain").(*models.Domain)
+	uuid := e.Param("uuid")
+	services.NewRoleService(h.Server.DB).GetRoleByUuidInDomain(&role, uuid, domain)
+	if role.ID == 0 {
+		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Role not found"))
+	}
+	return api.WebResponse(e, http.StatusOK, role)
 }
 
 func (h RoleHandler) Update(e echo.Context) error {
