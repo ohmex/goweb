@@ -14,6 +14,8 @@ func NewDomainService(db *gorm.DB) *DomainService {
 	return &DomainService{DB: db}
 }
 
-func (service *DomainService) GetDomainByUUID(domain *models.Domain, id string) {
-	service.DB.Where("uuid = ?", id).First(domain)
+func (service *DomainService) GetDomainByUUID(domain *models.Domain, id string) error {
+	return service.DB.
+		Where("uuid = ?", id).
+		First(domain).Error
 }

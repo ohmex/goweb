@@ -57,9 +57,39 @@ func (h RoleHandler) Read(e echo.Context) error {
 }
 
 func (h RoleHandler) Update(e echo.Context) error {
-	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Update Role not implemented"))
+	var role models.Role
+	service := services.NewRoleService(h.Server.DB)
+
+	roleRequest := new(requests.RoleRequest)
+
+	if err := e.Bind(roleRequest); err != nil {
+		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
+	}
+
+	if err := roleRequest.Validate(); err != nil {
+		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
+	}
+
+	uuid := e.Param("uuid")
+	domain := e.Get("domain").(*models.Domain)
+
+	service.GetRoleByUuidInDomain(&role, uuid, domain)
+	if role.ID == 0 {
+		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Role not found"))
+	}
+	role.Name = roleRequest.Name
+	service.UpdateRole(&role)
+
+	return api.WebResponse(e, http.StatusOK, role)
 }
 
 func (h RoleHandler) Delete(e echo.Context) error {
-	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Delete Role not implemented"))
+	var role models.Role
+	domain := e.Get("domain").(*models.Domain)
+	uuid := e.Param("uuid")
+	ok := services.NewRoleService(h.Server.DB).DeleteRoleByUuidInDomain(&role, uuid, domain)
+	if ok != nil {
+		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Role not found"))
+	}
+	return api.WebResponse(e, http.StatusOK, api.RESOURCE_DELETED("Role deleted"))
 }

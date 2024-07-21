@@ -56,35 +56,41 @@ func (service *UserService) Register(e echo.Context, request *requests.RegisterR
 	return api.WebResponse(e, http.StatusCreated, api.RESOURCE_CREATED("User created"))
 }
 
-func (service *UserService) UpdateUser(user *models.User) {
-	service.DB.Save(user)
+func (service *UserService) UpdateUser(user *models.User) error {
+	return service.DB.
+		Save(user).Error
 }
 
-func (service *UserService) GetUser(user *models.User, id int) {
-	service.DB.First(user, id)
+func (service *UserService) GetUser(user *models.User, id int) error {
+	return service.DB.
+		First(user, id).Error
 }
 
-func (service *UserService) GetUserByUUID(user *models.User, uuid string) {
-	service.DB.Where("uuid = ?", uuid).First(user)
+func (service *UserService) GetUserByUUID(user *models.User, uuid string) error {
+	return service.DB.
+		Where("uuid = ?", uuid).
+		First(user).Error
 }
 
-func (service *UserService) GetUserByEmail(user *models.User, email string) {
-	service.DB.Where("email = ?", email).First(user)
+func (service *UserService) GetUserByEmail(user *models.User, email string) error {
+	return service.DB.
+		Where("email = ?", email).
+		First(user).Error
 }
 
-func (service *UserService) GetUsersInDomain(users *[]*models.User, domain *models.Domain) {
-	service.DB.
+func (service *UserService) GetUsersInDomain(users *[]*models.User, domain *models.Domain) error {
+	return service.DB.
 		Joins("JOIN domain_users ON domain_users.user_id = users.id").
 		Where("domain_users.domain_id = ?", domain.ID).
-		Find(users)
+		Find(users).Error
 }
 
-func (service *UserService) GetUserByUuidInDomain(user *models.User, uuid string, domain *models.Domain) {
-	service.DB.
+func (service *UserService) GetUserByUuidInDomain(user *models.User, uuid string, domain *models.Domain) error {
+	return service.DB.
 		Joins("JOIN domain_users ON domain_users.user_id = users.id").
 		Where("domain_users.domain_id = ?", domain.ID).
 		Where("uuid = ?", uuid).
-		First(user)
+		First(user).Error
 }
 
 func (service *UserService) DeleteUserByUuidInDomain(user *models.User, uuid string, domain *models.Domain) error {

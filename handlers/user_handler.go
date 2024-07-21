@@ -93,7 +93,7 @@ func (u UserHandler) Delete(e echo.Context) error {
 	uuid := e.Param("uuid")
 	err := services.NewUserService(u.Server.DB).DeleteUserByUuidInDomain(&user, uuid, domain)
 	if err == nil {
-		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_CREATION_FAILED("User deleted"))
+		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("User not found"))
 	}
-	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("User not found"))
+	return api.WebResponse(e, http.StatusOK, api.RESOURCE_DELETED("User deleted"))
 }

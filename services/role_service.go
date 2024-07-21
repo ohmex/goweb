@@ -18,10 +18,10 @@ func NewRoleService(db *gorm.DB) *RoleService {
 	return &RoleService{DB: db}
 }
 
-func (service *RoleService) GetRolesInDomain(roles *[]*models.Role, domain *models.Domain) {
-	service.DB.
+func (service *RoleService) GetRolesInDomain(roles *[]*models.Role, domain *models.Domain) error {
+	return service.DB.
 		Where("domain_id in (-1, ?)", domain.ID).
-		Find(roles)
+		Find(roles).Error
 }
 
 func (service *RoleService) Create(e echo.Context, request *requests.RoleRequest, domain *models.Domain) error {
@@ -47,8 +47,19 @@ func (service *RoleService) Create(e echo.Context, request *requests.RoleRequest
 	return api.WebResponse(e, http.StatusCreated, api.RESOURCE_CREATED("Role created"))
 }
 
-func (service *RoleService) GetRoleByUuidInDomain(role *models.Role, uuid string, domain *models.Domain) {
-	service.DB.
+func (service *RoleService) GetRoleByUuidInDomain(role *models.Role, uuid string, domain *models.Domain) error {
+	return service.DB.
 		Where("domain_id = ? AND uuid = ?", domain.ID, uuid).
-		First(role)
+		First(role).Error
+}
+
+func (service *RoleService) UpdateRole(role *models.Role) error {
+	return service.DB.
+		Save(role).Error
+}
+
+func (service *RoleService) DeleteRoleByUuidInDomain(role *models.Role, uuid string, domain *models.Domain) error {
+	return service.DB.
+		Where("domain_id = ? AND uuid = ?", domain.ID, uuid).
+		Delete(role).Error
 }
