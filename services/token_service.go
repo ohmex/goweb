@@ -24,7 +24,7 @@ type Domain struct {
 }
 
 type JwtCustomClaims struct {
-	ID      uint     `json:"id"`
+	ID      int      `json:"id"`
 	UUID    string   `json:"uuid"`
 	Name    string   `json:"name"`
 	Domains []Domain `json:"domains"`
@@ -32,7 +32,7 @@ type JwtCustomClaims struct {
 }
 
 type JwtCustomRefreshClaims struct {
-	ID uint `json:"id"`
+	ID int `json:"id"`
 	jwt.RegisteredClaims
 }
 

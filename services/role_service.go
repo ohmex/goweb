@@ -25,18 +25,26 @@ func (service *RoleService) GetRolesInDomain(roles *[]*models.Role, domain *mode
 }
 
 func (service *RoleService) Create(e echo.Context, request *requests.RoleRequest, domain *models.Domain) error {
-	role := models.Role{}
-	role.Name = request.Name
+	var role models.Role
 
-	service.GetRoleByDomain(&role, int(domain.ID))
+	service.DB.Where("name = ? AND domain_id = ?", request.Name, domain.ID).First(role)
 
 	if role.ID != 0 {
-		return api.WebResponse(e, http.StatusBadRequest, api.RESOURCE_EXISTS())
+		return api.WebResponse(e, http.StatusBadRequest, api.RESOURCE_EXISTS("Role already exists"))
 	}
 
-	return nil
+	role.Name = request.Name
+	role.DomainID = domain.ID
+
+	ok := service.DB.Create(&role).Error
+
+	if ok != nil {
+		return api.WebResponse(e, http.StatusInternalServerError, api.RESOURCE_CREATION_FAILED("Error creating role"))
+	}
+
+	return api.WebResponse(e, http.StatusCreated, api.RESOURCE_CREATED("Role created"))
 }
 
-func (service *RoleService) GetRoleByDomain(role *models.Role, id int) {
-	service.DB.Where("id = ?", id).First(role)
+func (service *RoleService) GetRoleByNameInDomain(role *models.Role, id int) {
+	service.DB.Where("domain_id = ?", id).First(role)
 }
