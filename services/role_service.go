@@ -20,7 +20,7 @@ func NewRoleService(db *gorm.DB) *RoleService {
 }
 
 func (service *RoleService) GetRolesInDomain(roles *[]*models.Role, domain *models.Domain) error {
-	// 1 is System Domain
+	// TODO: Change the static value 1 for System domain & fetch it dynamically
 	return service.DB.
 		Where("domain_id in (1, ?)", domain.ID).
 		Find(roles).Error
