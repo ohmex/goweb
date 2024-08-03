@@ -3,9 +3,9 @@ package db
 import "gorm.io/gorm"
 
 type Model struct {
-	Id        int    `gorm:"primaryKey;autoIncrement"`
+	Id        uint64 `gorm:"primaryKey;autoIncrement"`
 	Migration string `gorm:"not null"`
-	Batch     int    `gorm:"not null"`
+	Batch     uint64 `gorm:"not null"`
 }
 
 func (Model) TableName() string {
@@ -28,7 +28,7 @@ func AddMigrators(setup ...Migrator) {
 
 func Migrate(db *gorm.DB) (err error) {
 	var (
-		batch       int
+		batch       uint64
 		installed   []Model
 		installMap  = make(map[string]struct{})
 		unInstalled []Migrator
@@ -61,7 +61,7 @@ func Migrate(db *gorm.DB) (err error) {
 
 func MigrateUp(db *gorm.DB) (err error) {
 	var (
-		batch      int
+		batch      uint64
 		installed  []Model
 		installMap = make(map[string]struct{})
 	)
@@ -89,7 +89,7 @@ func MigrateUp(db *gorm.DB) (err error) {
 
 func MigrateDown(db *gorm.DB) (err error) {
 	var (
-		batch     int
+		batch     uint64
 		installed []Model
 		downIdMap = make(map[string]struct{})
 	)
@@ -118,7 +118,7 @@ func MigrateDown(db *gorm.DB) (err error) {
 	return db.Where("batch=?", batch).Delete(&Model{}).Error
 }
 
-func migrate(db *gorm.DB, batch int, migrators ...Migrator) (err error) {
+func migrate(db *gorm.DB, batch uint64, migrators ...Migrator) (err error) {
 	for _, v := range migrators {
 		v.Up(db)
 		if err = db.Create(&Model{

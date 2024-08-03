@@ -3,7 +3,7 @@ package api
 import "github.com/labstack/echo/v4"
 
 type Response struct {
-	Code int    `json:"code"`
+	Code uint64 `json:"code"`
 	Err  string `json:"error,omitempty"`
 	Msg  string `json:"message,omitempty"`
 }

@@ -3,7 +3,7 @@ package models
 type Role struct {
 	Base
 	Name     string `json:"name" gorm:"type:varchar(64);"`
-	DomainID int
+	DomainID uint64
 }
 
 type User struct {
@@ -16,7 +16,7 @@ type User struct {
 }
 
 type DomainUser struct {
-	DomainID int  `gorm:"primaryKey"`
-	UserID   int  `gorm:"primaryKey"`
-	Active   bool `gorm:"default:false"`
+	DomainID uint64 `gorm:"primaryKey"`
+	UserID   uint64 `gorm:"primaryKey"`
+	Active   bool   `gorm:"default:false"`
 }

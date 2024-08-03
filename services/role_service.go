@@ -20,8 +20,9 @@ func NewRoleService(db *gorm.DB) *RoleService {
 }
 
 func (service *RoleService) GetRolesInDomain(roles *[]*models.Role, domain *models.Domain) error {
+	// 1 is System Domain
 	return service.DB.
-		Where("domain_id in (-1, ?)", domain.ID).
+		Where("domain_id in (1, ?)", domain.ID).
 		Find(roles).Error
 }
 
