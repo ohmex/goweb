@@ -70,7 +70,7 @@ func CasbinAuthorization(server *server.Server) echo.MiddlewareFunc {
 				return next(c)
 			}
 
-			return api.WebResponse(c, http.StatusForbidden, api.CASBIN_UNAUTHORIZED())
+			return api.WebResponse(c, http.StatusForbidden, api.CASBIN_UNAUTHORIZED("Access denied - domain authorization failed"))
 		}
 	}
 }
