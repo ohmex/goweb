@@ -92,7 +92,13 @@ func (authHandler *AuthHandler) RefreshToken(c echo.Context) error {
 		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_TOKEN())
 	}
 
+	// u, err := services.NewTokenService(authHandler.server).ValidateToken(claims, false)
+	// if err != nil {
+	// 	return api.WebResponse(c, http.StatusUnauthorized, err) // TODO: Change this return statement
+	// }
+
 	user := new(models.User)
+	//authHandler.server.DB.First(&user, int(claims.ID))
 	authHandler.server.DB.First(&user, int(claims["id"].(float64)))
 
 	if user.ID == 0 {
@@ -118,8 +124,8 @@ func (authHandler *AuthHandler) RefreshToken(c echo.Context) error {
 // @Security ApiKeyAuth
 // @Router /logout [post]
 func (authHandler *AuthHandler) Logout(c echo.Context) error {
-	user := c.Get("token").(*jwt.Token)
-	claims := user.Claims.(*services.JwtCustomClaims)
+	token := c.Get("token").(*jwt.Token)
+	claims := token.Claims.(*services.JwtCustomClaims)
 
 	authHandler.server.Redis.Del(context.Background(), fmt.Sprintf("token-%d", claims.ID))
 

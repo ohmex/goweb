@@ -42,7 +42,7 @@ func (rr RegisterRequest) Validate() error {
 }
 
 type RefreshRequest struct {
-	Token string `json:"token" validate:"required" example:"refresh_token"`
+	Token string `form:"token" json:"token" validate:"required" example:"refresh_token"`
 }
 
 type UpdateRequest struct {

@@ -31,11 +31,6 @@ type JwtCustomClaims struct {
 	jwt.RegisteredClaims
 }
 
-type JwtCustomRefreshClaims struct {
-	ID uint64 `json:"id"`
-	jwt.RegisteredClaims
-}
-
 type CachedTokens struct {
 	AccessUID  string `json:"access"`
 	RefreshUID string `json:"refresh"`
