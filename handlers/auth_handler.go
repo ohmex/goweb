@@ -76,36 +76,16 @@ func (authHandler *AuthHandler) RefreshToken(c echo.Context) error {
 		return err
 	}
 
-	token, err := jwt.Parse(refreshRequest.Token, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-		return []byte(authHandler.server.Config.Auth.RefreshSecret), nil
-	})
-
+	tokenService := services.NewTokenService(authHandler.server)
+	claims, _ := tokenService.ParseToken(refreshRequest.Token, authHandler.server.Config.Auth.RefreshSecret)
+	user, err := services.NewTokenService(authHandler.server).ValidateToken(claims, true)
 	if err != nil {
-		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_SIGNING_METHOD(err.Error()))
+		return api.WebResponse(c, http.StatusUnauthorized, err)
 	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok && !token.Valid {
-		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_TOKEN())
-	}
-
-	// u, err := services.NewTokenService(authHandler.server).ValidateToken(claims, false)
-	// if err != nil {
-	// 	return api.WebResponse(c, http.StatusUnauthorized, err) // TODO: Change this return statement
-	// }
-
-	user := new(models.User)
-	//authHandler.server.DB.First(&user, int(claims.ID))
-	authHandler.server.DB.First(&user, int(claims["id"].(float64)))
 
 	if user.ID == 0 {
 		return api.WebResponse(c, http.StatusUnauthorized, api.USER_NOT_FOUND())
 	}
-
-	tokenService := services.NewTokenService(authHandler.server)
 
 	accessToken, refreshToken, exp, _ := tokenService.GenerateTokenPair(user)
 
