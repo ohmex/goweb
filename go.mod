@@ -12,11 +12,11 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo-jwt/v4 v4.2.0
 	github.com/labstack/echo/v4 v4.12.0
-	github.com/redis/go-redis/v9 v9.6.1
+	github.com/redis/go-redis/v9 v9.7.0
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/cobra v1.8.1
 	github.com/swaggo/echo-swagger v1.4.1
-	github.com/swaggo/swag v1.16.3
+	github.com/swaggo/swag v1.16.4
 	golang.org/x/crypto v0.28.0
 	golang.org/x/sync v0.8.0
 	gorm.io/driver/mysql v1.5.7
@@ -27,7 +27,7 @@ require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
-	github.com/bmatcuk/doublestar/v4 v4.6.1 // indirect
+	github.com/bmatcuk/doublestar/v4 v4.7.1 // indirect
 	github.com/casbin/govaluate v1.2.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
@@ -62,7 +62,7 @@ require (
 	github.com/swaggo/files/v2 v2.0.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	golang.org/x/exp v0.0.0-20241004190924-225e2abe05e6 // indirect
+	golang.org/x/exp v0.0.0-20241009180824-f66d83c29e7c // indirect
 	golang.org/x/net v0.30.0 // indirect
 	golang.org/x/sys v0.26.0 // indirect
 	golang.org/x/text v0.19.0 // indirect
