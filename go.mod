@@ -3,7 +3,7 @@ module goweb
 go 1.22.5
 
 require (
-	github.com/brianvoe/gofakeit/v7 v7.0.4
+	github.com/brianvoe/gofakeit/v7 v7.1.1
 	github.com/casbin/casbin/v2 v2.100.0
 	github.com/casbin/gorm-adapter/v3 v3.28.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
