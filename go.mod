@@ -3,7 +3,7 @@ module goweb
 go 1.23.3
 
 require (
-	github.com/brianvoe/gofakeit/v7 v7.1.2
+	github.com/brianvoe/gofakeit/v7 v7.2.1
 	github.com/casbin/casbin/v2 v2.103.0
 	github.com/casbin/gorm-adapter/v3 v3.32.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
@@ -12,13 +12,13 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo-jwt/v4 v4.3.0
 	github.com/labstack/echo/v4 v4.13.3
-	github.com/redis/go-redis/v9 v9.7.0
+	github.com/redis/go-redis/v9 v9.7.1
 	github.com/rs/zerolog v1.33.0
-	github.com/spf13/cobra v1.8.1
+	github.com/spf13/cobra v1.9.1
 	github.com/swaggo/echo-swagger v1.4.1
 	github.com/swaggo/swag v1.16.4
-	golang.org/x/crypto v0.32.0
-	golang.org/x/sync v0.10.0
+	golang.org/x/crypto v0.35.0
+	golang.org/x/sync v0.11.0
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gorm v1.25.12
 )
@@ -39,7 +39,7 @@ require (
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
 	github.com/go-openapi/spec v0.21.0 // indirect
 	github.com/go-openapi/swag v0.23.0 // indirect
-	github.com/go-sql-driver/mysql v1.8.1 // indirect
+	github.com/go-sql-driver/mysql v1.9.0 // indirect
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
@@ -57,23 +57,23 @@ require (
 	github.com/microsoft/go-mssqldb v1.8.0 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/swaggo/files/v2 v2.0.2 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8 // indirect
-	golang.org/x/net v0.34.0 // indirect
-	golang.org/x/sys v0.29.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
-	golang.org/x/time v0.9.0 // indirect
-	golang.org/x/tools v0.29.0 // indirect
+	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa // indirect
+	golang.org/x/net v0.35.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
+	golang.org/x/text v0.22.0 // indirect
+	golang.org/x/time v0.10.0 // indirect
+	golang.org/x/tools v0.30.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/postgres v1.5.11 // indirect
 	gorm.io/driver/sqlserver v1.5.4 // indirect
 	gorm.io/plugin/dbresolver v1.5.3 // indirect
-	modernc.org/libc v1.61.9 // indirect
+	modernc.org/libc v1.61.13 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.8.2 // indirect
-	modernc.org/sqlite v1.34.5 // indirect
+	modernc.org/sqlite v1.36.0 // indirect
 )
