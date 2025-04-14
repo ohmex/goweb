@@ -107,7 +107,7 @@ func (authHandler *AuthHandler) Logout(c echo.Context) error {
 	token := c.Get("token").(*jwt.Token)
 	claims := token.Claims.(*services.JwtCustomClaims)
 
-	authHandler.server.Redis.Del(context.Background(), fmt.Sprintf("token-%d", claims.ID))
+	authHandler.server.Redis.Del(context.Background(), fmt.Sprintf("token-%d", claims.UserID))
 
 	return api.WebResponse(c, http.StatusOK, api.USER_LOGGED_OUT())
 }

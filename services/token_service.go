@@ -24,10 +24,11 @@ type Domain struct {
 }
 
 type JwtCustomClaims struct {
-	ID      uint64   `json:"id"`
-	UUID    string   `json:"uuid"`
-	Name    string   `json:"name"`
-	Domains []Domain `json:"domains"`
+	UUID     string   `json:"uuid"`
+	UserID   uint64   `json:"userid"`
+	UserUUID string   `json:"useruuid"`
+	UserName string   `json:"username"`
+	Domains  []Domain `json:"domains"`
 	jwt.RegisteredClaims
 }
 
@@ -92,7 +93,7 @@ func (tokenService *TokenService) ValidateToken(claims *JwtCustomClaims, isRefre
 	var g errgroup.Group
 
 	g.Go(func() error {
-		cacheJSON, _ := tokenService.server.Redis.Get(context.Background(), fmt.Sprintf("token-%d", claims.ID)).Result()
+		cacheJSON, _ := tokenService.server.Redis.Get(context.Background(), fmt.Sprintf("token-%d", claims.UserID)).Result()
 		cachedTokens := new(CachedTokens)
 		err = json.Unmarshal([]byte(cacheJSON), cachedTokens)
 
@@ -113,7 +114,7 @@ func (tokenService *TokenService) ValidateToken(claims *JwtCustomClaims, isRefre
 	g.Go(func() error {
 		user = new(models.User)
 		userRepository := NewUserService(tokenService.server.DB)
-		userRepository.GetUser(user, int(claims.ID))
+		userRepository.GetUser(user, int(claims.UserID))
 		if user.ID == 0 {
 			return api.USER_NOT_FOUND()
 		}
@@ -138,8 +139,9 @@ func (tokenService *TokenService) createToken(user *models.User, expireMinutes i
 	}
 
 	claims := &JwtCustomClaims{
-		user.ID,
 		tokenUuid,
+		user.ID,
+		user.UUID.String(),
 		user.Name,
 		domains,
 		jwt.RegisteredClaims{
