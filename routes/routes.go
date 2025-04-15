@@ -44,7 +44,7 @@ func ConfigureRoutes(server *server.Server) {
 	server.Echo.Use(middleware.RequestID())
 
 	server.Echo.GET("", func(ctx echo.Context) error {
-		return ctx.String(http.StatusOK, "Welcome to HOME!")
+		return ctx.String(http.StatusOK, "Ohmex welcomes you to paradise!")
 	})
 	server.Echo.GET("/swagger/*", echoSwagger.WrapHandler)
 

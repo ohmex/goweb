@@ -39,7 +39,7 @@ func Execute() {
 
 func StartServer() {
 	cfg := config.NewConfig()
-	// TODO: overide from cmdline options
+	// TODO: override the cmdline options
 	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s", cfg.HTTP.Host, cfg.HTTP.Port)
 	app := server.NewServer(cfg)
 	routes.ConfigureRoutes(app)

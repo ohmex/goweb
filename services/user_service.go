@@ -96,7 +96,7 @@ func (service *UserService) GetUserByUuidInDomain(user *models.User, uuid string
 func (service *UserService) DeleteUserByUuidInDomain(user *models.User, uuid string, domain *models.Domain) error {
 	// delete the user only if User.uuid == uuid & User.domains contains selected domain
 	// get the domains of the user that we want to delete
-	// check if the seleted domain is contained in domains above
+	// check if the selected domain is present within domains above
 	service.DB.
 		Joins("JOIN domain_users ON domain_users.user_id = users.id").
 		Where("domain_users.domain_id = ?", domain.ID).
