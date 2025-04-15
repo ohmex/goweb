@@ -25,7 +25,7 @@ func FIELD_VALIDATION_ERROR(s ...string) Response {
 }
 
 func INVALID_CREDENTIALS(s ...string) Response {
-	data := "Invalid credentails"
+	data := "Invalid credentials"
 	if s != nil {
 		data = s[0]
 	}

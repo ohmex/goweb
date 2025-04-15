@@ -43,7 +43,7 @@ func JwtAuthorization(server *server.Server) echo.MiddlewareFunc {
 			c.Set("domain", domain)
 
 			go func() {
-				server.Redis.Expire(context.Background(), fmt.Sprintf("token-%d", claims.ID), time.Minute*services.AutoLogoffMinutes)
+				server.Redis.Expire(context.Background(), fmt.Sprintf("token-%s", claims.ID), time.Minute*services.AutoLogoffMinutes)
 			}()
 
 			return next(c)
@@ -61,10 +61,10 @@ func CasbinAuthorization(server *server.Server) echo.MiddlewareFunc {
 			// Get user name as UUID
 			user := c.Get("user").(*models.User).UUID.String()
 
-			// Check, user though mabe assiciated with a domain in DB
+			// Check, user though maybe associated with a domain in DB
 			// Does he has casbin domain assigned to him or not
 			domains, _ := server.Casbin.GetDomainsForUser(user)
-			ok := util.Contains[string](domains, domain)
+			ok := util.Contains(domains, domain)
 
 			if ok {
 				return next(c)
@@ -82,7 +82,7 @@ func ResourceAuthorization(server *server.Server, resource string, action string
 			user := e.Get("user").(*models.User).UUID.String()
 			domain := e.Request().Header.Get("domain")
 
-			// Enforce used nomentlature (sub, dom, obj, act)
+			// Enforce used nomenclature (sub, dom, obj, act)
 			ok, _ := server.Casbin.Enforce(user, domain, resource, action)
 
 			if !ok {
