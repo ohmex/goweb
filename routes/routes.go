@@ -26,7 +26,7 @@ func ConfigureRoutes(server *server.Server) {
 		SigningKey:    []byte(server.Config.Auth.AccessSecret),
 	}
 	server.JwtAuthenticationMw = echojwt.WithConfig(config)
-	server.JwtAuthorizationMw = interceptor.JwtAuthorization(server)
+	server.JwtClaimsAuthorization = interceptor.JwtClaimsAuthorization(server)
 	server.CasbinAuthorizationMw = interceptor.CasbinAuthorization(server)
 
 	authHandler := handlers.NewAuthHandler(server)
@@ -54,7 +54,7 @@ func ConfigureRoutes(server *server.Server) {
 
 	protectedGroup := server.Echo.Group("")
 	protectedGroup.Use(server.JwtAuthenticationMw)
-	protectedGroup.Use(server.JwtAuthorizationMw)
+	protectedGroup.Use(server.JwtClaimsAuthorization)
 	protectedGroup.POST("/logout", authHandler.Logout)
 
 	AddResource(server, "/role", handlers.NewRoleHandler(server))
@@ -65,7 +65,7 @@ func ConfigureRoutes(server *server.Server) {
 func AddResource(server *server.Server, p string, h handlers.BaseInterface) {
 	group := server.Echo.Group("/api" + p)
 	group.Use(server.JwtAuthenticationMw)
-	group.Use(server.JwtAuthorizationMw)
+	group.Use(server.JwtClaimsAuthorization)
 	group.Use(server.CasbinAuthorizationMw)
 	group.GET("", h.List, interceptor.ResourceAuthorization(server, h.Type(), "List"))              // Respond back with a the List of Resource
 	group.GET("/:uuid", h.Read, interceptor.ResourceAuthorization(server, h.Type(), "Read"))        // Read a single Resource identified by id
