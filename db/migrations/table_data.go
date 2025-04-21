@@ -2,9 +2,11 @@ package migrations
 
 import (
 	"goweb/models"
+	"goweb/util"
 
 	"github.com/casbin/casbin/v2"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
+	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -86,6 +88,11 @@ func (TableData) Up(db *gorm.DB) {
 	db.Create(&user)
 	db.Save(&models.DomainUser{UserID: user.ID, DomainID: reliance.ID, Active: true})
 	casbin.AddRoleForUserInDomain(user.UUID.String(), "Admin", relianceUUID)
+
+	key, secret, hashedSecret := util.GenerateAPIKeySecret()
+	log.Debug().Str("User: ", user.Email).Str("Key: ", key).Str("Secret: ", secret).Send()
+	apiKey := models.APIKey{UserID: user.ID, ApiKey: key, HashedSecret: hashedSecret}
+	db.Create(&apiKey)
 
 	user = models.User{Name: "UserB", Email: "userb@gmail.com", Password: string(hashedPassword), Domains: []*models.Domain{&reliance}}
 	db.Create(&user)
