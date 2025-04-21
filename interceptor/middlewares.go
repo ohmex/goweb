@@ -20,7 +20,7 @@ import (
 // 2. Check the user exists in DB
 // 3. Add the user data to Echo Context
 // 4. Prolong the Redis TTL of the current token pair
-func JwtClaimsAuthorization(server *server.Server) echo.MiddlewareFunc {
+func JwtClaimsAuthorizationMw(server *server.Server) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			token := c.Get("token").(*jwt.Token)

@@ -13,14 +13,14 @@ import (
 )
 
 type Server struct {
-	Echo                   *echo.Echo
-	DB                     *gorm.DB
-	Redis                  *redis.Client
-	Config                 *config.Config
-	Casbin                 *casbin.Enforcer
-	JwtAuthenticationMw    echo.MiddlewareFunc
-	JwtClaimsAuthorization echo.MiddlewareFunc
-	CasbinAuthorizationMw  echo.MiddlewareFunc
+	Echo                     *echo.Echo
+	DB                       *gorm.DB
+	Redis                    *redis.Client
+	Config                   *config.Config
+	Casbin                   *casbin.Enforcer
+	JwtAuthenticationMw      echo.MiddlewareFunc
+	JwtClaimsAuthorizationMw echo.MiddlewareFunc
+	CasbinAuthorizationMw    echo.MiddlewareFunc
 }
 
 func NewServer(cfg *config.Config) *Server {
