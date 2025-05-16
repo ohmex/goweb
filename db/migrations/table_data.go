@@ -4,7 +4,7 @@ import (
 	"goweb/models"
 
 	"github.com/casbin/casbin/v2"
-	gormadapter "github.com/casbin/gorm-adapter/v3"
+	ga "github.com/casbin/gorm-adapter/v3"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -16,7 +16,7 @@ func (TableData) Id() string {
 }
 
 func (TableData) Up(db *gorm.DB) {
-	adaptor, _ := gormadapter.NewAdapterByDBUseTableName(db, "", "casbin")
+	adaptor, _ := ga.NewAdapterByDBUseTableName(db, "", "casbin")
 	casbin, _ := casbin.NewEnforcer("casbin/model.conf", adaptor)
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)

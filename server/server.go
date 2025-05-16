@@ -5,7 +5,7 @@ import (
 	"goweb/db"
 
 	"github.com/casbin/casbin/v2"
-	gormadapter "github.com/casbin/gorm-adapter/v3"
+	ga "github.com/casbin/gorm-adapter/v3"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/redis/go-redis/v9"
@@ -25,8 +25,8 @@ type Server struct {
 
 func NewServer(cfg *config.Config) *Server {
 	database := db.InitDB(cfg)
-	//adaptor, _ := gormadapter.NewAdapter("sqlite3", "casbin.db")
-	adaptor, _ := gormadapter.NewAdapterByDBUseTableName(database, "", "casbin")
+	//adaptor, _ := ga.NewAdapter("sqlite3", "casbin.db")
+	adaptor, _ := ga.NewAdapterByDBUseTableName(database, "", "casbin")
 	enforcer, _ := casbin.NewEnforcer("casbin/model.conf", adaptor)
 	//enforcer.EnableLog(true)
 	enforcer.LoadPolicy()
