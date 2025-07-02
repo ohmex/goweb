@@ -19,22 +19,33 @@ func NewRoleHandler(server *server.Server) *RoleHandler {
 	return &RoleHandler{Server: server}
 }
 
-func (h RoleHandler) Type() string {
+func (h *RoleHandler) getDomain(e echo.Context) (*models.Domain, error) {
+	domain, ok := e.Get("domain").(*models.Domain)
+	if !ok || domain == nil {
+		return nil, api.FIELD_VALIDATION_ERROR("Missing domain information")
+	}
+	return domain, nil
+}
+
+func (h *RoleHandler) Type() string {
 	return "Role"
 }
 
-func (h RoleHandler) List(e echo.Context) error {
-	domain, ok := e.Get("domain").(*models.Domain)
-	if !ok {
-		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR("Missing domain information"))
+func (h *RoleHandler) List(e echo.Context) error {
+	domain, err := h.getDomain(e)
+	if err != nil {
+		return api.WebResponse(e, http.StatusBadRequest, err)
 	}
 
 	var roles []*models.Role
-	services.NewRoleService(h.Server.DB).GetRolesInDomain(&roles, domain)
+	service := services.NewRoleService(h.Server.DB)
+	if err := service.GetRolesInDomain(&roles, domain); err != nil {
+		return api.WebResponse(e, http.StatusInternalServerError, err)
+	}
 	return api.WebResponse(e, http.StatusOK, roles)
 }
 
-func (h RoleHandler) Create(e echo.Context) error {
+func (h *RoleHandler) Create(e echo.Context) error {
 	roleRequest := new(requests.RoleRequest)
 
 	if err := e.Bind(roleRequest); err != nil {
@@ -45,26 +56,36 @@ func (h RoleHandler) Create(e echo.Context) error {
 		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
 
-	domain, ok := e.Get("domain").(*models.Domain)
-	if !ok {
-		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR("Missing domain information"))
+	domain, err := h.getDomain(e)
+	if err != nil {
+		return api.WebResponse(e, http.StatusBadRequest, err)
 	}
 
-	return services.NewRoleService(h.Server.DB).Create(e, roleRequest, domain)
+	service := services.NewRoleService(h.Server.DB)
+	if err := service.Create(e, roleRequest, domain); err != nil {
+		return api.WebResponse(e, http.StatusInternalServerError, err)
+	}
+	return api.WebResponse(e, http.StatusCreated, api.RESOURCE_CREATED("Role created"))
 }
 
-func (h RoleHandler) Read(e echo.Context) error {
+func (h *RoleHandler) Read(e echo.Context) error {
 	var role models.Role
-	domain := e.Get("domain").(*models.Domain)
+	domain, err := h.getDomain(e)
+	if err != nil {
+		return api.WebResponse(e, http.StatusBadRequest, err)
+	}
 	uuid := e.Param("uuid")
-	services.NewRoleService(h.Server.DB).GetRoleByUuidInDomain(&role, uuid, domain)
+	service := services.NewRoleService(h.Server.DB)
+	if err := service.GetRoleByUuidInDomain(&role, uuid, domain); err != nil {
+		return api.WebResponse(e, http.StatusInternalServerError, err)
+	}
 	if role.ID == 0 {
 		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Role not found"))
 	}
 	return api.WebResponse(e, http.StatusOK, role)
 }
 
-func (h RoleHandler) Update(e echo.Context) error {
+func (h *RoleHandler) Update(e echo.Context) error {
 	var role models.Role
 	service := services.NewRoleService(h.Server.DB)
 
@@ -80,31 +101,35 @@ func (h RoleHandler) Update(e echo.Context) error {
 
 	// Extract UUID and domain from the request context
 	uuid := e.Param("uuid")
-	domain, ok := e.Get("domain").(*models.Domain)
-	if !ok {
-		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR("Missing domain information"))
+	domain, err := h.getDomain(e)
+	if err != nil {
+		return api.WebResponse(e, http.StatusBadRequest, err)
 	}
 
-	service.GetRoleByUuidInDomain(&role, uuid, domain)
+	if err := service.GetRoleByUuidInDomain(&role, uuid, domain); err != nil {
+		return api.WebResponse(e, http.StatusInternalServerError, err)
+	}
 	if role.ID == 0 {
 		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Role not found"))
 	}
 	role.Name = roleRequest.Name
-	service.UpdateRole(&role)
+	if err := service.UpdateRole(&role); err != nil {
+		return api.WebResponse(e, http.StatusInternalServerError, err)
+	}
 
 	return api.WebResponse(e, http.StatusOK, role)
 }
 
-func (h RoleHandler) Delete(e echo.Context) error {
+func (h *RoleHandler) Delete(e echo.Context) error {
 	var role models.Role
 	uuid := e.Param("uuid")
-	domain, OK := e.Get("domain").(*models.Domain)
-	if !OK {
-		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR("Missing domain information"))
+	domain, err := h.getDomain(e)
+	if err != nil {
+		return api.WebResponse(e, http.StatusBadRequest, err)
 	}
 
-	ok := services.NewRoleService(h.Server.DB).DeleteRoleByUuidInDomain(&role, uuid, domain)
-	if ok != nil {
+	service := services.NewRoleService(h.Server.DB)
+	if err := service.DeleteRoleByUuidInDomain(&role, uuid, domain); err != nil {
 		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Role not found"))
 	}
 	return api.WebResponse(e, http.StatusOK, api.RESOURCE_DELETED("Role deleted"))
