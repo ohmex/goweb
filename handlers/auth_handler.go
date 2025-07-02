@@ -37,7 +37,7 @@ func (authHandler *AuthHandler) Login(c echo.Context) error {
 	loginRequest := new(requests.LoginRequest)
 
 	if err := c.Bind(loginRequest); err != nil {
-		return err
+		return api.WebResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	if err := loginRequest.Validate(); err != nil {
@@ -48,16 +48,21 @@ func (authHandler *AuthHandler) Login(c echo.Context) error {
 	userRepository := services.NewUserService(authHandler.server.DB)
 	userRepository.GetUserByEmail(&user, loginRequest.Email)
 
-	if user.ID == 0 || (bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginRequest.Password)) != nil) {
+	if user.ID == 0 {
+		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_CREDENTIALS())
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginRequest.Password)); err != nil {
 		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_CREDENTIALS())
 	}
 
 	tokenService := services.NewTokenService(authHandler.server)
-
-	accessToken, refreshToken, exp, _ := tokenService.GenerateTokenPair(&user)
+	accessToken, refreshToken, exp, err := tokenService.GenerateTokenPair(&user)
+	if err != nil {
+		return api.WebResponse(c, http.StatusInternalServerError, "Failed to generate token pair")
+	}
 
 	res := responses.NewLoginResponse(accessToken, refreshToken, exp)
-
 	return api.WebResponse(c, http.StatusOK, res)
 }
 
@@ -73,24 +78,30 @@ func (authHandler *AuthHandler) Login(c echo.Context) error {
 func (authHandler *AuthHandler) RefreshToken(c echo.Context) error {
 	refreshRequest := new(requests.RefreshRequest)
 	if err := c.Bind(refreshRequest); err != nil {
-		return err
+		return api.WebResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	tokenService := services.NewTokenService(authHandler.server)
-	claims, _ := tokenService.ParseToken(refreshRequest.Token, authHandler.server.Config.Auth.RefreshSecret)
-	user, err := services.NewTokenService(authHandler.server).ValidateToken(claims, true)
+	claims, err := tokenService.ParseToken(refreshRequest.Token, authHandler.server.Config.Auth.RefreshSecret)
 	if err != nil {
-		return api.WebResponse(c, http.StatusUnauthorized, err)
+		return api.WebResponse(c, http.StatusUnauthorized, "Invalid refresh token")
+	}
+
+	user, err := tokenService.ValidateToken(claims, true)
+	if err != nil {
+		return api.WebResponse(c, http.StatusUnauthorized, err.Error())
 	}
 
 	if user.ID == 0 {
 		return api.WebResponse(c, http.StatusUnauthorized, api.USER_NOT_FOUND())
 	}
 
-	accessToken, refreshToken, exp, _ := tokenService.GenerateTokenPair(user)
+	accessToken, refreshToken, exp, err := tokenService.GenerateTokenPair(user)
+	if err != nil {
+		return api.WebResponse(c, http.StatusInternalServerError, "Failed to generate token pair")
+	}
 
 	res := responses.NewLoginResponse(accessToken, refreshToken, exp)
-
 	return api.WebResponse(c, http.StatusOK, res)
 }
 
@@ -104,10 +115,20 @@ func (authHandler *AuthHandler) RefreshToken(c echo.Context) error {
 // @Security ApiKeyAuth
 // @Router /logout [post]
 func (authHandler *AuthHandler) Logout(c echo.Context) error {
-	token := c.Get("token").(*jwt.Token)
-	claims := token.Claims.(*services.JwtCustomClaims)
+	tokenInterface := c.Get("token")
+	token, ok := tokenInterface.(*jwt.Token)
+	if !ok {
+		return api.WebResponse(c, http.StatusUnauthorized, "Invalid token")
+	}
+	claims, ok := token.Claims.(*services.JwtCustomClaims)
+	if !ok {
+		return api.WebResponse(c, http.StatusUnauthorized, "Invalid token claims")
+	}
 
-	authHandler.server.Redis.Del(context.Background(), fmt.Sprintf("token-%d", claims.UserID))
+	err := authHandler.server.Redis.Del(context.Background(), fmt.Sprintf("token-%d", claims.UserID)).Err()
+	if err != nil {
+		return api.WebResponse(c, http.StatusInternalServerError, "Failed to logout user")
+	}
 
 	return api.WebResponse(c, http.StatusOK, api.USER_LOGGED_OUT())
 }
