@@ -1,23 +1,34 @@
 package routes
 
 import (
-	"goweb/handlers"
-	"goweb/interceptor"
-	"goweb/server"
-	"goweb/services"
+	// Standard library
 	"net/http"
 	"strings"
 
+	// Third-party
 	"github.com/golang-jwt/jwt/v5"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
+
+	// Local
+	"goweb/handlers"
+	"goweb/interceptor"
+	"goweb/server"
+	"goweb/services"
 )
 
+// gzipSkipper skips Gzip middleware for health and swagger endpoints
+func gzipSkipper(c echo.Context) bool {
+	p := c.Path()
+	return p == "/health" || strings.HasPrefix(p, "/swagger")
+}
+
+// ConfigureRoutes sets up all routes and middleware for the server
 func ConfigureRoutes(server *server.Server) {
-	// Configure middleware with the custom claims type
-	config := echojwt.Config{
+	// JWT middleware configuration
+	jwtConfig := echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return new(services.JwtCustomClaims)
 		},
@@ -25,51 +36,59 @@ func ConfigureRoutes(server *server.Server) {
 		SigningMethod: jwt.SigningMethodHS512.Name,
 		SigningKey:    []byte(server.Config.Auth.AccessSecret),
 	}
-	server.JwtAuthenticationMw = echojwt.WithConfig(config)
-	server.JwtClaimsAuthorizationMw = interceptor.JwtClaimsAuthorizationMw(server)
-	server.CasbinAuthorizationMw = interceptor.CasbinAuthorization(server)
 
-	authHandler := handlers.NewAuthHandler(server)
-	registerHandler := handlers.NewRegisterHandler(server)
-
+	// Global middleware
 	server.Echo.Use(middleware.Recover())
 	server.Echo.Use(middleware.GzipWithConfig(middleware.GzipConfig{
-		Skipper: func(c echo.Context) bool {
-			return strings.Contains(c.Request().URL.Path, "swagger")
-		},
-		Level:     5,
-		MinLength: 64,
+		Skipper:   gzipSkipper,
+		Level:     2,
+		MinLength: 128,
 	}))
 	server.Echo.Use(middleware.Logger())
 	server.Echo.Use(middleware.RequestID())
 
-	server.Echo.GET("", func(ctx echo.Context) error {
+	// Middleware assignments for later use
+	server.JwtAuthenticationMw = echojwt.WithConfig(jwtConfig)
+	server.JwtClaimsAuthorizationMw = interceptor.JwtClaimsAuthorizationMw(server)
+	server.CasbinAuthorizationMw = interceptor.CasbinAuthorization(server)
+
+	// Global Handlers
+	authHandler := handlers.NewAuthHandler(server)
+	registerHandler := handlers.NewRegisterHandler(server)
+
+	// Public routes
+	server.Echo.GET("/", func(ctx echo.Context) error {
 		return ctx.String(http.StatusOK, "Ohmex welcomes you to paradise!")
 	})
 	server.Echo.GET("/swagger/*", echoSwagger.WrapHandler)
-
 	server.Echo.POST("/login", authHandler.Login)
 	server.Echo.POST("/register", registerHandler.Register)
 	server.Echo.POST("/refresh", authHandler.RefreshToken)
 
-	protectedGroup := server.Echo.Group("")
-	protectedGroup.Use(server.JwtAuthenticationMw)
-	protectedGroup.Use(server.JwtClaimsAuthorizationMw)
-	protectedGroup.POST("/logout", authHandler.Logout)
+	// Protected routes group
+	protected := server.Echo.Group("")
+	protected.Use(server.JwtAuthenticationMw, server.JwtClaimsAuthorizationMw)
+	protected.POST("/logout", authHandler.Logout)
 
-	AddResource(server, "/role", handlers.NewRoleHandler(server))
-	AddResource(server, "/user", handlers.NewUserHandler(server))
-	AddResource(server, "/post", handlers.NewPostHandler(server))
+	// Resource Handlers
+	roleHandler := handlers.NewRoleHandler(server)
+	userHandler := handlers.NewUserHandler(server)
+	postHandler := handlers.NewPostHandler(server)
+
+	// API resource routes grouped under /api
+	api := server.Echo.Group("/api")
+	api.Use(server.JwtAuthenticationMw, server.JwtClaimsAuthorizationMw, server.CasbinAuthorizationMw)
+	addResource(api, "/role", roleHandler, server)
+	addResource(api, "/user", userHandler, server)
+	addResource(api, "/post", postHandler, server)
 }
 
-func AddResource(server *server.Server, p string, h handlers.BaseInterface) {
-	group := server.Echo.Group("/api" + p)
-	group.Use(server.JwtAuthenticationMw)
-	group.Use(server.JwtClaimsAuthorizationMw)
-	group.Use(server.CasbinAuthorizationMw)
-	group.GET("", h.List, interceptor.ResourceAuthorization(server, h.Type(), "List"))              // Respond back with a the List of Resource
-	group.GET("/:uuid", h.Read, interceptor.ResourceAuthorization(server, h.Type(), "Read"))        // Read a single Resource identified by id
-	group.POST("", h.Create, interceptor.ResourceAuthorization(server, h.Type(), "Create"))         // Create a new Resource
-	group.PUT("/:uuid", h.Update, interceptor.ResourceAuthorization(server, h.Type(), "Update"))    // Update an existing Resource identified by id
-	group.DELETE("/:uuid", h.Delete, interceptor.ResourceAuthorization(server, h.Type(), "Delete")) // Delete a single Resource identified by id
+// addResource adds RESTful resource routes to the given group
+func addResource(group *echo.Group, p string, h handlers.BaseInterface, server *server.Server) {
+	sub := group.Group(p)
+	sub.GET("", h.List, interceptor.ResourceAuthorization(server, h.Type(), "List"))              // List resources
+	sub.GET("/:uuid", h.Read, interceptor.ResourceAuthorization(server, h.Type(), "Read"))        // Read resource
+	sub.POST("", h.Create, interceptor.ResourceAuthorization(server, h.Type(), "Create"))         // Create resource
+	sub.PUT("/:uuid", h.Update, interceptor.ResourceAuthorization(server, h.Type(), "Update"))    // Update resource
+	sub.DELETE("/:uuid", h.Delete, interceptor.ResourceAuthorization(server, h.Type(), "Delete")) // Delete resource
 }
