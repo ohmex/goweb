@@ -48,6 +48,10 @@ func NewTokenService(server *server.Server) *TokenService {
 }
 
 func (tokenService *TokenService) GenerateTokenPair(user *models.User) (accessToken, refreshToken string, exp int64, err error) {
+	if !domainsLoaded(user) {
+		tokenService.server.DB.Preload("Domains").First(user)
+	}
+
 	var accessUID, refreshUID string
 
 	if accessToken, accessUID, exp, err = tokenService.createToken(user, ExpireAccessMinutes,
@@ -113,12 +117,10 @@ func (tokenService *TokenService) ValidateToken(claims *JwtCustomClaims, isRefre
 
 	g.Go(func() error {
 		user = new(models.User)
-		userRepository := NewUserService(tokenService.server.DB)
-		userRepository.GetUser(user, int(claims.UserID))
-		if user.ID == 0 {
+		err := tokenService.server.DB.Preload("Domains").First(user, claims.UserID).Error
+		if err != nil || user.ID == 0 {
 			return api.USER_NOT_FOUND()
 		}
-
 		return nil
 	})
 
@@ -131,7 +133,9 @@ func (tokenService *TokenService) createToken(user *models.User, expireMinutes i
 	expiry := time.Now().Add(time.Minute * time.Duration(expireMinutes))
 	tokenUuid = uuid.New().String()
 
-	tokenService.server.DB.Preload("Domains").First(user)
+	if !domainsLoaded(user) {
+		tokenService.server.DB.Preload("Domains").First(user)
+	}
 
 	var domains []Domain
 	for _, e := range user.Domains {
@@ -154,4 +158,8 @@ func (tokenService *TokenService) createToken(user *models.User, expireMinutes i
 	token, err = jwtToken.SignedString([]byte(secret))
 
 	return
+}
+
+func domainsLoaded(user *models.User) bool {
+	return user.Domains != nil && len(user.Domains) > 0 && user.Domains[0] != nil && user.Domains[0].UUID.String() != ""
 }
