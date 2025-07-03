@@ -11,11 +11,13 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// UserHandler handles HTTP requests related to users.
 type UserHandler struct {
 	BaseHandler
 	UserService *services.UserService
 }
 
+// NewUserHandler creates a new UserHandler instance.
 func NewUserHandler(server *server.Server) *UserHandler {
 	return &UserHandler{
 		BaseHandler: BaseHandler{
@@ -25,6 +27,7 @@ func NewUserHandler(server *server.Server) *UserHandler {
 	}
 }
 
+// Type returns the type of the handler.
 func (u *UserHandler) Type() string {
 	return "User"
 }
@@ -49,6 +52,7 @@ func findUserByUUID(e echo.Context, userService *services.UserService, domain *m
 	return &user, nil
 }
 
+// List handles listing users in a domain.
 func (u *UserHandler) List(e echo.Context) error {
 	domain, err := extractDomain(e)
 	if err != nil {
@@ -59,6 +63,7 @@ func (u *UserHandler) List(e echo.Context) error {
 	return api.WebResponse(e, http.StatusOK, users)
 }
 
+// Create handles creating a new user in a domain.
 func (u *UserHandler) Create(e echo.Context) error {
 	registerRequest := new(requests.RegisterRequest)
 
@@ -76,6 +81,7 @@ func (u *UserHandler) Create(e echo.Context) error {
 	return u.UserService.Register(e, registerRequest, domain)
 }
 
+// Read handles reading a user by UUID in a domain.
 func (u *UserHandler) Read(e echo.Context) error {
 	domain, err := extractDomain(e)
 	if err != nil {
@@ -88,6 +94,7 @@ func (u *UserHandler) Read(e echo.Context) error {
 	return api.WebResponse(e, http.StatusOK, user)
 }
 
+// Update handles updating a user by UUID in a domain.
 func (u *UserHandler) Update(e echo.Context) error {
 	updateRequest := new(requests.UpdateRequest)
 
@@ -112,6 +119,7 @@ func (u *UserHandler) Update(e echo.Context) error {
 	return api.WebResponse(e, http.StatusOK, user)
 }
 
+// Delete handles deleting a user by UUID in a domain.
 func (u *UserHandler) Delete(e echo.Context) error {
 	domain, err := extractDomain(e)
 	if err != nil {

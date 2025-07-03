@@ -17,12 +17,14 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// AuthHandler handles authentication-related HTTP requests.
 type AuthHandler struct {
 	server       *server.Server
 	userService  *services.UserService
 	tokenService *services.TokenService
 }
 
+// NewAuthHandler creates a new AuthHandler instance.
 func NewAuthHandler(server *server.Server) *AuthHandler {
 	return &AuthHandler{
 		server:       server,

@@ -9,10 +9,12 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// RegisterHandler handles HTTP requests for user registration.
 type RegisterHandler struct {
 	server *server.Server
 }
 
+// NewRegisterHandler creates a new RegisterHandler instance.
 func NewRegisterHandler(server *server.Server) *RegisterHandler {
 	return &RegisterHandler{server: server}
 }
