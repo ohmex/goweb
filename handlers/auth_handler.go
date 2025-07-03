@@ -17,14 +17,14 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// AuthHandler handles authentication-related HTTP requests.
+// AuthHandler provides endpoints for user authentication, token refresh, and logout operations.
 type AuthHandler struct {
 	server       *server.Server
 	userService  *services.UserService
 	tokenService *services.TokenService
 }
 
-// NewAuthHandler creates a new AuthHandler instance.
+// NewAuthHandler initializes the AuthHandler with the provided server and its dependencies.
 func NewAuthHandler(server *server.Server) *AuthHandler {
 	return &AuthHandler{
 		server:       server,
@@ -59,7 +59,7 @@ func (h *AuthHandler) respondWithTokenPair(c echo.Context, user *models.User) er
 }
 
 // Login godoc
-// @Summary Authenticate a user
+// @Summary Authenticates a user using email and password, and returns a token pair if successful.
 // @Description Perform user login with email and password
 // @ID user-login
 // @Tags User Actions
@@ -96,7 +96,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 
 // RefreshToken godoc
 // @Summary Refresh access token
-// @Description Refresh access token using a valid refresh token
+// @Description RefreshToken issues a new access token using a valid refresh token.
 // @ID user-refresh
 // @Tags User Actions
 // @Accept json

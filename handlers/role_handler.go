@@ -11,13 +11,13 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// RoleHandler handles HTTP requests related to roles.
+// RoleHandler provides endpoints for managing roles within a domain, including CRUD operations.
 type RoleHandler struct {
 	Server  *server.Server
 	service *services.RoleService
 }
 
-// NewRoleHandler creates a new RoleHandler instance.
+// NewRoleHandler initializes the RoleHandler with the provided server and its dependencies.
 func NewRoleHandler(server *server.Server) *RoleHandler {
 	return &RoleHandler{
 		Server:  server,
@@ -63,12 +63,12 @@ func (h *RoleHandler) getRoleByUUID(uuid string, domain *models.Domain) (*models
 	return &role, nil
 }
 
-// Type returns the type of the handler.
+// Type returns the string identifier for the RoleHandler.
 func (h *RoleHandler) Type() string {
 	return "Role"
 }
 
-// List handles listing roles in a domain.
+// List returns a list of roles for the specified domain.
 func (h *RoleHandler) List(e echo.Context) error {
 	domain, err := h.getDomain(e)
 	if err != nil {
@@ -83,7 +83,7 @@ func (h *RoleHandler) List(e echo.Context) error {
 	return api.WebResponse(e, http.StatusOK, roles)
 }
 
-// Create handles creating a new role in a domain.
+// Create creates a new role in the specified domain.
 func (h *RoleHandler) Create(e echo.Context) error {
 	roleRequest, err := h.validateRoleRequest(e)
 	if err != nil {
@@ -102,7 +102,7 @@ func (h *RoleHandler) Create(e echo.Context) error {
 	return api.WebResponse(e, http.StatusCreated, api.RESOURCE_CREATED("Role created successfully"))
 }
 
-// Read handles reading a role by UUID in a domain.
+// Read returns the details of a role by UUID within the specified domain.
 func (h *RoleHandler) Read(e echo.Context) error {
 	domain, err := h.getDomain(e)
 	if err != nil {
@@ -125,7 +125,7 @@ func (h *RoleHandler) Read(e echo.Context) error {
 	return api.WebResponse(e, http.StatusOK, role)
 }
 
-// Update handles updating a role by UUID in a domain.
+// Update modifies the details of a role by UUID within the specified domain.
 func (h *RoleHandler) Update(e echo.Context) error {
 	roleRequest, err := h.validateRoleRequest(e)
 	if err != nil {
@@ -160,7 +160,7 @@ func (h *RoleHandler) Update(e echo.Context) error {
 	return api.WebResponse(e, http.StatusOK, role)
 }
 
-// Delete handles deleting a role by UUID in a domain.
+// Delete removes a role by UUID from the specified domain.
 func (h *RoleHandler) Delete(e echo.Context) error {
 	domain, err := h.getDomain(e)
 	if err != nil {

@@ -9,17 +9,17 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// DomainHandler handles HTTP requests related to domains.
+// DomainHandler provides endpoints for managing domains, including CRUD operations (some not implemented).
 type DomainHandler struct {
 	server *server.Server
 }
 
-// NewDomainHandler creates a new DomainHandler instance.
+// NewDomainHandler initializes the DomainHandler with the provided server.
 func NewDomainHandler(server *server.Server) *DomainHandler {
 	return &DomainHandler{server: server}
 }
 
-// Type returns the type of the handler.
+// Type returns the string identifier for the DomainHandler.
 func (u DomainHandler) Type() string {
 	return "Domain"
 }

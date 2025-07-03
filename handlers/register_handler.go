@@ -9,19 +9,19 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// RegisterHandler handles HTTP requests for user registration.
+// RegisterHandler provides an endpoint for registering new users and their domains.
 type RegisterHandler struct {
 	server *server.Server
 }
 
-// NewRegisterHandler creates a new RegisterHandler instance.
+// NewRegisterHandler initializes the RegisterHandler with the provided server.
 func NewRegisterHandler(server *server.Server) *RegisterHandler {
 	return &RegisterHandler{server: server}
 }
 
 // Register godoc
-// @Summary Register
-// @Description New user registration
+// @Summary Register a new user
+// @Description Register creates a new user and domain based on the provided registration request.
 // @ID user-register
 // @Tags User Actions
 // @Accept json

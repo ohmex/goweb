@@ -11,13 +11,13 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// UserHandler handles HTTP requests related to users.
+// UserHandler provides endpoints for managing users within a domain, including CRUD operations.
 type UserHandler struct {
 	BaseHandler
 	UserService *services.UserService
 }
 
-// NewUserHandler creates a new UserHandler instance.
+// NewUserHandler initializes the UserHandler with the provided server and its dependencies.
 func NewUserHandler(server *server.Server) *UserHandler {
 	return &UserHandler{
 		BaseHandler: BaseHandler{
@@ -27,7 +27,7 @@ func NewUserHandler(server *server.Server) *UserHandler {
 	}
 }
 
-// Type returns the type of the handler.
+// Type returns the string identifier for the UserHandler.
 func (u *UserHandler) Type() string {
 	return "User"
 }
@@ -52,7 +52,7 @@ func findUserByUUID(e echo.Context, userService *services.UserService, domain *m
 	return &user, nil
 }
 
-// List handles listing users in a domain.
+// List returns a list of users for the specified domain.
 func (u *UserHandler) List(e echo.Context) error {
 	domain, err := extractDomain(e)
 	if err != nil {
@@ -63,7 +63,7 @@ func (u *UserHandler) List(e echo.Context) error {
 	return api.WebResponse(e, http.StatusOK, users)
 }
 
-// Create handles creating a new user in a domain.
+// Create creates a new user in the specified domain.
 func (u *UserHandler) Create(e echo.Context) error {
 	registerRequest := new(requests.RegisterRequest)
 
@@ -81,7 +81,7 @@ func (u *UserHandler) Create(e echo.Context) error {
 	return u.UserService.Register(e, registerRequest, domain)
 }
 
-// Read handles reading a user by UUID in a domain.
+// Read returns the details of a user by UUID within the specified domain.
 func (u *UserHandler) Read(e echo.Context) error {
 	domain, err := extractDomain(e)
 	if err != nil {
@@ -94,7 +94,7 @@ func (u *UserHandler) Read(e echo.Context) error {
 	return api.WebResponse(e, http.StatusOK, user)
 }
 
-// Update handles updating a user by UUID in a domain.
+// Update modifies the details of a user by UUID within the specified domain.
 func (u *UserHandler) Update(e echo.Context) error {
 	updateRequest := new(requests.UpdateRequest)
 
@@ -119,7 +119,7 @@ func (u *UserHandler) Update(e echo.Context) error {
 	return api.WebResponse(e, http.StatusOK, user)
 }
 
-// Delete handles deleting a user by UUID in a domain.
+// Delete removes a user by UUID from the specified domain.
 func (u *UserHandler) Delete(e echo.Context) error {
 	domain, err := extractDomain(e)
 	if err != nil {

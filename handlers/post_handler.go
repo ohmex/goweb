@@ -8,17 +8,17 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// PostHandler handles HTTP requests related to posts.
+// PostHandler provides endpoints for managing posts, including CRUD operations (not implemented).
 type PostHandler struct {
 	server *server.Server
 }
 
-// NewPostHandler creates a new PostHandler instance.
+// NewPostHandler initializes the PostHandler with the provided server.
 func NewPostHandler(server *server.Server) *PostHandler {
 	return &PostHandler{server: server}
 }
 
-// Type returns the type of the handler.
+// Type returns the string identifier for the PostHandler.
 func (u PostHandler) Type() string {
 	return "Post"
 }
