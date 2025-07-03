@@ -29,8 +29,8 @@ func (u *UserHandler) Type() string {
 	return "User"
 }
 
-// getDomain safely extracts the domain from context
-func getDomain(e echo.Context) (*models.Domain, error) {
+// Helper to extract domain from context
+func extractDomain(e echo.Context) (*models.Domain, error) {
 	domain, ok := e.Get("domain").(*models.Domain)
 	if !ok || domain == nil {
 		return nil, echo.NewHTTPError(http.StatusBadRequest, "Invalid domain context")
@@ -38,8 +38,19 @@ func getDomain(e echo.Context) (*models.Domain, error) {
 	return domain, nil
 }
 
+// Helper to fetch user by UUID in domain
+func findUserByUUID(e echo.Context, userService *services.UserService, domain *models.Domain) (*models.User, error) {
+	uuid := e.Param("uuid")
+	var user models.User
+	userService.GetUserByUuidInDomain(&user, uuid, domain)
+	if user.ID == 0 {
+		return nil, echo.NewHTTPError(http.StatusNotFound, "User not found")
+	}
+	return &user, nil
+}
+
 func (u *UserHandler) List(e echo.Context) error {
-	domain, err := getDomain(e)
+	domain, err := extractDomain(e)
 	if err != nil {
 		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
@@ -58,7 +69,7 @@ func (u *UserHandler) Create(e echo.Context) error {
 	if err := registerRequest.Validate(); err != nil {
 		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
-	domain, err := getDomain(e)
+	domain, err := extractDomain(e)
 	if err != nil {
 		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
@@ -66,22 +77,18 @@ func (u *UserHandler) Create(e echo.Context) error {
 }
 
 func (u *UserHandler) Read(e echo.Context) error {
-	var user models.User
-	domain, err := getDomain(e)
+	domain, err := extractDomain(e)
 	if err != nil {
 		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
-	uuid := e.Param("uuid")
-	u.UserService.GetUserByUuidInDomain(&user, uuid, domain)
-	if user.ID == 0 {
+	user, err := findUserByUUID(e, u.UserService, domain)
+	if err != nil {
 		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("User not found"))
 	}
 	return api.WebResponse(e, http.StatusOK, user)
 }
 
-// TODO: Check the resource being accessed belongs to the domain that user have access to
 func (u *UserHandler) Update(e echo.Context) error {
-	var user models.User
 	updateRequest := new(requests.UpdateRequest)
 
 	if err := e.Bind(updateRequest); err != nil {
@@ -91,29 +98,27 @@ func (u *UserHandler) Update(e echo.Context) error {
 	if err := updateRequest.Validate(); err != nil {
 		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
-	domain, err := getDomain(e)
+	domain, err := extractDomain(e)
 	if err != nil {
 		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
-	uuid := e.Param("uuid")
-	u.UserService.GetUserByUuidInDomain(&user, uuid, domain)
-	if user.ID == 0 {
+	user, err := findUserByUUID(e, u.UserService, domain)
+	if err != nil {
 		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("User not found"))
 	}
 	user.Name = updateRequest.Name
-	u.UserService.UpdateUser(&user)
+	u.UserService.UpdateUser(user)
 
 	return api.WebResponse(e, http.StatusOK, user)
 }
 
-// TODO: Check the resource being accessed belongs to the domain that user have access to
 func (u *UserHandler) Delete(e echo.Context) error {
-	var user models.User
-	domain, err := getDomain(e)
+	domain, err := extractDomain(e)
 	if err != nil {
 		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
 	uuid := e.Param("uuid")
+	var user models.User
 	err = u.UserService.DeleteUserByUuidInDomain(&user, uuid, domain)
 	if err != nil {
 		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("User not found"))
