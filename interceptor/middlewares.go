@@ -21,6 +21,8 @@ import (
 // 3. Add the user data to Echo Context
 // 4. Prolong the Redis TTL of the current token pair
 func JwtClaimsAuthorizationMw(server *server.Server) echo.MiddlewareFunc {
+	tokenService := services.NewTokenService(server)
+	domainService := services.NewDomainService(server.DB)
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			tokenVal := c.Get("token")
@@ -36,7 +38,6 @@ func JwtClaimsAuthorizationMw(server *server.Server) echo.MiddlewareFunc {
 
 			domainuuid := c.Request().Header.Get("domain")
 
-			tokenService := services.NewTokenService(server)
 			user, err := tokenService.ValidateToken(claims, false)
 			if err != nil {
 				return api.WebResponse(c, http.StatusUnauthorized, err) // TODO: Change this return statement
@@ -44,7 +45,6 @@ func JwtClaimsAuthorizationMw(server *server.Server) echo.MiddlewareFunc {
 
 			c.Set("user", user)
 
-			domainService := services.NewDomainService(server.DB)
 			domain := new(models.Domain)
 			err = domainService.GetDomainByUUID(domain, domainuuid)
 			if err != nil || domain.ID == 0 {
@@ -53,15 +53,16 @@ func JwtClaimsAuthorizationMw(server *server.Server) echo.MiddlewareFunc {
 
 			c.Set("domain", domain)
 
-			go func() {
+			// Asynchronously update Redis TTL for the token in a goroutine
+			go func(userID uint64) {
 				ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 				defer cancel()
-				key := fmt.Sprintf("token-%d", claims.UserID)
+				key := fmt.Sprintf("token-%d", userID)
 				if err := server.Redis.Expire(ctx, key, time.Minute*services.AutoLogoffMinutes).Err(); err != nil {
-					// Log error, but do not interrupt request
+					// TODO: Use a proper logger here for production
 					fmt.Printf("Failed to update Redis TTL for %s: %v\n", key, err)
 				}
-			}()
+			}(claims.UserID)
 
 			return next(c)
 		}
