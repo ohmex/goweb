@@ -161,5 +161,5 @@ func (tokenService *TokenService) createToken(user *models.User, expireMinutes i
 }
 
 func domainsLoaded(user *models.User) bool {
-	return user.Domains != nil && len(user.Domains) > 0 && user.Domains[0] != nil && user.Domains[0].UUID.String() != ""
+	return len(user.Domains) > 0 && user.Domains[0] != nil && user.Domains[0].UUID.String() != ""
 }
