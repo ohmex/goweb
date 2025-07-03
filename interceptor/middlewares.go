@@ -56,7 +56,7 @@ func JwtClaimsAuthorizationMw(server *server.Server) echo.MiddlewareFunc {
 			go func() {
 				ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 				defer cancel()
-				key := fmt.Sprintf("token-%s", claims.ID)
+				key := fmt.Sprintf("token-%d", claims.UserID)
 				if err := server.Redis.Expire(ctx, key, time.Minute*services.AutoLogoffMinutes).Err(); err != nil {
 					// Log error, but do not interrupt request
 					fmt.Printf("Failed to update Redis TTL for %s: %v\n", key, err)
