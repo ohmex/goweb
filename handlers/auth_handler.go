@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"fmt"
 	"goweb/api"
 	"goweb/models"
@@ -32,6 +31,31 @@ func NewAuthHandler(server *server.Server) *AuthHandler {
 	}
 }
 
+// Helper to bind and validate request
+func bindAndValidate[T any](c echo.Context) (*T, error) {
+	obj := new(T)
+	if err := c.Bind(obj); err != nil {
+		return nil, api.FIELD_VALIDATION_ERROR("Invalid request format")
+	}
+	if validator, ok := any(obj).(interface{ Validate() error }); ok {
+		if err := validator.Validate(); err != nil {
+			return nil, api.FIELD_VALIDATION_ERROR(err.Error())
+		}
+	}
+	return obj, nil
+}
+
+// Helper to generate token pair and return response
+func (h *AuthHandler) respondWithTokenPair(c echo.Context, user *models.User) error {
+	accessToken, refreshToken, exp, err := h.tokenService.GenerateTokenPair(user)
+	if err != nil {
+		log.Error().Str("event", "token_generation_failed").Err(err).Uint64("user_id", uint64(user.ID)).Msg("Failed to generate authentication tokens")
+		return api.WebResponse(c, http.StatusInternalServerError, api.INTERNAL_SERVICE_ERROR("Failed to generate authentication tokens"))
+	}
+	res := responses.NewLoginResponse(accessToken, refreshToken, exp)
+	return api.WebResponse(c, http.StatusOK, res)
+}
+
 // Login godoc
 // @Summary Authenticate a user
 // @Description Perform user login with email and password
@@ -48,44 +72,24 @@ func NewAuthHandler(server *server.Server) *AuthHandler {
 func (h *AuthHandler) Login(c echo.Context) error {
 	start := time.Now()
 
-	// Parse and validate request
-	loginRequest := new(requests.LoginRequest)
-	if err := c.Bind(loginRequest); err != nil {
-		return api.WebResponse(c, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR("Invalid request format"))
+	loginRequest, err := bindAndValidate[requests.LoginRequest](c)
+	if err != nil {
+		return api.WebResponse(c, http.StatusBadRequest, err)
 	}
 
-	if err := loginRequest.Validate(); err != nil {
-		return api.WebResponse(c, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR(err.Error()))
-	}
-
-	// Get user by email
 	user := &models.User{}
-	if err := h.userService.GetUserByEmail(user, loginRequest.Email); err != nil {
+	if err := h.userService.GetUserByEmail(user, loginRequest.Email); err != nil || user.ID == 0 {
 		log.Info().Str("event", "login_failed").Str("email", loginRequest.Email).Str("error", "user_not_found").Msg("Login failed: user not found")
 		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_CREDENTIALS())
 	}
 
-	if user.ID == 0 {
-		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_CREDENTIALS())
-	}
-
-	// Verify password
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginRequest.Password)); err != nil {
 		log.Info().Str("event", "login_failed").Str("email", loginRequest.Email).Uint64("user_id", uint64(user.ID)).Str("error", "invalid_password").Msg("Login failed: invalid password")
 		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_CREDENTIALS())
 	}
 
-	// Generate token pair
-	accessToken, refreshToken, exp, err := h.tokenService.GenerateTokenPair(user)
-	if err != nil {
-		log.Error().Str("event", "token_generation_failed").Err(err).Uint64("user_id", uint64(user.ID)).Msg("Failed to generate authentication tokens")
-		return api.WebResponse(c, http.StatusInternalServerError, api.INTERNAL_SERVICE_ERROR("Failed to generate authentication tokens"))
-	}
-
 	log.Info().Str("event", "login_success").Uint64("user_id", uint64(user.ID)).Str("email", user.Email).Int64("duration_ms", time.Since(start).Milliseconds()).Msg("Login successful")
-
-	res := responses.NewLoginResponse(accessToken, refreshToken, exp)
-	return api.WebResponse(c, http.StatusOK, res)
+	return h.respondWithTokenPair(c, user)
 }
 
 // RefreshToken godoc
@@ -104,45 +108,25 @@ func (h *AuthHandler) Login(c echo.Context) error {
 func (h *AuthHandler) RefreshToken(c echo.Context) error {
 	start := time.Now()
 
-	// Parse and validate request
-	refreshRequest := new(requests.RefreshRequest)
-	if err := c.Bind(refreshRequest); err != nil {
-		return api.WebResponse(c, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR("Invalid request format"))
+	refreshRequest, err := bindAndValidate[requests.RefreshRequest](c)
+	if err != nil {
+		return api.WebResponse(c, http.StatusBadRequest, err)
 	}
 
-	if err := refreshRequest.Validate(); err != nil {
-		return api.WebResponse(c, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR(err.Error()))
-	}
-
-	// Parse and validate refresh token
 	claims, err := h.tokenService.ParseToken(refreshRequest.Token, h.server.Config.Auth.RefreshSecret)
 	if err != nil {
 		log.Info().Str("event", "refresh_token_invalid").Str("error", err.Error()).Msg("Invalid or expired refresh token")
 		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_TOKEN("Invalid or expired refresh token"))
 	}
 
-	// Validate token and get user
 	user, err := h.tokenService.ValidateToken(claims, true)
-	if err != nil {
+	if err != nil || user.ID == 0 {
 		log.Info().Str("event", "refresh_token_validation_failed").Uint64("user_id", claims.UserID).Str("error", err.Error()).Msg("Refresh token validation failed")
 		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_TOKEN(err.Error()))
 	}
 
-	if user.ID == 0 {
-		return api.WebResponse(c, http.StatusUnauthorized, api.USER_NOT_FOUND())
-	}
-
-	// Generate new token pair
-	accessToken, refreshToken, exp, err := h.tokenService.GenerateTokenPair(user)
-	if err != nil {
-		log.Error().Str("event", "refresh_token_generation_failed").Err(err).Uint64("user_id", uint64(user.ID)).Msg("Failed to generate new authentication tokens")
-		return api.WebResponse(c, http.StatusInternalServerError, api.INTERNAL_SERVICE_ERROR("Failed to generate new authentication tokens"))
-	}
-
 	log.Info().Str("event", "token_refresh_success").Uint64("user_id", uint64(user.ID)).Int64("duration_ms", time.Since(start).Milliseconds()).Msg("Token refresh successful")
-
-	res := responses.NewLoginResponse(accessToken, refreshToken, exp)
-	return api.WebResponse(c, http.StatusOK, res)
+	return h.respondWithTokenPair(c, user)
 }
 
 // Logout godoc
@@ -158,7 +142,6 @@ func (h *AuthHandler) RefreshToken(c echo.Context) error {
 // @Failure 500 {object} api.Response
 // @Router /logout [post]
 func (h *AuthHandler) Logout(c echo.Context) error {
-	// Extract token from context
 	tokenInterface := c.Get("token")
 	token, ok := tokenInterface.(*jwt.Token)
 	if !ok {
@@ -170,17 +153,12 @@ func (h *AuthHandler) Logout(c echo.Context) error {
 		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_TOKEN("Invalid token claims"))
 	}
 
-	// Invalidate token in Redis
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	err := h.server.Redis.Del(ctx, fmt.Sprintf("token-%d", claims.UserID)).Err()
+	err := h.server.Redis.Del(c.Request().Context(), fmt.Sprintf("token-%d", claims.UserID)).Err()
 	if err != nil {
 		log.Error().Str("event", "logout_redis_failed").Err(err).Uint64("user_id", claims.UserID).Msg("Failed to logout user (redis error)")
 		return api.WebResponse(c, http.StatusInternalServerError, api.INTERNAL_SERVICE_ERROR("Failed to logout user"))
 	}
 
 	log.Info().Str("event", "logout_success").Uint64("user_id", claims.UserID).Msg("Logout successful")
-
 	return api.WebResponse(c, http.StatusOK, api.USER_LOGGED_OUT())
 }
