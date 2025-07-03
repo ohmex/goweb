@@ -13,6 +13,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
+	"github.com/rs/zerolog/log"
 )
 
 // Middleware for additional steps:
@@ -59,8 +60,7 @@ func JwtClaimsAuthorizationMw(server *server.Server) echo.MiddlewareFunc {
 				defer cancel()
 				key := fmt.Sprintf("token-%d", userID)
 				if err := server.Redis.Expire(ctx, key, time.Minute*services.AutoLogoffMinutes).Err(); err != nil {
-					// TODO: Use a proper logger here for production
-					fmt.Printf("Failed to update Redis TTL for %s: %v\n", key, err)
+					log.Error().Str("event", "redis_ttl_update_failed").Str("key", key).Err(err).Msg("Failed to update Redis TTL")
 				}
 			}(claims.UserID)
 
