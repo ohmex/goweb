@@ -45,6 +45,12 @@ type RefreshRequest struct {
 	Token string `form:"token" json:"token" validate:"required" example:"refresh_token"`
 }
 
+func (rr RefreshRequest) Validate() error {
+	return validation.ValidateStruct(&rr,
+		validation.Field(&rr.Token, validation.Required),
+	)
+}
+
 type UpdateRequest struct {
 	Name string `form:"name" json:"name" validate:"required" example:"John Doe"`
 }
