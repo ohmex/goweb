@@ -14,6 +14,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
+	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -60,11 +61,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	// Get user by email
 	user := &models.User{}
 	if err := h.userService.GetUserByEmail(user, loginRequest.Email); err != nil {
-		// Log failed login attempt for security monitoring
-		h.logSecurityEvent("login_failed", map[string]interface{}{
-			"email": loginRequest.Email,
-			"error": "user_not_found",
-		})
+		log.Info().Str("event", "login_failed").Str("email", loginRequest.Email).Str("error", "user_not_found").Msg("Login failed: user not found")
 		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_CREDENTIALS())
 	}
 
@@ -74,30 +71,18 @@ func (h *AuthHandler) Login(c echo.Context) error {
 
 	// Verify password
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginRequest.Password)); err != nil {
-		// Log failed login attempt for security monitoring
-		h.logSecurityEvent("login_failed", map[string]interface{}{
-			"email":   loginRequest.Email,
-			"user_id": user.ID,
-			"error":   "invalid_password",
-		})
+		log.Info().Str("event", "login_failed").Str("email", loginRequest.Email).Uint64("user_id", uint64(user.ID)).Str("error", "invalid_password").Msg("Login failed: invalid password")
 		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_CREDENTIALS())
 	}
 
 	// Generate token pair
 	accessToken, refreshToken, exp, err := h.tokenService.GenerateTokenPair(user)
 	if err != nil {
-		h.logError("token_generation_failed", err, map[string]interface{}{
-			"user_id": user.ID,
-		})
+		log.Error().Str("event", "token_generation_failed").Err(err).Uint64("user_id", uint64(user.ID)).Msg("Failed to generate authentication tokens")
 		return api.WebResponse(c, http.StatusInternalServerError, api.INTERNAL_SERVICE_ERROR("Failed to generate authentication tokens"))
 	}
 
-	// Log successful login
-	h.logSecurityEvent("login_success", map[string]interface{}{
-		"user_id":     user.ID,
-		"email":       user.Email,
-		"duration_ms": time.Since(start).Milliseconds(),
-	})
+	log.Info().Str("event", "login_success").Uint64("user_id", uint64(user.ID)).Str("email", user.Email).Int64("duration_ms", time.Since(start).Milliseconds()).Msg("Login successful")
 
 	res := responses.NewLoginResponse(accessToken, refreshToken, exp)
 	return api.WebResponse(c, http.StatusOK, res)
@@ -132,19 +117,14 @@ func (h *AuthHandler) RefreshToken(c echo.Context) error {
 	// Parse and validate refresh token
 	claims, err := h.tokenService.ParseToken(refreshRequest.Token, h.server.Config.Auth.RefreshSecret)
 	if err != nil {
-		h.logSecurityEvent("refresh_token_invalid", map[string]interface{}{
-			"error": err.Error(),
-		})
+		log.Info().Str("event", "refresh_token_invalid").Str("error", err.Error()).Msg("Invalid or expired refresh token")
 		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_TOKEN("Invalid or expired refresh token"))
 	}
 
 	// Validate token and get user
 	user, err := h.tokenService.ValidateToken(claims, true)
 	if err != nil {
-		h.logSecurityEvent("refresh_token_validation_failed", map[string]interface{}{
-			"user_id": claims.UserID,
-			"error":   err.Error(),
-		})
+		log.Info().Str("event", "refresh_token_validation_failed").Uint64("user_id", claims.UserID).Str("error", err.Error()).Msg("Refresh token validation failed")
 		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_TOKEN(err.Error()))
 	}
 
@@ -155,17 +135,11 @@ func (h *AuthHandler) RefreshToken(c echo.Context) error {
 	// Generate new token pair
 	accessToken, refreshToken, exp, err := h.tokenService.GenerateTokenPair(user)
 	if err != nil {
-		h.logError("refresh_token_generation_failed", err, map[string]interface{}{
-			"user_id": user.ID,
-		})
+		log.Error().Str("event", "refresh_token_generation_failed").Err(err).Uint64("user_id", uint64(user.ID)).Msg("Failed to generate new authentication tokens")
 		return api.WebResponse(c, http.StatusInternalServerError, api.INTERNAL_SERVICE_ERROR("Failed to generate new authentication tokens"))
 	}
 
-	// Log successful token refresh
-	h.logSecurityEvent("token_refresh_success", map[string]interface{}{
-		"user_id":     user.ID,
-		"duration_ms": time.Since(start).Milliseconds(),
-	})
+	log.Info().Str("event", "token_refresh_success").Uint64("user_id", uint64(user.ID)).Int64("duration_ms", time.Since(start).Milliseconds()).Msg("Token refresh successful")
 
 	res := responses.NewLoginResponse(accessToken, refreshToken, exp)
 	return api.WebResponse(c, http.StatusOK, res)
@@ -202,29 +176,11 @@ func (h *AuthHandler) Logout(c echo.Context) error {
 
 	err := h.server.Redis.Del(ctx, fmt.Sprintf("token-%d", claims.UserID)).Err()
 	if err != nil {
-		h.logError("logout_redis_failed", err, map[string]interface{}{
-			"user_id": claims.UserID,
-		})
+		log.Error().Str("event", "logout_redis_failed").Err(err).Uint64("user_id", claims.UserID).Msg("Failed to logout user (redis error)")
 		return api.WebResponse(c, http.StatusInternalServerError, api.INTERNAL_SERVICE_ERROR("Failed to logout user"))
 	}
 
-	// Log successful logout
-	h.logSecurityEvent("logout_success", map[string]interface{}{
-		"user_id": claims.UserID,
-	})
+	log.Info().Str("event", "logout_success").Uint64("user_id", claims.UserID).Msg("Logout successful")
 
 	return api.WebResponse(c, http.StatusOK, api.USER_LOGGED_OUT())
-}
-
-// Helper methods for logging and monitoring
-func (h *AuthHandler) logSecurityEvent(event string, fields map[string]interface{}) {
-	// In a production environment, you would use a proper logging library
-	// like logrus, zap, or structured logging
-	// For now, we'll use a simple approach
-	fmt.Printf("[SECURITY] %s: %+v\n", event, fields)
-}
-
-func (h *AuthHandler) logError(event string, err error, fields map[string]interface{}) {
-	// In a production environment, you would use a proper logging library
-	fmt.Printf("[ERROR] %s: %v, fields: %+v\n", event, err, fields)
 }
