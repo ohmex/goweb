@@ -52,7 +52,16 @@ func findUserByUUID(e echo.Context, userService *services.UserService, domain *m
 	return &user, nil
 }
 
-// List returns a list of users for the specified domain.
+// List godoc
+// @Summary List users
+// @Description Returns a list of users for the specified domain.
+// @ID user-list
+// @Tags User Management
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.User
+// @Failure 400 {object} api.Response
+// @Router /users [get]
 func (u *UserHandler) List(e echo.Context) error {
 	domain, err := extractDomain(e)
 	if err != nil {
@@ -63,7 +72,17 @@ func (u *UserHandler) List(e echo.Context) error {
 	return api.WebResponse(e, http.StatusOK, users)
 }
 
-// Create creates a new user in the specified domain.
+// Create godoc
+// @Summary Create user
+// @Description Creates a new user in the specified domain.
+// @ID user-create
+// @Tags User Management
+// @Accept json
+// @Produce json
+// @Param params body requests.RegisterRequest true "User registration data"
+// @Success 201 {object} api.Response
+// @Failure 400 {object} api.Response
+// @Router /users [post]
 func (u *UserHandler) Create(e echo.Context) error {
 	registerRequest := new(requests.RegisterRequest)
 
@@ -81,7 +100,18 @@ func (u *UserHandler) Create(e echo.Context) error {
 	return u.UserService.Register(e, registerRequest, domain)
 }
 
-// Read returns the details of a user by UUID within the specified domain.
+// Read godoc
+// @Summary Get user
+// @Description Returns the details of a user by UUID within the specified domain.
+// @ID user-read
+// @Tags User Management
+// @Accept json
+// @Produce json
+// @Param uuid path string true "User UUID"
+// @Success 200 {object} models.User
+// @Failure 400 {object} api.Response
+// @Failure 404 {object} api.Response
+// @Router /users/{uuid} [get]
 func (u *UserHandler) Read(e echo.Context) error {
 	domain, err := extractDomain(e)
 	if err != nil {
@@ -94,7 +124,19 @@ func (u *UserHandler) Read(e echo.Context) error {
 	return api.WebResponse(e, http.StatusOK, user)
 }
 
-// Update modifies the details of a user by UUID within the specified domain.
+// Update godoc
+// @Summary Update user
+// @Description Modifies the details of a user by UUID within the specified domain.
+// @ID user-update
+// @Tags User Management
+// @Accept json
+// @Produce json
+// @Param uuid path string true "User UUID"
+// @Param params body requests.UpdateRequest true "User update data"
+// @Success 200 {object} models.User
+// @Failure 400 {object} api.Response
+// @Failure 404 {object} api.Response
+// @Router /users/{uuid} [put]
 func (u *UserHandler) Update(e echo.Context) error {
 	updateRequest := new(requests.UpdateRequest)
 
@@ -119,7 +161,18 @@ func (u *UserHandler) Update(e echo.Context) error {
 	return api.WebResponse(e, http.StatusOK, user)
 }
 
-// Delete removes a user by UUID from the specified domain.
+// Delete godoc
+// @Summary Delete user
+// @Description Removes a user by UUID from the specified domain.
+// @ID user-delete
+// @Tags User Management
+// @Accept json
+// @Produce json
+// @Param uuid path string true "User UUID"
+// @Success 200 {object} api.Response
+// @Failure 400 {object} api.Response
+// @Failure 404 {object} api.Response
+// @Router /users/{uuid} [delete]
 func (u *UserHandler) Delete(e echo.Context) error {
 	domain, err := extractDomain(e)
 	if err != nil {

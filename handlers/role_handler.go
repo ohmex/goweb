@@ -68,7 +68,16 @@ func (h *RoleHandler) Type() string {
 	return "Role"
 }
 
-// List returns a list of roles for the specified domain.
+// List godoc
+// @Summary List roles
+// @Description Returns a list of roles for the specified domain.
+// @ID role-list
+// @Tags Role Management
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.Role
+// @Failure 400 {object} api.Response
+// @Router /roles [get]
 func (h *RoleHandler) List(e echo.Context) error {
 	domain, err := h.getDomain(e)
 	if err != nil {
@@ -83,7 +92,17 @@ func (h *RoleHandler) List(e echo.Context) error {
 	return api.WebResponse(e, http.StatusOK, roles)
 }
 
-// Create creates a new role in the specified domain.
+// Create godoc
+// @Summary Create role
+// @Description Creates a new role in the specified domain.
+// @ID role-create
+// @Tags Role Management
+// @Accept json
+// @Produce json
+// @Param params body requests.RoleRequest true "Role creation data"
+// @Success 201 {object} api.Response
+// @Failure 400 {object} api.Response
+// @Router /roles [post]
 func (h *RoleHandler) Create(e echo.Context) error {
 	roleRequest, err := h.validateRoleRequest(e)
 	if err != nil {
@@ -102,7 +121,18 @@ func (h *RoleHandler) Create(e echo.Context) error {
 	return api.WebResponse(e, http.StatusCreated, api.RESOURCE_CREATED("Role created successfully"))
 }
 
-// Read returns the details of a role by UUID within the specified domain.
+// Read godoc
+// @Summary Get role
+// @Description Returns the details of a role by UUID within the specified domain.
+// @ID role-read
+// @Tags Role Management
+// @Accept json
+// @Produce json
+// @Param uuid path string true "Role UUID"
+// @Success 200 {object} models.Role
+// @Failure 400 {object} api.Response
+// @Failure 404 {object} api.Response
+// @Router /roles/{uuid} [get]
 func (h *RoleHandler) Read(e echo.Context) error {
 	domain, err := h.getDomain(e)
 	if err != nil {
@@ -125,7 +155,19 @@ func (h *RoleHandler) Read(e echo.Context) error {
 	return api.WebResponse(e, http.StatusOK, role)
 }
 
-// Update modifies the details of a role by UUID within the specified domain.
+// Update godoc
+// @Summary Update role
+// @Description Modifies the details of a role by UUID within the specified domain.
+// @ID role-update
+// @Tags Role Management
+// @Accept json
+// @Produce json
+// @Param uuid path string true "Role UUID"
+// @Param params body requests.RoleRequest true "Role update data"
+// @Success 200 {object} models.Role
+// @Failure 400 {object} api.Response
+// @Failure 404 {object} api.Response
+// @Router /roles/{uuid} [put]
 func (h *RoleHandler) Update(e echo.Context) error {
 	roleRequest, err := h.validateRoleRequest(e)
 	if err != nil {
@@ -160,7 +202,18 @@ func (h *RoleHandler) Update(e echo.Context) error {
 	return api.WebResponse(e, http.StatusOK, role)
 }
 
-// Delete removes a role by UUID from the specified domain.
+// Delete godoc
+// @Summary Delete role
+// @Description Removes a role by UUID from the specified domain.
+// @ID role-delete
+// @Tags Role Management
+// @Accept json
+// @Produce json
+// @Param uuid path string true "Role UUID"
+// @Success 200 {object} api.Response
+// @Failure 400 {object} api.Response
+// @Failure 404 {object} api.Response
+// @Router /roles/{uuid} [delete]
 func (h *RoleHandler) Delete(e echo.Context) error {
 	domain, err := h.getDomain(e)
 	if err != nil {

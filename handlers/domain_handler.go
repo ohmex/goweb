@@ -24,27 +24,70 @@ func (u DomainHandler) Type() string {
 	return "Domain"
 }
 
-// List returns a sample response for listing domains.
+// List godoc
+// @Summary List domains
+// @Description Returns a sample response for listing domains.
+// @ID domain-list
+// @Tags Domain Management
+// @Accept json
+// @Produce json
+// @Success 200 {object} api.Response
+// @Router /domains [get]
 func (u DomainHandler) List(e echo.Context) error {
 	return api.WebResponse(e, http.StatusOK, api.STATUS_OK(gofakeit.Paragraph(100, 10, 10, " ")))
 }
 
-// Create returns a not implemented response for creating a domain.
+// Create godoc
+// @Summary Create domain
+// @Description Not implemented.
+// @ID domain-create
+// @Tags Domain Management
+// @Accept json
+// @Produce json
+// @Failure 404 {object} api.Response
+// @Router /domains [post]
 func (u DomainHandler) Create(e echo.Context) error {
 	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Create Domain not implemented"))
 }
 
-// Read returns a not implemented response for reading a domain.
+// Read godoc
+// @Summary Get domain
+// @Description Not implemented.
+// @ID domain-read
+// @Tags Domain Management
+// @Accept json
+// @Produce json
+// @Param uuid path string true "Domain UUID"
+// @Failure 404 {object} api.Response
+// @Router /domains/{uuid} [get]
 func (u DomainHandler) Read(e echo.Context) error {
 	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Read Domain not implemented"))
 }
 
-// Update returns a not implemented response for updating a domain.
+// Update godoc
+// @Summary Update domain
+// @Description Not implemented.
+// @ID domain-update
+// @Tags Domain Management
+// @Accept json
+// @Produce json
+// @Param uuid path string true "Domain UUID"
+// @Failure 404 {object} api.Response
+// @Router /domains/{uuid} [put]
 func (u DomainHandler) Update(e echo.Context) error {
 	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Update Domain not implemented"))
 }
 
-// Delete returns a not implemented response for deleting a domain.
+// Delete godoc
+// @Summary Delete domain
+// @Description Not implemented.
+// @ID domain-delete
+// @Tags Domain Management
+// @Accept json
+// @Produce json
+// @Param uuid path string true "Domain UUID"
+// @Failure 404 {object} api.Response
+// @Router /domains/{uuid} [delete]
 func (u DomainHandler) Delete(e echo.Context) error {
 	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Delete Domain not implemented"))
 }
