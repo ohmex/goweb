@@ -35,7 +35,10 @@ func (u *UserHandler) Type() string {
 
 // Helper to fetch user by UUID in domain
 func findUserByUUID(e echo.Context, userService *services.UserService, domain *models.Domain) (*models.User, error) {
-	uuid := e.Param("uuid")
+	uuid, err := util.GetUUIDParam(e)
+	if err != nil {
+		return nil, err
+	}
 	var user models.User
 	userService.GetUserByUuidInDomain(&user, uuid, domain)
 	if user.ID == 0 {
@@ -77,13 +80,8 @@ func (u *UserHandler) List(e echo.Context) error {
 // @Failure 400 {object} api.Response
 // @Router /users [post]
 func (u *UserHandler) Create(e echo.Context) error {
-	registerRequest := new(requests.RegisterRequest)
-
-	if err := e.Bind(registerRequest); err != nil {
-		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
-	}
-
-	if err := registerRequest.Validate(); err != nil {
+	registerRequest, err := util.BindAndValidate[requests.RegisterRequest](e)
+	if err != nil {
 		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
 	d, err := util.ExtractDomain(e)
@@ -133,13 +131,8 @@ func (u *UserHandler) Read(e echo.Context) error {
 // @Failure 404 {object} api.Response
 // @Router /users/{uuid} [put]
 func (u *UserHandler) Update(e echo.Context) error {
-	updateRequest := new(requests.UpdateRequest)
-
-	if err := e.Bind(updateRequest); err != nil {
-		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
-	}
-
-	if err := updateRequest.Validate(); err != nil {
+	updateRequest, err := util.BindAndValidate[requests.UpdateRequest](e)
+	if err != nil {
 		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
 	d, err := util.ExtractDomain(e)
@@ -175,7 +168,10 @@ func (u *UserHandler) Delete(e echo.Context) error {
 		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
 	domain, _ := d.(*models.Domain)
-	uuid := e.Param("uuid")
+	uuid, err := util.GetUUIDParam(e)
+	if err != nil {
+		return api.WebResponse(e, http.StatusBadRequest, err)
+	}
 	var user models.User
 	err = u.UserService.DeleteUserByUuidInDomain(&user, uuid, domain)
 	if err != nil {

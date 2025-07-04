@@ -66,3 +66,23 @@ func GzipSkipper(c echo.Context) bool {
 	p := c.Path()
 	return p == "/health" || len(p) >= 8 && p[:8] == "/swagger"
 }
+
+// HashPassword hashes a plain password using bcrypt
+func HashPassword(password string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(hash), err
+}
+
+// CheckPasswordHash compares a bcrypt hashed password with its possible plaintext equivalent
+func CheckPasswordHash(hash, password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+}
+
+// GetUUIDParam extracts the 'uuid' parameter from the Echo context and returns an error if missing
+func GetUUIDParam(e echo.Context) (string, error) {
+	uuid := e.Param("uuid")
+	if uuid == "" {
+		return "", echo.NewHTTPError(http.StatusBadRequest, "Missing or invalid UUID parameter")
+	}
+	return uuid, nil
+}

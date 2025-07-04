@@ -15,7 +15,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
-	"golang.org/x/crypto/bcrypt"
 )
 
 // AuthHandler provides endpoints for user authentication, token refresh, and logout operations.
@@ -72,7 +71,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_CREDENTIALS())
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginRequest.Password)); err != nil {
+	if err := util.CheckPasswordHash(user.Password, loginRequest.Password); err != nil {
 		log.Info().Str("event", "login_failed").Str("email", loginRequest.Email).Uint64("user_id", uint64(user.ID)).Str("error", "invalid_password").Msg("Login failed: invalid password")
 		return api.WebResponse(c, http.StatusUnauthorized, api.INVALID_CREDENTIALS())
 	}

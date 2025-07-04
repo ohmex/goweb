@@ -5,10 +5,10 @@ import (
 	"goweb/api"
 	"goweb/models"
 	"goweb/requests"
+	"goweb/util"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -29,10 +29,7 @@ func (service *UserService) Register(e echo.Context, request *requests.RegisterR
 		return api.WebResponse(e, http.StatusBadRequest, api.USER_EXISTS())
 	}
 
-	encryptedPassword, err := bcrypt.GenerateFromPassword(
-		[]byte(request.Password),
-		bcrypt.DefaultCost,
-	)
+	encryptedPassword, err := util.HashPassword(request.Password)
 
 	if err != nil {
 		return api.WebResponse(e, http.StatusInternalServerError, api.RESOURCE_CREATION_FAILED("Resource creation failed - error creating password"))
@@ -41,7 +38,7 @@ func (service *UserService) Register(e echo.Context, request *requests.RegisterR
 	newUser := models.User{
 		Name:     request.Name,
 		Email:    request.Email,
-		Password: string(encryptedPassword),
+		Password: encryptedPassword,
 		Domains:  []*models.Domain{domain},
 	}
 

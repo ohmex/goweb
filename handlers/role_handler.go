@@ -6,6 +6,7 @@ import (
 	"goweb/requests"
 	"goweb/server"
 	"goweb/services"
+	"goweb/util"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -27,25 +28,20 @@ func NewRoleHandler(server *server.Server) *RoleHandler {
 
 // getDomain extracts and validates domain from context
 func (h *RoleHandler) getDomain(e echo.Context) (*models.Domain, error) {
-	domain, ok := e.Get("domain").(*models.Domain)
-	if !ok || domain == nil {
+	d, err := util.ExtractDomain(e)
+	if err != nil {
 		return nil, api.FIELD_VALIDATION_ERROR("Missing domain information")
 	}
+	domain, _ := d.(*models.Domain)
 	return domain, nil
 }
 
 // validateRoleRequest validates and binds role request
 func (h *RoleHandler) validateRoleRequest(e echo.Context) (*requests.RoleRequest, error) {
-	roleRequest := new(requests.RoleRequest)
-
-	if err := e.Bind(roleRequest); err != nil {
+	roleRequest, err := util.BindAndValidate[requests.RoleRequest](e)
+	if err != nil {
 		return nil, api.FIELD_VALIDATION_ERROR("Invalid request format")
 	}
-
-	if err := roleRequest.Validate(); err != nil {
-		return nil, api.FIELD_VALIDATION_ERROR("Validation failed: " + err.Error())
-	}
-
 	return roleRequest, nil
 }
 
@@ -139,9 +135,9 @@ func (h *RoleHandler) Read(e echo.Context) error {
 		return api.WebResponse(e, http.StatusBadRequest, err)
 	}
 
-	uuid := e.Param("uuid")
-	if uuid == "" {
-		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR("Role UUID is required"))
+	uuid, err := util.GetUUIDParam(e)
+	if err != nil {
+		return api.WebResponse(e, http.StatusBadRequest, err)
 	}
 
 	role, err := h.getRoleByUUID(uuid, domain)
@@ -179,9 +175,9 @@ func (h *RoleHandler) Update(e echo.Context) error {
 		return api.WebResponse(e, http.StatusBadRequest, err)
 	}
 
-	uuid := e.Param("uuid")
-	if uuid == "" {
-		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR("Role UUID is required"))
+	uuid, err := util.GetUUIDParam(e)
+	if err != nil {
+		return api.WebResponse(e, http.StatusBadRequest, err)
 	}
 
 	role, err := h.getRoleByUUID(uuid, domain)
@@ -220,9 +216,9 @@ func (h *RoleHandler) Delete(e echo.Context) error {
 		return api.WebResponse(e, http.StatusBadRequest, err)
 	}
 
-	uuid := e.Param("uuid")
-	if uuid == "" {
-		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR("Role UUID is required"))
+	uuid, err := util.GetUUIDParam(e)
+	if err != nil {
+		return api.WebResponse(e, http.StatusBadRequest, err)
 	}
 
 	var role models.Role
