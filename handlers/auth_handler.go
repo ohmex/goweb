@@ -8,6 +8,7 @@ import (
 	"goweb/responses"
 	"goweb/server"
 	"goweb/services"
+	"goweb/util"
 	"net/http"
 	"time"
 
@@ -31,20 +32,6 @@ func NewAuthHandler(server *server.Server) *AuthHandler {
 		userService:  services.NewUserService(server.DB),
 		tokenService: services.NewTokenService(server),
 	}
-}
-
-// Helper to bind and validate request
-func bindAndValidate[T any](c echo.Context) (*T, error) {
-	obj := new(T)
-	if err := c.Bind(obj); err != nil {
-		return nil, api.FIELD_VALIDATION_ERROR("Invalid request format")
-	}
-	if validator, ok := any(obj).(interface{ Validate() error }); ok {
-		if err := validator.Validate(); err != nil {
-			return nil, api.FIELD_VALIDATION_ERROR(err.Error())
-		}
-	}
-	return obj, nil
 }
 
 // Helper to generate token pair and return response
@@ -74,7 +61,7 @@ func (h *AuthHandler) respondWithTokenPair(c echo.Context, user *models.User) er
 func (h *AuthHandler) Login(c echo.Context) error {
 	start := time.Now()
 
-	loginRequest, err := bindAndValidate[requests.LoginRequest](c)
+	loginRequest, err := util.BindAndValidate[requests.LoginRequest](c)
 	if err != nil {
 		return api.WebResponse(c, http.StatusBadRequest, err)
 	}
@@ -110,7 +97,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 func (h *AuthHandler) RefreshToken(c echo.Context) error {
 	start := time.Now()
 
-	refreshRequest, err := bindAndValidate[requests.RefreshRequest](c)
+	refreshRequest, err := util.BindAndValidate[requests.RefreshRequest](c)
 	if err != nil {
 		return api.WebResponse(c, http.StatusBadRequest, err)
 	}

@@ -3,7 +3,6 @@ package routes
 import (
 	// Standard library
 	"net/http"
-	"strings"
 
 	// Third-party
 	"github.com/golang-jwt/jwt/v5"
@@ -17,13 +16,8 @@ import (
 	"goweb/interceptor"
 	"goweb/server"
 	"goweb/services"
+	"goweb/util"
 )
-
-// gzipSkipper skips Gzip middleware for health and swagger endpoints
-func gzipSkipper(c echo.Context) bool {
-	p := c.Path()
-	return p == "/health" || strings.HasPrefix(p, "/swagger")
-}
 
 // ConfigureRoutes sets up all routes and middleware for the server
 func ConfigureRoutes(server *server.Server) {
@@ -40,7 +34,7 @@ func ConfigureRoutes(server *server.Server) {
 	// Global middleware
 	server.Echo.Use(middleware.Recover())
 	server.Echo.Use(middleware.GzipWithConfig(middleware.GzipConfig{
-		Skipper:   gzipSkipper,
+		Skipper:   util.GzipSkipper,
 		Level:     2,
 		MinLength: 128,
 	}))

@@ -6,6 +6,7 @@ import (
 	"goweb/requests"
 	"goweb/server"
 	"goweb/services"
+	"goweb/util"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -32,15 +33,6 @@ func (u *UserHandler) Type() string {
 	return "User"
 }
 
-// Helper to extract domain from context
-func extractDomain(e echo.Context) (*models.Domain, error) {
-	domain, ok := e.Get("domain").(*models.Domain)
-	if !ok || domain == nil {
-		return nil, echo.NewHTTPError(http.StatusBadRequest, "Invalid domain context")
-	}
-	return domain, nil
-}
-
 // Helper to fetch user by UUID in domain
 func findUserByUUID(e echo.Context, userService *services.UserService, domain *models.Domain) (*models.User, error) {
 	uuid := e.Param("uuid")
@@ -63,10 +55,11 @@ func findUserByUUID(e echo.Context, userService *services.UserService, domain *m
 // @Failure 400 {object} api.Response
 // @Router /users [get]
 func (u *UserHandler) List(e echo.Context) error {
-	domain, err := extractDomain(e)
+	d, err := util.ExtractDomain(e)
 	if err != nil {
 		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
+	domain, _ := d.(*models.Domain)
 	var users []*models.User
 	u.UserService.GetUsersInDomain(&users, domain)
 	return api.WebResponse(e, http.StatusOK, users)
@@ -93,10 +86,11 @@ func (u *UserHandler) Create(e echo.Context) error {
 	if err := registerRequest.Validate(); err != nil {
 		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
-	domain, err := extractDomain(e)
+	d, err := util.ExtractDomain(e)
 	if err != nil {
 		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
+	domain, _ := d.(*models.Domain)
 	return u.UserService.Register(e, registerRequest, domain)
 }
 
@@ -113,10 +107,11 @@ func (u *UserHandler) Create(e echo.Context) error {
 // @Failure 404 {object} api.Response
 // @Router /users/{uuid} [get]
 func (u *UserHandler) Read(e echo.Context) error {
-	domain, err := extractDomain(e)
+	d, err := util.ExtractDomain(e)
 	if err != nil {
 		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
+	domain, _ := d.(*models.Domain)
 	user, err := findUserByUUID(e, u.UserService, domain)
 	if err != nil {
 		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("User not found"))
@@ -147,10 +142,11 @@ func (u *UserHandler) Update(e echo.Context) error {
 	if err := updateRequest.Validate(); err != nil {
 		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
-	domain, err := extractDomain(e)
+	d, err := util.ExtractDomain(e)
 	if err != nil {
 		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
+	domain, _ := d.(*models.Domain)
 	user, err := findUserByUUID(e, u.UserService, domain)
 	if err != nil {
 		return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("User not found"))
@@ -174,10 +170,11 @@ func (u *UserHandler) Update(e echo.Context) error {
 // @Failure 404 {object} api.Response
 // @Router /users/{uuid} [delete]
 func (u *UserHandler) Delete(e echo.Context) error {
-	domain, err := extractDomain(e)
+	d, err := util.ExtractDomain(e)
 	if err != nil {
 		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR())
 	}
+	domain, _ := d.(*models.Domain)
 	uuid := e.Param("uuid")
 	var user models.User
 	err = u.UserService.DeleteUserByUuidInDomain(&user, uuid, domain)
