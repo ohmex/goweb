@@ -46,7 +46,7 @@ func (h *AuthHandler) respondWithTokenPair(c echo.Context, user *models.User) er
 
 // Login godoc
 // @Summary Authenticates a user using email and password, and returns a token pair if successful.
-// @Description Perform user login with email and password
+// @Description Perform user login with email and password. The returned `accessToken` should be used as a Bearer token in the `Authorization` header (i.e., `Authorization: Bearer <accessToken>`) for authenticated endpoints such as Logout.
 // @ID user-login
 // @Tags User Actions
 // @Accept json

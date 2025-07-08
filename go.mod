@@ -16,7 +16,6 @@ require (
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/cobra v1.9.1
 	github.com/swaggo/echo-swagger v1.4.1
-	github.com/swaggo/swag v1.16.4
 	golang.org/x/crypto v0.39.0
 	golang.org/x/sync v0.15.0
 	gorm.io/driver/mysql v1.6.0
@@ -59,6 +58,7 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/swaggo/files/v2 v2.0.2 // indirect
+	github.com/swaggo/swag v1.16.4 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b // indirect
