@@ -3,8 +3,8 @@ package requests
 import validation "github.com/go-ozzo/ozzo-validation/v4"
 
 type BasicPost struct {
-	Title   string `json:"title" validate:"required" example:"Echo"`
-	Content string `json:"content" validate:"required" example:"Echo is nice!"`
+	Title   string `form:"title" json:"title" validate:"required" example:"Echo"`
+	Content string `form:"content" json:"content" validate:"required" example:"Echo is nice!"`
 }
 
 func (bp BasicPost) Validate() error {

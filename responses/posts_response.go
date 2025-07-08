@@ -5,10 +5,10 @@ import (
 )
 
 type PostResponse struct {
+	UUID     string `json:"uuid" example:"uuid"`
+	Username string `json:"username" example:"John Doe"`
 	Title    string `json:"title" example:"Echo"`
 	Content  string `json:"content" example:"Echo is nice!"`
-	Username string `json:"username" example:"John Doe"`
-	ID       uint64 `json:"id" example:"1"`
 }
 
 func NewPostResponse(posts []models.Post) *[]PostResponse {
@@ -16,10 +16,10 @@ func NewPostResponse(posts []models.Post) *[]PostResponse {
 
 	for i := range posts {
 		postResponse = append(postResponse, PostResponse{
+			UUID:     posts[i].UUID.String(),
+			Username: posts[i].User.Name,
 			Title:    posts[i].Title,
 			Content:  posts[i].Content,
-			Username: posts[i].User.Name,
-			ID:       posts[i].ID,
 		})
 	}
 
