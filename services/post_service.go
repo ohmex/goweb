@@ -28,3 +28,11 @@ func (postService *PostService) Update(post *models.Post, updatePostRequest *req
 	post.Title = updatePostRequest.Title
 	postService.DB.Save(post)
 }
+
+func (postService *PostService) GetPostsInDomain(posts *[]models.Post, domain *models.Domain) {
+	postService.DB.Preload("User").Where("domain = ?", domain.UUID).Find(posts)
+}
+
+func (postService *PostService) GetPostByUuidInDomain(post *models.Post, uuid string, domain *models.Domain) {
+	postService.DB.Preload("User").Where("uuid = ? AND domain = ?", uuid, domain.UUID).First(post)
+}
