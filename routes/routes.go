@@ -9,7 +9,6 @@ import (
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	echoSwagger "github.com/swaggo/echo-swagger"
 
 	// Local
 	"goweb/handlers"
@@ -54,7 +53,8 @@ func ConfigureRoutes(server *server.Server) {
 	server.Echo.GET("/", func(ctx echo.Context) error {
 		return ctx.String(http.StatusOK, "Ohmex welcomes you to paradise!")
 	})
-	server.Echo.GET("/swagger/*", echoSwagger.WrapHandler)
+
+	server.Echo.Static("/swagger", "docs")
 	server.Echo.POST("/login", authHandler.Login)
 	server.Echo.POST("/register", registerHandler.Register)
 	server.Echo.POST("/refresh", authHandler.RefreshToken)

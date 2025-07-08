@@ -25,6 +25,5 @@ casbin.db
 .env
 .env.testing
 /.idea
-docs
 main
 .DS_Store
