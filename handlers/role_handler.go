@@ -71,9 +71,10 @@ func (h *RoleHandler) Type() string {
 // @Tags Role Management
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Success 200 {array} models.Role
 // @Failure 400 {object} api.Response
-// @Router /roles [get]
+// @Router /api/role [get]
 func (h *RoleHandler) List(e echo.Context) error {
 	domain, err := h.getDomain(e)
 	if err != nil {
@@ -95,10 +96,11 @@ func (h *RoleHandler) List(e echo.Context) error {
 // @Tags Role Management
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param params body requests.RoleRequest true "Role creation data"
 // @Success 201 {object} api.Response
 // @Failure 400 {object} api.Response
-// @Router /roles [post]
+// @Router /api/role [post]
 func (h *RoleHandler) Create(e echo.Context) error {
 	roleRequest, err := h.validateRoleRequest(e)
 	if err != nil {
@@ -124,11 +126,12 @@ func (h *RoleHandler) Create(e echo.Context) error {
 // @Tags Role Management
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param uuid path string true "Role UUID"
 // @Success 200 {object} models.Role
 // @Failure 400 {object} api.Response
 // @Failure 404 {object} api.Response
-// @Router /roles/{uuid} [get]
+// @Router /api/role/{uuid} [get]
 func (h *RoleHandler) Read(e echo.Context) error {
 	domain, err := h.getDomain(e)
 	if err != nil {
@@ -158,12 +161,13 @@ func (h *RoleHandler) Read(e echo.Context) error {
 // @Tags Role Management
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param uuid path string true "Role UUID"
 // @Param params body requests.RoleRequest true "Role update data"
 // @Success 200 {object} models.Role
 // @Failure 400 {object} api.Response
 // @Failure 404 {object} api.Response
-// @Router /roles/{uuid} [put]
+// @Router /api/role/{uuid} [put]
 func (h *RoleHandler) Update(e echo.Context) error {
 	roleRequest, err := h.validateRoleRequest(e)
 	if err != nil {
@@ -205,11 +209,12 @@ func (h *RoleHandler) Update(e echo.Context) error {
 // @Tags Role Management
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param uuid path string true "Role UUID"
 // @Success 200 {object} api.Response
 // @Failure 400 {object} api.Response
 // @Failure 404 {object} api.Response
-// @Router /roles/{uuid} [delete]
+// @Router /api/role/{uuid} [delete]
 func (h *RoleHandler) Delete(e echo.Context) error {
 	domain, err := h.getDomain(e)
 	if err != nil {

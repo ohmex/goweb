@@ -23,7 +23,7 @@ func NewRegisterHandler(server *server.Server) *RegisterHandler {
 // @Summary Register a new user
 // @Description Register creates a new user and domain based on the provided registration request.
 // @ID user-register
-// @Tags User Actions
+// @Tags Account Actions
 // @Accept json
 // @Produce json
 // @Param params body requests.RegisterRequest true "User's email, user's password"

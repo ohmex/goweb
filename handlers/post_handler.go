@@ -40,9 +40,10 @@ func (u PostHandler) Type() string {
 // @Tags Post Management
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Success 200 {array} responses.PostResponse
 // @Failure 400 {object} api.Response
-// @Router /posts [get]
+// @Router /api/post [get]
 func (h *PostHandler) List(e echo.Context) error {
 	d, err := util.ExtractDomain(e)
 	if err != nil {
@@ -61,10 +62,11 @@ func (h *PostHandler) List(e echo.Context) error {
 // @Tags Post Management
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param params body requests.CreatePostRequest true "Post creation data"
 // @Success 201 {object} api.Response
 // @Failure 400 {object} api.Response
-// @Router /posts [post]
+// @Router /api/post [post]
 func (h *PostHandler) Create(e echo.Context) error {
 	createRequest, err := util.BindAndValidate[requests.CreatePostRequest](e)
 	if err != nil {
@@ -97,11 +99,12 @@ func (h *PostHandler) Create(e echo.Context) error {
 // @Tags Post Management
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param uuid path string true "Post UUID"
 // @Success 200 {object} responses.PostResponse
 // @Failure 400 {object} api.Response
 // @Failure 404 {object} api.Response
-// @Router /posts/{uuid} [get]
+// @Router /api/post/{uuid} [get]
 func (h *PostHandler) Read(e echo.Context) error {
 	d, err := util.ExtractDomain(e)
 	if err != nil {
@@ -129,10 +132,11 @@ func (h *PostHandler) Read(e echo.Context) error {
 // @Produce json
 // @Param uuid path string true "Post UUID"
 // @Param params body requests.UpdatePostRequest true "Post update data"
+// @Security ApiKeyAuth
 // @Success 200 {object} responses.PostResponse
 // @Failure 400 {object} api.Response
 // @Failure 404 {object} api.Response
-// @Router /posts/{uuid} [put]
+// @Router /api/post/{uuid} [put]
 func (h *PostHandler) Update(e echo.Context) error {
 	updateRequest, err := util.BindAndValidate[requests.UpdatePostRequest](e)
 	if err != nil {
@@ -164,10 +168,11 @@ func (h *PostHandler) Update(e echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param uuid path string true "Post UUID"
+// @Security ApiKeyAuth
 // @Success 200 {object} api.Response
 // @Failure 400 {object} api.Response
 // @Failure 404 {object} api.Response
-// @Router /posts/{uuid} [delete]
+// @Router /api/post/{uuid} [delete]
 func (h *PostHandler) Delete(e echo.Context) error {
 	d, err := util.ExtractDomain(e)
 	if err != nil {

@@ -48,7 +48,7 @@ func (h *AuthHandler) respondWithTokenPair(c echo.Context, user *models.User) er
 // @Summary Authenticates a user using email and password, and returns a token pair if successful.
 // @Description Perform user login with email and password. The returned `accessToken` should be used as a Bearer token in the `Authorization` header (i.e., `Authorization: Bearer <accessToken>`) for authenticated endpoints such as Logout.
 // @ID user-login
-// @Tags User Actions
+// @Tags Account Actions
 // @Accept json
 // @Produce json
 // @Param params body requests.LoginRequest true "User's credentials"
@@ -84,7 +84,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 // @Summary Refresh access token
 // @Description RefreshToken issues a new access token using a valid refresh token.
 // @ID user-refresh
-// @Tags User Actions
+// @Tags Account Actions
 // @Accept json
 // @Produce json
 // @Param params body requests.RefreshRequest true "Refresh token"
@@ -121,7 +121,7 @@ func (h *AuthHandler) RefreshToken(c echo.Context) error {
 // @Summary Logout user
 // @Description Invalidate user session and logout
 // @ID user-logout
-// @Tags User Actions
+// @Tags Account Actions
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth

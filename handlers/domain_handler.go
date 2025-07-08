@@ -31,8 +31,9 @@ func (u DomainHandler) Type() string {
 // @Tags Domain Management
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Success 200 {object} api.Response
-// @Router /domains [get]
+// @Router /api/domain [get]
 func (u DomainHandler) List(e echo.Context) error {
 	return api.WebResponse(e, http.StatusOK, api.STATUS_OK(gofakeit.Paragraph(100, 10, 10, " ")))
 }
@@ -44,8 +45,9 @@ func (u DomainHandler) List(e echo.Context) error {
 // @Tags Domain Management
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Failure 404 {object} api.Response
-// @Router /domains [post]
+// @Router /api/domain [post]
 func (u DomainHandler) Create(e echo.Context) error {
 	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Create Domain not implemented"))
 }
@@ -57,9 +59,10 @@ func (u DomainHandler) Create(e echo.Context) error {
 // @Tags Domain Management
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param uuid path string true "Domain UUID"
 // @Failure 404 {object} api.Response
-// @Router /domains/{uuid} [get]
+// @Router /api/domain/{uuid} [get]
 func (u DomainHandler) Read(e echo.Context) error {
 	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Read Domain not implemented"))
 }
@@ -71,9 +74,10 @@ func (u DomainHandler) Read(e echo.Context) error {
 // @Tags Domain Management
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param uuid path string true "Domain UUID"
 // @Failure 404 {object} api.Response
-// @Router /domains/{uuid} [put]
+// @Router /api/domain/{uuid} [put]
 func (u DomainHandler) Update(e echo.Context) error {
 	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Update Domain not implemented"))
 }
@@ -85,9 +89,10 @@ func (u DomainHandler) Update(e echo.Context) error {
 // @Tags Domain Management
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param uuid path string true "Domain UUID"
 // @Failure 404 {object} api.Response
-// @Router /domains/{uuid} [delete]
+// @Router /api/domain/{uuid} [delete]
 func (u DomainHandler) Delete(e echo.Context) error {
 	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Delete Domain not implemented"))
 }

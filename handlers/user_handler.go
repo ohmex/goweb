@@ -54,9 +54,10 @@ func findUserByUUID(e echo.Context, userService *services.UserService, domain *m
 // @Tags User Management
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Success 200 {array} models.User
 // @Failure 400 {object} api.Response
-// @Router /users [get]
+// @Router /api/user [get]
 func (u *UserHandler) List(e echo.Context) error {
 	d, err := util.ExtractDomain(e)
 	if err != nil {
@@ -75,10 +76,11 @@ func (u *UserHandler) List(e echo.Context) error {
 // @Tags User Management
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param params body requests.RegisterRequest true "User registration data"
 // @Success 201 {object} api.Response
 // @Failure 400 {object} api.Response
-// @Router /users [post]
+// @Router /api/user [post]
 func (u *UserHandler) Create(e echo.Context) error {
 	registerRequest, err := util.BindAndValidate[requests.RegisterRequest](e)
 	if err != nil {
@@ -99,11 +101,12 @@ func (u *UserHandler) Create(e echo.Context) error {
 // @Tags User Management
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param uuid path string true "User UUID"
 // @Success 200 {object} models.User
 // @Failure 400 {object} api.Response
 // @Failure 404 {object} api.Response
-// @Router /users/{uuid} [get]
+// @Router /api/user/{uuid} [get]
 func (u *UserHandler) Read(e echo.Context) error {
 	d, err := util.ExtractDomain(e)
 	if err != nil {
@@ -124,12 +127,13 @@ func (u *UserHandler) Read(e echo.Context) error {
 // @Tags User Management
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param uuid path string true "User UUID"
 // @Param params body requests.UpdateRequest true "User update data"
 // @Success 200 {object} models.User
 // @Failure 400 {object} api.Response
 // @Failure 404 {object} api.Response
-// @Router /users/{uuid} [put]
+// @Router /api/user/{uuid} [put]
 func (u *UserHandler) Update(e echo.Context) error {
 	updateRequest, err := util.BindAndValidate[requests.UpdateRequest](e)
 	if err != nil {
@@ -157,11 +161,12 @@ func (u *UserHandler) Update(e echo.Context) error {
 // @Tags User Management
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param uuid path string true "User UUID"
 // @Success 200 {object} api.Response
 // @Failure 400 {object} api.Response
 // @Failure 404 {object} api.Response
-// @Router /users/{uuid} [delete]
+// @Router /api/user/{uuid} [delete]
 func (u *UserHandler) Delete(e echo.Context) error {
 	d, err := util.ExtractDomain(e)
 	if err != nil {

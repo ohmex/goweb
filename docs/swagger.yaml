@@ -179,7 +179,7 @@ definitions:
 info:
   contact: {}
 paths:
-  /domains:
+  /api/domain:
     get:
       consumes:
       - application/json
@@ -192,6 +192,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/api.Response'
+      security:
+      - ApiKeyAuth: []
       summary: List domains
       tags:
       - Domain Management
@@ -207,10 +209,12 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/api.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Create domain
       tags:
       - Domain Management
-  /domains/{uuid}:
+  /api/domain/{uuid}:
     delete:
       consumes:
       - application/json
@@ -229,6 +233,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/api.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Delete domain
       tags:
       - Domain Management
@@ -250,6 +256,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/api.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Get domain
       tags:
       - Domain Management
@@ -271,9 +279,467 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/api.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Update domain
       tags:
       - Domain Management
+  /api/post:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of posts for the specified domain.
+      operationId: post-list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.PostResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: List posts
+      tags:
+      - Post Management
+    post:
+      consumes:
+      - application/json
+      description: Creates a new post in the specified domain.
+      operationId: post-create
+      parameters:
+      - description: Post creation data
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreatePostRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create post
+      tags:
+      - Post Management
+  /api/post/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Removes a post by UUID from the specified domain.
+      operationId: post-delete
+      parameters:
+      - description: Post UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete post
+      tags:
+      - Post Management
+    get:
+      consumes:
+      - application/json
+      description: Returns the details of a post by UUID within the specified domain.
+      operationId: post-read
+      parameters:
+      - description: Post UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.PostResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get post
+      tags:
+      - Post Management
+    put:
+      consumes:
+      - application/json
+      description: Modifies the details of a post by UUID within the specified domain.
+      operationId: post-update
+      parameters:
+      - description: Post UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Post update data
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdatePostRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.PostResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update post
+      tags:
+      - Post Management
+  /api/role:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of roles for the specified domain.
+      operationId: role-list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Role'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: List roles
+      tags:
+      - Role Management
+    post:
+      consumes:
+      - application/json
+      description: Creates a new role in the specified domain.
+      operationId: role-create
+      parameters:
+      - description: Role creation data
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/requests.RoleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create role
+      tags:
+      - Role Management
+  /api/role/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Removes a role by UUID from the specified domain.
+      operationId: role-delete
+      parameters:
+      - description: Role UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete role
+      tags:
+      - Role Management
+    get:
+      consumes:
+      - application/json
+      description: Returns the details of a role by UUID within the specified domain.
+      operationId: role-read
+      parameters:
+      - description: Role UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Role'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get role
+      tags:
+      - Role Management
+    put:
+      consumes:
+      - application/json
+      description: Modifies the details of a role by UUID within the specified domain.
+      operationId: role-update
+      parameters:
+      - description: Role UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Role update data
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/requests.RoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Role'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update role
+      tags:
+      - Role Management
+  /api/user:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of users for the specified domain.
+      operationId: user-list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: List users
+      tags:
+      - User Management
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user in the specified domain.
+      operationId: user-create
+      parameters:
+      - description: User registration data
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/requests.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create user
+      tags:
+      - User Management
+  /api/user/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Removes a user by UUID from the specified domain.
+      operationId: user-delete
+      parameters:
+      - description: User UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user
+      tags:
+      - User Management
+    get:
+      consumes:
+      - application/json
+      description: Returns the details of a user by UUID within the specified domain.
+      operationId: user-read
+      parameters:
+      - description: User UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user
+      tags:
+      - User Management
+    put:
+      consumes:
+      - application/json
+      description: Modifies the details of a user by UUID within the specified domain.
+      operationId: user-update
+      parameters:
+      - description: User UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: User update data
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update user
+      tags:
+      - User Management
   /login:
     post:
       consumes:
@@ -311,7 +777,7 @@ paths:
       summary: Authenticates a user using email and password, and returns a token
         pair if successful.
       tags:
-      - User Actions
+      - Account Actions
   /logout:
     post:
       consumes:
@@ -337,149 +803,7 @@ paths:
       - ApiKeyAuth: []
       summary: Logout user
       tags:
-      - User Actions
-  /posts:
-    get:
-      consumes:
-      - application/json
-      description: Returns a list of posts for the specified domain.
-      operationId: post-list
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/responses.PostResponse'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Response'
-      summary: List posts
-      tags:
-      - Post Management
-    post:
-      consumes:
-      - application/json
-      description: Creates a new post in the specified domain.
-      operationId: post-create
-      parameters:
-      - description: Post creation data
-        in: body
-        name: params
-        required: true
-        schema:
-          $ref: '#/definitions/requests.CreatePostRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/api.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Response'
-      summary: Create post
-      tags:
-      - Post Management
-  /posts/{uuid}:
-    delete:
-      consumes:
-      - application/json
-      description: Removes a post by UUID from the specified domain.
-      operationId: post-delete
-      parameters:
-      - description: Post UUID
-        in: path
-        name: uuid
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.Response'
-      summary: Delete post
-      tags:
-      - Post Management
-    get:
-      consumes:
-      - application/json
-      description: Returns the details of a post by UUID within the specified domain.
-      operationId: post-read
-      parameters:
-      - description: Post UUID
-        in: path
-        name: uuid
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/responses.PostResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.Response'
-      summary: Get post
-      tags:
-      - Post Management
-    put:
-      consumes:
-      - application/json
-      description: Modifies the details of a post by UUID within the specified domain.
-      operationId: post-update
-      parameters:
-      - description: Post UUID
-        in: path
-        name: uuid
-        required: true
-        type: string
-      - description: Post update data
-        in: body
-        name: params
-        required: true
-        schema:
-          $ref: '#/definitions/requests.UpdatePostRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/responses.PostResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.Response'
-      summary: Update post
-      tags:
-      - Post Management
+      - Account Actions
   /refresh:
     post:
       consumes:
@@ -514,7 +838,7 @@ paths:
             $ref: '#/definitions/api.Response'
       summary: Refresh access token
       tags:
-      - User Actions
+      - Account Actions
   /register:
     post:
       consumes:
@@ -534,291 +858,7 @@ paths:
       responses: {}
       summary: Register a new user
       tags:
-      - User Actions
-  /roles:
-    get:
-      consumes:
-      - application/json
-      description: Returns a list of roles for the specified domain.
-      operationId: role-list
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.Role'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Response'
-      summary: List roles
-      tags:
-      - Role Management
-    post:
-      consumes:
-      - application/json
-      description: Creates a new role in the specified domain.
-      operationId: role-create
-      parameters:
-      - description: Role creation data
-        in: body
-        name: params
-        required: true
-        schema:
-          $ref: '#/definitions/requests.RoleRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/api.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Response'
-      summary: Create role
-      tags:
-      - Role Management
-  /roles/{uuid}:
-    delete:
-      consumes:
-      - application/json
-      description: Removes a role by UUID from the specified domain.
-      operationId: role-delete
-      parameters:
-      - description: Role UUID
-        in: path
-        name: uuid
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.Response'
-      summary: Delete role
-      tags:
-      - Role Management
-    get:
-      consumes:
-      - application/json
-      description: Returns the details of a role by UUID within the specified domain.
-      operationId: role-read
-      parameters:
-      - description: Role UUID
-        in: path
-        name: uuid
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Role'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.Response'
-      summary: Get role
-      tags:
-      - Role Management
-    put:
-      consumes:
-      - application/json
-      description: Modifies the details of a role by UUID within the specified domain.
-      operationId: role-update
-      parameters:
-      - description: Role UUID
-        in: path
-        name: uuid
-        required: true
-        type: string
-      - description: Role update data
-        in: body
-        name: params
-        required: true
-        schema:
-          $ref: '#/definitions/requests.RoleRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Role'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.Response'
-      summary: Update role
-      tags:
-      - Role Management
-  /users:
-    get:
-      consumes:
-      - application/json
-      description: Returns a list of users for the specified domain.
-      operationId: user-list
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.User'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Response'
-      summary: List users
-      tags:
-      - User Management
-    post:
-      consumes:
-      - application/json
-      description: Creates a new user in the specified domain.
-      operationId: user-create
-      parameters:
-      - description: User registration data
-        in: body
-        name: params
-        required: true
-        schema:
-          $ref: '#/definitions/requests.RegisterRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/api.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Response'
-      summary: Create user
-      tags:
-      - User Management
-  /users/{uuid}:
-    delete:
-      consumes:
-      - application/json
-      description: Removes a user by UUID from the specified domain.
-      operationId: user-delete
-      parameters:
-      - description: User UUID
-        in: path
-        name: uuid
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.Response'
-      summary: Delete user
-      tags:
-      - User Management
-    get:
-      consumes:
-      - application/json
-      description: Returns the details of a user by UUID within the specified domain.
-      operationId: user-read
-      parameters:
-      - description: User UUID
-        in: path
-        name: uuid
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.User'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.Response'
-      summary: Get user
-      tags:
-      - User Management
-    put:
-      consumes:
-      - application/json
-      description: Modifies the details of a user by UUID within the specified domain.
-      operationId: user-update
-      parameters:
-      - description: User UUID
-        in: path
-        name: uuid
-        required: true
-        type: string
-      - description: User update data
-        in: body
-        name: params
-        required: true
-        schema:
-          $ref: '#/definitions/requests.UpdateRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.User'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/api.Response'
-      summary: Update user
-      tags:
-      - User Management
+      - Account Actions
 securityDefinitions:
   ApiKeyAuth:
     description: 'Provide the accessToken as a Bearer token: ''Bearer {accessToken}'''
