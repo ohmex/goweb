@@ -24,3 +24,23 @@ $ swag init
 ## TODO:
 1. Token should be unique for the User & Domain, No need to send domain explicitly, it can be the part of token
 
+# Database Partitioning Support
+
+This project supports PostgreSQL table partitioning by the `domain` field for multi-tenancy. Partitioning is controlled by the `DB_PARTITIONING_ENABLED` environment variable.
+
+## How to Enable Partitioning
+
+- Set the following environment variable before running migrations or starting the application:
+
+```
+DB_PARTITIONING_ENABLED=true
+```
+
+- Partitioning is only applied if the database driver is PostgreSQL (`DB_DRIVER=postgres`).
+- When enabled, the `posts` table will be partitioned by the `domain` column during migration.
+
+## Effect
+- Improves performance and scalability for multi-tenant data separation.
+- Only affects tables that use the `BaseResource` struct (currently, only `posts`).
+- If disabled or using a non-PostgreSQL database, standard tables are created without partitioning.
+
