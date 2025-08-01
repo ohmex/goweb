@@ -4,9 +4,10 @@ import (
 	"goweb/config"
 	"goweb/db"
 	"goweb/db/migrations"
+	"goweb/services"
+	"goweb/util"
 
 	"github.com/rs/zerolog/log"
-
 	"github.com/spf13/cobra"
 	"gorm.io/gorm"
 )
@@ -42,6 +43,9 @@ func MigrateUp() {
 	if err := db.Migrate(GetDB()); err != nil {
 		log.Fatal().Msg("Migrate UP failed")
 	}
+
+	// Create partitions for existing domains after migration
+	CreatePartitionsForExistingDomains()
 }
 
 func MigrateDown() {
@@ -50,4 +54,27 @@ func MigrateDown() {
 	if err := db.MigrateDown(GetDB()); err != nil {
 		log.Fatal().Msg("Migrate DOWN failed")
 	}
+}
+
+func CreatePartitionsForExistingDomains() {
+	database := GetDB()
+	domainService := services.NewDomainService(database)
+
+	// Check if partitioning is enabled
+	if !util.IsPartitioningEnabled() {
+		log.Info().Msg("Partitioning disabled - skipping partition creation")
+		return
+	}
+
+	// Check if database supports partitioning
+	if !util.IsDatabasePartitioningSupported(database) {
+		log.Info().Msg("Database does not support partitioning - skipping partition creation")
+		return
+	}
+
+	if err := domainService.CreatePartitionsForExistingDomains(); err != nil {
+		log.Fatal().Err(err).Msg("Failed to create partitions for existing domains")
+	}
+
+	log.Info().Msg("Successfully created partitions for all existing domains")
 }

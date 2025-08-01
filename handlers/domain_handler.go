@@ -2,7 +2,10 @@ package handlers
 
 import (
 	"goweb/api"
+	"goweb/models"
+	"goweb/requests"
 	"goweb/server"
+	"goweb/services"
 	"net/http"
 
 	"github.com/brianvoe/gofakeit/v7"
@@ -40,16 +43,42 @@ func (u DomainHandler) List(e echo.Context) error {
 
 // Create godoc
 // @Summary Create domain
-// @Description Not implemented.
+// @Description Creates a new domain with automatic partition creation.
 // @ID domain-create
 // @Tags Domain Management
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Failure 404 {object} api.Response
+// @Param domain body requests.CreateDomainRequest true "Domain creation request"
+// @Success 201 {object} api.Response
+// @Failure 400 {object} api.Response
+// @Failure 500 {object} api.Response
 // @Router /api/domain [post]
 func (u DomainHandler) Create(e echo.Context) error {
-	return api.WebResponse(e, http.StatusNotFound, api.RESOURCE_NOT_FOUND("Create Domain not implemented"))
+	var request requests.CreateDomainRequest
+
+	if err := e.Bind(&request); err != nil {
+		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR("Invalid request format"))
+	}
+
+	if err := request.Validate(); err != nil {
+		return api.WebResponse(e, http.StatusBadRequest, api.FIELD_VALIDATION_ERROR(err.Error()))
+	}
+
+	// Create domain service
+	domainService := services.NewDomainService(u.server.DB)
+
+	// Create domain model
+	domain := &models.Domain{
+		Name: request.Name,
+	}
+
+	// Create domain with automatic partition creation
+	if err := domainService.CreateDomain(domain); err != nil {
+		return api.WebResponse(e, http.StatusInternalServerError, api.RESOURCE_CREATION_FAILED("Failed to create domain: "+err.Error()))
+	}
+
+	return api.WebResponse(e, http.StatusCreated, api.RESOURCE_CREATED("Domain created successfully"))
 }
 
 // Read godoc

@@ -1,6 +1,9 @@
 package config
 
-import "os"
+import (
+	"goweb/util"
+	"os"
+)
 
 type DBConfig struct {
 	User                string
@@ -13,10 +16,7 @@ type DBConfig struct {
 }
 
 func LoadDBConfig() DBConfig {
-	partitioning := false
-	if os.Getenv("DB_PARTITIONING_ENABLED") == "true" {
-		partitioning = true
-	}
+	partitioning := util.IsPartitioningEnabled()
 	return DBConfig{
 		User:                os.Getenv("DB_USER"),
 		Password:            os.Getenv("DB_PASSWORD"),

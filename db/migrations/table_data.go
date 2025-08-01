@@ -1,7 +1,10 @@
 package migrations
 
 import (
+	"fmt"
 	"goweb/models"
+	"goweb/util"
+	"strings"
 
 	"github.com/casbin/casbin/v2"
 	ga "github.com/casbin/gorm-adapter/v3"
@@ -27,6 +30,19 @@ func (TableData) Up(db *gorm.DB) {
 	system := models.Domain{Name: "System"}
 	db.Create(&system)
 
+	// Create partition for System domain if partitioning is enabled
+	if util.IsPartitioningEnabled() && util.IsDatabasePartitioningSupported(db) {
+		systemUUID := system.UUID.String()
+		safeUUID := strings.ReplaceAll(systemUUID, "-", "_")
+		partitionName := fmt.Sprintf("posts_%s", safeUUID)
+		partitionSQL := fmt.Sprintf(`
+			CREATE TABLE IF NOT EXISTS %s 
+			PARTITION OF posts 
+			FOR VALUES IN ('%s');
+		`, partitionName, systemUUID)
+		db.Exec(partitionSQL)
+	}
+
 	role := models.Role{Name: "Admin", DomainID: system.ID}
 	db.Create(&role)
 	role = models.Role{Name: "Manager", DomainID: system.ID}
@@ -37,6 +53,18 @@ func (TableData) Up(db *gorm.DB) {
 	reliance := models.Domain{Name: "Reliance"}
 	db.Create(&reliance)
 	relianceUUID := reliance.UUID.String() //Get UUID port creating table
+
+	// Create partition for Reliance domain if partitioning is enabled
+	if util.IsPartitioningEnabled() && util.IsDatabasePartitioningSupported(db) {
+		safeUUID := strings.ReplaceAll(relianceUUID, "-", "_")
+		partitionName := fmt.Sprintf("posts_%s", safeUUID)
+		partitionSQL := fmt.Sprintf(`
+			CREATE TABLE IF NOT EXISTS %s 
+			PARTITION OF posts 
+			FOR VALUES IN ('%s');
+		`, partitionName, relianceUUID)
+		db.Exec(partitionSQL)
+	}
 	casbin.AddPolicy("Admin", relianceUUID, "User", "List")
 	casbin.AddPolicy("Admin", relianceUUID, "User", "Read")
 	casbin.AddPolicy("Admin", relianceUUID, "User", "Create")
@@ -62,6 +90,18 @@ func (TableData) Up(db *gorm.DB) {
 	dmart := models.Domain{Name: "DMart"}
 	db.Create(&dmart)
 	dmartUUID := dmart.UUID.String() //Get UUID port creating table
+
+	// Create partition for DMart domain if partitioning is enabled
+	if util.IsPartitioningEnabled() && util.IsDatabasePartitioningSupported(db) {
+		safeUUID := strings.ReplaceAll(dmartUUID, "-", "_")
+		partitionName := fmt.Sprintf("posts_%s", safeUUID)
+		partitionSQL := fmt.Sprintf(`
+			CREATE TABLE IF NOT EXISTS %s 
+			PARTITION OF posts 
+			FOR VALUES IN ('%s');
+		`, partitionName, dmartUUID)
+		db.Exec(partitionSQL)
+	}
 	casbin.AddPolicy("Admin", dmartUUID, "User", "List")
 	casbin.AddPolicy("Admin", dmartUUID, "User", "Read")
 	casbin.AddPolicy("Admin", dmartUUID, "User", "Create")

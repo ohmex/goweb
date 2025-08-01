@@ -4,9 +4,12 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 // function to check given string is in array or not
@@ -85,4 +88,21 @@ func GetUUIDParam(e echo.Context) (string, error) {
 		return "", echo.NewHTTPError(http.StatusBadRequest, "Missing or invalid UUID parameter")
 	}
 	return uuid, nil
+}
+
+// GeneratePartitionName generates a safe partition name for a domain UUID
+func GeneratePartitionName(domainUUID string) string {
+	// Replace hyphens with underscores to make it PostgreSQL compatible
+	safeUUID := strings.ReplaceAll(domainUUID, "-", "_")
+	return "posts_" + safeUUID
+}
+
+// IsPartitioningEnabled checks if database partitioning is enabled via environment variable
+func IsPartitioningEnabled() bool {
+	return os.Getenv("DB_PARTITIONING_ENABLED") == "true"
+}
+
+// IsDatabasePartitioningSupported checks if the current database supports partitioning
+func IsDatabasePartitioningSupported(db *gorm.DB) bool {
+	return db.Dialector.Name() == "postgres"
 }

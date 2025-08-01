@@ -2,7 +2,7 @@ package migrations
 
 import (
 	"goweb/models"
-	"os"
+	"goweb/util"
 
 	"gorm.io/gorm"
 )
@@ -16,13 +16,9 @@ func (DatabaseTables) Up(db *gorm.DB) {
 	db.SetupJoinTable(&models.Domain{}, "Users", &models.DomainUser{})
 	db.Migrator().AutoMigrate(&models.Role{}, &models.User{}, &models.Domain{})
 
-	dbType := db.Dialector.Name()
-	partitioningEnabled := false
-	if os.Getenv("DB_PARTITIONING_ENABLED") == "true" {
-		partitioningEnabled = true
-	}
+	partitioningEnabled := util.IsPartitioningEnabled()
 
-	if dbType == "postgres" && partitioningEnabled {
+	if util.IsDatabasePartitioningSupported(db) && partitioningEnabled {
 		db.Exec(`
 			CREATE TABLE posts (
 				id BIGSERIAL,

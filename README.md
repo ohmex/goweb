@@ -26,21 +26,44 @@ $ swag init
 
 # Database Partitioning Support
 
-This project supports PostgreSQL table partitioning by the `domain` field for multi-tenancy. Partitioning is controlled by the `DB_PARTITIONING_ENABLED` environment variable.
+This project supports PostgreSQL table partitioning by the `domain` field for multi-tenancy with **automatic partition creation** for each domain.
 
-## How to Enable Partitioning
+## Quick Start
 
-- Set the following environment variable before running migrations or starting the application:
+1. **Enable Partitioning**: Set the environment variable:
+   ```bash
+   export DB_PARTITIONING_ENABLED=true
+   ```
 
-```
-DB_PARTITIONING_ENABLED=true
-```
+2. **Create Domains**: Use the API to create domains - partitions are created automatically:
+   ```bash
+   curl -X POST http://localhost:8080/api/domain \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+     -d '{"name": "NewCompany"}'
+   ```
 
-- Partitioning is only applied if the database driver is PostgreSQL (`DB_DRIVER=postgres`).
-- When enabled, the `posts` table will be partitioned by the `domain` column during migration.
+3. **Run Migrations**: Partitions are created automatically during migration:
+   ```bash
+   go run main.go migrate
+   ```
 
-## Effect
-- Improves performance and scalability for multi-tenant data separation.
-- Only affects tables that use the `BaseResource` struct (currently, only `posts`).
-- If disabled or using a non-PostgreSQL database, standard tables are created without partitioning.
+## Features
+
+- ✅ **Automatic Partition Creation**: Partitions created automatically when domains are created
+- ✅ **Multi-tenant Isolation**: Complete data separation between domains
+- ✅ **Performance Optimization**: Improved query performance for domain-specific data
+- ✅ **Migration Integration**: Works with existing migration system
+- ✅ **Error Handling**: Graceful handling of partitioning failures
+
+## Detailed Documentation
+
+For comprehensive information about the partitioning system, see [docs/partitioning.md](docs/partitioning.md).
+
+## Configuration
+
+- **Environment Variable**: `DB_PARTITIONING_ENABLED=true`
+- **Database**: PostgreSQL only (`DB_DRIVER=postgres`)
+- **Affected Tables**: Tables using `BaseResource` struct (currently `posts`)
+- **Partition Type**: LIST partitions by domain UUID
 
