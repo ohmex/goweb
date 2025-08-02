@@ -38,7 +38,12 @@ func InitDB(cfg *config.Config) *gorm.DB {
 			cfg.DB.Host,
 			cfg.DB.Port,
 			cfg.DB.Name)
-		db, err = gorm.Open(mysql.Open(dataSourceName), &gorm.Config{Logger: newLogger})
+		db, err = gorm.Open(mysql.Open(dataSourceName), &gorm.Config{
+			Logger: newLogger,
+			// Performance optimizations
+			SkipDefaultTransaction: true, // Disable default transaction for better performance
+			PrepareStmt:            true, // Enable prepared statements
+		})
 	case "postgres":
 		dataSourceName = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 			cfg.DB.Host,
@@ -46,7 +51,12 @@ func InitDB(cfg *config.Config) *gorm.DB {
 			cfg.DB.User,
 			cfg.DB.Password,
 			cfg.DB.Name)
-		db, err = gorm.Open(postgres.Open(dataSourceName), &gorm.Config{Logger: newLogger})
+		db, err = gorm.Open(postgres.Open(dataSourceName), &gorm.Config{
+			Logger: newLogger,
+			// Performance optimizations
+			SkipDefaultTransaction: true, // Disable default transaction for better performance
+			PrepareStmt:            true, // Enable prepared statements
+		})
 	default:
 		panic("unsupported database driver: " + cfg.DB.Driver)
 	}
@@ -55,6 +65,18 @@ func InitDB(cfg *config.Config) *gorm.DB {
 		panic(err.Error())
 	}
 
+	// Configure connection pool for better performance
+	sqlDB, err := db.DB()
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// Set connection pool settings
+	sqlDB.SetMaxIdleConns(10)                  // Maximum number of idle connections
+	sqlDB.SetMaxOpenConns(100)                 // Maximum number of open connections
+	sqlDB.SetConnMaxLifetime(time.Hour)        // Maximum lifetime of a connection
+	sqlDB.SetConnMaxIdleTime(30 * time.Minute) // Maximum idle time of a connection
+
 	return db
 }
 
@@ -62,6 +84,16 @@ func InitRedis(cfg *config.Config) *redis.Client {
 	addr := fmt.Sprintf("%s:%s", cfg.Redis.Host, cfg.Redis.Port)
 
 	return redis.NewClient(&redis.Options{
-		Addr: addr,
+		Addr:     addr,
+		Password: cfg.Redis.Password,
+		DB:       cfg.Redis.DB,
+		// Connection pool settings for better performance
+		PoolSize:     20, // Maximum number of connections in the pool
+		MinIdleConns: 5,  // Minimum number of idle connections
+		MaxRetries:   3,  // Maximum number of retries
+		// Timeout settings
+		DialTimeout:  5 * time.Second, // Timeout for dialing
+		ReadTimeout:  3 * time.Second, // Timeout for reading
+		WriteTimeout: 3 * time.Second, // Timeout for writing
 	})
 }
