@@ -71,11 +71,11 @@ func InitDB(cfg *config.Config) *gorm.DB {
 		panic(err.Error())
 	}
 
-	// Set connection pool settings
-	sqlDB.SetMaxIdleConns(10)                  // Maximum number of idle connections
-	sqlDB.SetMaxOpenConns(100)                 // Maximum number of open connections
-	sqlDB.SetConnMaxLifetime(time.Hour)        // Maximum lifetime of a connection
-	sqlDB.SetConnMaxIdleTime(30 * time.Minute) // Maximum idle time of a connection
+	// Set connection pool settings for optimal performance
+	sqlDB.SetMaxIdleConns(25)                  // Increased idle connections for better reuse
+	sqlDB.SetMaxOpenConns(200)                 // Increased max connections for high concurrency
+	sqlDB.SetConnMaxLifetime(30 * time.Minute) // Shorter lifetime for better connection freshness
+	sqlDB.SetConnMaxIdleTime(15 * time.Minute) // Shorter idle time for better resource management
 
 	return db
 }
@@ -87,13 +87,15 @@ func InitRedis(cfg *config.Config) *redis.Client {
 		Addr:     addr,
 		Password: cfg.Redis.Password,
 		DB:       cfg.Redis.DB,
-		// Connection pool settings for better performance
-		PoolSize:     20, // Maximum number of connections in the pool
-		MinIdleConns: 5,  // Minimum number of idle connections
+		// Optimized connection pool settings for better performance
+		PoolSize:     50, // Increased pool size for high concurrency
+		MinIdleConns: 10, // Increased minimum idle connections
 		MaxRetries:   3,  // Maximum number of retries
-		// Timeout settings
-		DialTimeout:  5 * time.Second, // Timeout for dialing
-		ReadTimeout:  3 * time.Second, // Timeout for reading
-		WriteTimeout: 3 * time.Second, // Timeout for writing
+		// Optimized timeout settings
+		DialTimeout:  3 * time.Second, // Reduced dial timeout
+		ReadTimeout:  2 * time.Second, // Reduced read timeout
+		WriteTimeout: 2 * time.Second, // Reduced write timeout
+		// Additional performance settings
+		PoolTimeout: 4 * time.Second, // Timeout for getting connection from pool
 	})
 }

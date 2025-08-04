@@ -20,11 +20,14 @@ type UserHandler struct {
 
 // NewUserHandler initializes the UserHandler with the provided server and its dependencies.
 func NewUserHandler(server *server.Server) *UserHandler {
+	userService := services.NewUserService(server.DB)
+	userService.SetRedis(server)
+
 	return &UserHandler{
 		BaseHandler: BaseHandler{
 			Server: server,
 		},
-		UserService: services.NewUserService(server.DB),
+		UserService: userService,
 	}
 }
 

@@ -121,3 +121,42 @@ func ResourceAuthorization(server *server.Server, resource string, action string
 		}
 	}
 }
+
+// PerformanceMonitoringMw adds performance monitoring to requests
+func PerformanceMonitoringMw(server *server.Server) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			start := time.Now()
+
+			// Log database stats before request
+			util.LogDatabasePoolStats(server.DB)
+
+			// Process request
+			err := next(c)
+
+			// Calculate duration
+			duration := time.Since(start)
+
+			// Log performance metrics
+			log.Info().
+				Str("method", c.Request().Method).
+				Str("path", c.Path()).
+				Dur("duration", duration).
+				Int("status", c.Response().Status).
+				Str("ip", c.RealIP()).
+				Str("user_agent", c.Request().UserAgent()).
+				Msg("Request performance")
+
+			// Log slow requests
+			if duration > 1*time.Second {
+				log.Warn().
+					Str("method", c.Request().Method).
+					Str("path", c.Path()).
+					Dur("duration", duration).
+					Msg("Slow request detected")
+			}
+
+			return err
+		}
+	}
+}

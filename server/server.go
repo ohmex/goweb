@@ -3,6 +3,7 @@ package server
 import (
 	"goweb/config"
 	"goweb/db"
+	"time"
 
 	"github.com/casbin/casbin/v2"
 	ga "github.com/casbin/gorm-adapter/v3"
@@ -32,9 +33,15 @@ func NewServer(cfg *config.Config) *Server {
 	enforcer.LoadPolicy()
 
 	e := echo.New()
-	//e.HideBanner = true
-	//e.HidePort = true
+	e.HideBanner = false
+	e.HidePort = false
 	e.Pre(middleware.RemoveTrailingSlash())
+
+	// Performance optimizations for Echo server
+	e.Server.ReadTimeout = 30 * time.Second
+	e.Server.WriteTimeout = 30 * time.Second
+	e.Server.IdleTimeout = 120 * time.Second
+	e.Server.MaxHeaderBytes = 1 << 20 // 1MB
 
 	return &Server{
 		Echo:   e,

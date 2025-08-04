@@ -2,7 +2,9 @@ package routes
 
 import (
 	// Standard library
+	"context"
 	"net/http"
+	"time"
 
 	// Third-party
 	"github.com/golang-jwt/jwt/v5"
@@ -39,6 +41,7 @@ func ConfigureRoutes(server *server.Server) {
 	}))
 	server.Echo.Use(middleware.Logger())
 	server.Echo.Use(middleware.RequestID())
+	server.Echo.Use(interceptor.PerformanceMonitoringMw(server))
 
 	// Middleware assignments for later use
 	server.JwtAuthenticationMw = echojwt.WithConfig(jwtConfig)
@@ -52,6 +55,39 @@ func ConfigureRoutes(server *server.Server) {
 	// Public routes
 	server.Echo.GET("/", func(ctx echo.Context) error {
 		return ctx.String(http.StatusOK, "Ohmex welcomes you to paradise!")
+	})
+
+	// Health check endpoint for monitoring
+	server.Echo.GET("/health", func(ctx echo.Context) error {
+		// Check database connection
+		sqlDB, err := server.DB.DB()
+		if err != nil {
+			return ctx.JSON(http.StatusServiceUnavailable, map[string]interface{}{
+				"status": "unhealthy",
+				"error":  "database connection failed",
+			})
+		}
+
+		if err := sqlDB.Ping(); err != nil {
+			return ctx.JSON(http.StatusServiceUnavailable, map[string]interface{}{
+				"status": "unhealthy",
+				"error":  "database ping failed",
+			})
+		}
+
+		// Check Redis connection
+		ctxRedis := context.Background()
+		if err := server.Redis.Ping(ctxRedis).Err(); err != nil {
+			return ctx.JSON(http.StatusServiceUnavailable, map[string]interface{}{
+				"status": "unhealthy",
+				"error":  "redis connection failed",
+			})
+		}
+
+		return ctx.JSON(http.StatusOK, map[string]interface{}{
+			"status":    "healthy",
+			"timestamp": time.Now().Unix(),
+		})
 	})
 
 	server.Echo.Static("/swagger", "docs")

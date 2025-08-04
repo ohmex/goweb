@@ -6,8 +6,10 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -105,4 +107,54 @@ func IsPartitioningEnabled() bool {
 // IsDatabasePartitioningSupported checks if the current database supports partitioning
 func IsDatabasePartitioningSupported(db *gorm.DB) bool {
 	return db.Dialector.Name() == "postgres"
+}
+
+// DatabasePoolStats represents connection pool statistics
+type DatabasePoolStats struct {
+	MaxOpenConnections int
+	OpenConnections    int
+	InUse              int
+	Idle               int
+	WaitCount          int64
+	WaitDuration       time.Duration
+	MaxIdleClosed      int64
+	MaxLifetimeClosed  int64
+}
+
+// GetDatabasePoolStats retrieves current database connection pool statistics
+func GetDatabasePoolStats(db *gorm.DB) (*DatabasePoolStats, error) {
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, err
+	}
+
+	return &DatabasePoolStats{
+		MaxOpenConnections: sqlDB.Stats().MaxOpenConnections,
+		OpenConnections:    sqlDB.Stats().OpenConnections,
+		InUse:              sqlDB.Stats().InUse,
+		Idle:               sqlDB.Stats().Idle,
+		WaitCount:          sqlDB.Stats().WaitCount,
+		WaitDuration:       sqlDB.Stats().WaitDuration,
+		MaxIdleClosed:      sqlDB.Stats().MaxIdleClosed,
+		MaxLifetimeClosed:  sqlDB.Stats().MaxLifetimeClosed,
+	}, nil
+}
+
+// LogDatabasePoolStats logs database connection pool statistics
+func LogDatabasePoolStats(db *gorm.DB) {
+	stats, err := GetDatabasePoolStats(db)
+	if err != nil {
+		return
+	}
+
+	log.Info().
+		Int("max_open", stats.MaxOpenConnections).
+		Int("open", stats.OpenConnections).
+		Int("in_use", stats.InUse).
+		Int("idle", stats.Idle).
+		Int64("wait_count", stats.WaitCount).
+		Dur("wait_duration", stats.WaitDuration).
+		Int64("max_idle_closed", stats.MaxIdleClosed).
+		Int64("max_lifetime_closed", stats.MaxLifetimeClosed).
+		Msg("Database connection pool stats")
 }
