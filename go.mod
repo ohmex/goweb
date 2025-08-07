@@ -4,18 +4,18 @@ go 1.23.3
 
 require (
 	github.com/brianvoe/gofakeit/v7 v7.3.0
-	github.com/casbin/casbin/v2 v2.110.0
-	github.com/casbin/gorm-adapter/v3 v3.34.0
+	github.com/casbin/casbin/v2 v2.115.0
+	github.com/casbin/gorm-adapter/v3 v3.36.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
-	github.com/golang-jwt/jwt/v5 v5.2.3
+	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo-jwt/v4 v4.3.1
 	github.com/labstack/echo/v4 v4.13.4
-	github.com/redis/go-redis/v9 v9.11.0
+	github.com/redis/go-redis/v9 v9.12.0
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/cobra v1.9.1
-	github.com/swaggo/swag v1.16.5
+	github.com/swaggo/swag v1.16.6
 	golang.org/x/crypto v0.40.0
 	golang.org/x/sync v0.16.0
 	gorm.io/driver/mysql v1.6.0
@@ -70,8 +70,8 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/sqlserver v1.6.1 // indirect
 	gorm.io/plugin/dbresolver v1.6.2 // indirect
-	modernc.org/libc v1.66.4 // indirect
+	modernc.org/libc v1.66.6 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
-	modernc.org/sqlite v1.38.1 // indirect
+	modernc.org/sqlite v1.38.2 // indirect
 )
