@@ -22,10 +22,12 @@ type PostHandler struct {
 
 // NewPostHandler initializes the PostHandler with the provided server.
 func NewPostHandler(server *server.Server) *PostHandler {
-	return &PostHandler{
+	handler := &PostHandler{
 		server:      server,
 		postService: services.NewPostService(server.DB),
 	}
+	handler.postService.SetRedis(server)
+	return handler
 }
 
 // Type returns the string identifier for the PostHandler.
