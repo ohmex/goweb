@@ -18,6 +18,8 @@ const ExpireAccessMinutes = 30
 const ExpireRefreshMinutes = 2 * 60
 const AutoLogoffMinutes = 10
 
+const TokenUserCacheKey = "tokens:user:%d"
+
 type Domain struct {
 	UUID string
 	Name string
@@ -69,7 +71,7 @@ func (tokenService *TokenService) GenerateTokenPair(user *models.User) (accessTo
 		RefreshUID: refreshUID,
 	})
 
-	tokenService.server.Redis.Set(context.Background(), fmt.Sprintf("token-%d", user.ID), string(cacheJSON), time.Minute*AutoLogoffMinutes)
+	tokenService.server.Redis.Set(context.Background(), fmt.Sprintf(TokenUserCacheKey, user.ID), string(cacheJSON), time.Minute*AutoLogoffMinutes)
 
 	return
 }
@@ -97,7 +99,7 @@ func (tokenService *TokenService) ValidateToken(claims *JwtCustomClaims, isRefre
 	var g errgroup.Group
 
 	g.Go(func() error {
-		cacheJSON, _ := tokenService.server.Redis.Get(context.Background(), fmt.Sprintf("token-%d", claims.UserID)).Result()
+		cacheJSON, _ := tokenService.server.Redis.Get(context.Background(), fmt.Sprintf(TokenUserCacheKey, claims.UserID)).Result()
 		cachedTokens := new(CachedTokens)
 		err = json.Unmarshal([]byte(cacheJSON), cachedTokens)
 
