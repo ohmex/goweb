@@ -239,6 +239,47 @@
         .flow-step:last-child::after {
             display: none;
         }
+        .middleware-chain {
+            margin-top: 30px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e74c3c;
+        }
+        .middleware-chain h4 {
+            margin: 0 0 15px 0;
+            color: #e74c3c;
+            text-align: center;
+        }
+        .middleware-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .middleware-item {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 8px 12px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #495057;
+            border-left: 3px solid #e74c3c;
+        }
+        .version-info {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .version-info h3 {
+            margin: 0 0 10px 0;
+        }
+        .version-info p {
+            margin: 0;
+            opacity: 0.9;
+        }
         @media (max-width: 768px) {
             .flow-diagram {
                 flex-direction: column;
@@ -260,12 +301,18 @@
         </div>
         
         <div class="content">
+            <!-- Version Information -->
+            <div class="version-info">
+                <h3>Current Technology Stack</h3>
+                <p>Go 1.24.4 • Echo v4.13.4 • GORM v1.30.1 • JWT v5.3.0 • Casbin v2.115.0</p>
+            </div>
+
             <!-- Architecture Layers -->
             <div class="architecture-grid">
                 <div class="layer">
                     <h3>Presentation Layer</h3>
                     <div class="component">
-                        <h4>Echo Framework</h4>
+                        <h4>Echo Framework v4.13.4</h4>
                         <p>High-performance HTTP web framework with middleware support, routing, and request handling</p>
                     </div>
                     <div class="component">
@@ -273,8 +320,12 @@
                         <p>Auto-generated API documentation with interactive testing interface</p>
                     </div>
                     <div class="component">
-                        <h4>Static File Serving</h4>
-                        <p>Static file hosting for documentation and assets</p>
+                        <h4>Health Check Endpoints</h4>
+                        <p>Application monitoring with database and Redis connectivity checks</p>
+                    </div>
+                    <div class="component">
+                        <h4>Gzip Compression</h4>
+                        <p>Response compression with configurable levels and intelligent skipping</p>
                     </div>
                 </div>
 
@@ -286,11 +337,15 @@
                     </div>
                     <div class="component">
                         <h4>Routes</h4>
-                        <p>RESTful API route configuration with middleware chaining</p>
+                        <p>RESTful API route configuration with middleware chaining and API versioning</p>
                     </div>
                     <div class="component">
                         <h4>Interceptors</h4>
-                        <p>Middleware for authentication, authorization, and performance monitoring</p>
+                        <p>Middleware for authentication, authorization, performance monitoring, and domain validation</p>
+                    </div>
+                    <div class="component">
+                        <h4>CLI Commands</h4>
+                        <p>Cobra-based command-line interface with database migration support</p>
                     </div>
                 </div>
 
@@ -302,18 +357,22 @@
                     </div>
                     <div class="component">
                         <h4>Token Service</h4>
-                        <p>JWT token generation, validation, and refresh token management</p>
+                        <p>JWT token generation, validation, refresh management with Redis caching</p>
                     </div>
                     <div class="component">
                         <h4>Validation</h4>
-                        <p>Request validation using ozzo-validation library</p>
+                        <p>Request validation using ozzo-validation v4.3.0 library</p>
+                    </div>
+                    <div class="component">
+                        <h4>Domain Management</h4>
+                        <p>Multi-tenant architecture with domain-based user associations</p>
                     </div>
                 </div>
 
                 <div class="layer">
                     <h3>Data Access Layer</h3>
                     <div class="component">
-                        <h4>GORM</h4>
+                        <h4>GORM v1.30.1</h4>
                         <p>Object-Relational Mapping with support for MySQL, PostgreSQL, and SQLite</p>
                     </div>
                     <div class="component">
@@ -321,8 +380,12 @@
                         <p>Schema management and data seeding with version control</p>
                     </div>
                     <div class="component">
-                        <h4>Redis Cache</h4>
-                        <p>In-memory caching for session management and token storage</p>
+                        <h4>Redis Cache v9.12.0</h4>
+                        <p>In-memory caching for session management, token storage, and TTL management</p>
+                    </div>
+                    <div class="component">
+                        <h4>Connection Pooling</h4>
+                        <p>Database connection optimization with configurable pool limits</p>
                     </div>
                 </div>
             </div>
@@ -333,11 +396,19 @@
                 <div class="security-grid">
                     <div class="security-item">
                         <h4>JWT Authentication</h4>
-                        <p>Token-based authentication with access and refresh tokens</p>
+                        <p>Token-based authentication with HS512 signing and automatic TTL extension</p>
                     </div>
                     <div class="security-item">
                         <h4>Casbin RBAC</h4>
-                        <p>Role-based access control with domain-specific permissions</p>
+                        <p>Role-based access control with domain-specific permissions and multi-tenant support</p>
+                    </div>
+                    <div class="security-item">
+                        <h4>Domain Authorization</h4>
+                        <p>Multi-level authorization with domain-based access control</p>
+                    </div>
+                    <div class="security-item">
+                        <h4>Resource Authorization</h4>
+                        <p>Action-based authorization with resource-level permissions</p>
                     </div>
                     <div class="security-item">
                         <h4>Password Hashing</h4>
@@ -345,7 +416,7 @@
                     </div>
                     <div class="security-item">
                         <h4>Request Validation</h4>
-                        <p>Input sanitization and validation</p>
+                        <p>Input sanitization and structured validation</p>
                     </div>
                 </div>
             </div>
@@ -359,7 +430,7 @@
                         <ol>
                             <li>Client sends credentials to /login endpoint</li>
                             <li>Service validates credentials against database</li>
-                            <li>JWT access and refresh tokens generated</li>
+                            <li>JWT access and refresh tokens generated with HS512</li>
                             <li>Tokens cached in Redis with expiration</li>
                             <li>Response includes tokens and user information</li>
                         </ol>
@@ -368,10 +439,22 @@
                         <h3>Protected Resource Access</h3>
                         <ol>
                             <li>Client includes JWT token in Authorization header</li>
-                            <li>JWT middleware validates token signature</li>
-                            <li>Claims authorization middleware extracts user info</li>
-                            <li>Casbin middleware checks resource permissions</li>
+                            <li>JWT middleware validates token signature and expiration</li>
+                            <li>Claims authorization middleware validates Redis token</li>
+                            <li>Domain validation middleware checks user-domain association</li>
+                            <li>Casbin middleware checks resource permissions for domain</li>
+                            <li>Resource authorization middleware validates action permissions</li>
                             <li>Handler processes request and returns response</li>
+                        </ol>
+                    </div>
+                    <div class="workflow">
+                        <h3>Token Refresh Flow</h3>
+                        <ol>
+                            <li>Client sends refresh token to /refresh endpoint</li>
+                            <li>Service validates refresh token against Redis</li>
+                            <li>New access and refresh tokens are generated</li>
+                            <li>Old tokens are invalidated</li>
+                            <li>New tokens are cached in Redis</li>
                         </ol>
                     </div>
                 </div>
@@ -388,6 +471,21 @@
                     <div class="flow-step">Service</div>
                     <div class="flow-step">Database</div>
                 </div>
+                
+                <div class="middleware-chain">
+                    <h4>Middleware Chain Processing</h4>
+                    <div class="middleware-list">
+                        <div class="middleware-item">Recovery</div>
+                        <div class="middleware-item">Gzip Compression</div>
+                        <div class="middleware-item">Logger</div>
+                        <div class="middleware-item">Request ID</div>
+                        <div class="middleware-item">Performance Monitoring</div>
+                        <div class="middleware-item">JWT Authentication</div>
+                        <div class="middleware-item">Claims Authorization</div>
+                        <div class="middleware-item">Domain Authorization</div>
+                        <div class="middleware-item">Resource Authorization</div>
+                    </div>
+                </div>
             </div>
 
             <!-- Libraries & Dependencies -->
@@ -397,11 +495,11 @@
                     <div class="library-category">
                         <h4>Web Framework</h4>
                         <div class="library-item">
-                            <strong>Echo v4</strong><br>
+                            <strong>Echo v4.13.4</strong><br>
                             <span>High-performance HTTP web framework</span>
                         </div>
                         <div class="library-item">
-                            <strong>Echo-JWT</strong><br>
+                            <strong>Echo-JWT v4.3.1</strong><br>
                             <span>JWT middleware for Echo framework</span>
                         </div>
                     </div>
@@ -409,31 +507,39 @@
                     <div class="library-category">
                         <h4>Database & ORM</h4>
                         <div class="library-item">
-                            <strong>GORM v1.30</strong><br>
+                            <strong>GORM v1.30.1</strong><br>
                             <span>Object-Relational Mapping library</span>
                         </div>
                         <div class="library-item">
-                            <strong>MySQL/PostgreSQL Drivers</strong><br>
+                            <strong>MySQL/PostgreSQL Drivers v1.6.0</strong><br>
                             <span>Database connectivity drivers</span>
                         </div>
                         <div class="library-item">
-                            <strong>Redis v9</strong><br>
+                            <strong>Redis v9.12.0</strong><br>
                             <span>In-memory data structure store</span>
+                        </div>
+                        <div class="library-item">
+                            <strong>SQLite Support</strong><br>
+                            <span>Embedded database support</span>
                         </div>
                     </div>
 
                     <div class="library-category">
                         <h4>Authentication & Security</h4>
                         <div class="library-item">
-                            <strong>JWT v5</strong><br>
+                            <strong>JWT v5.3.0</strong><br>
                             <span>JSON Web Token implementation</span>
                         </div>
                         <div class="library-item">
-                            <strong>Casbin v2</strong><br>
+                            <strong>Casbin v2.115.0</strong><br>
                             <span>Authorization library with RBAC support</span>
                         </div>
                         <div class="library-item">
-                            <strong>Ozzo-Validation</strong><br>
+                            <strong>Casbin GORM Adapter v3.36.0</strong><br>
+                            <span>Database adapter for Casbin</span>
+                        </div>
+                        <div class="library-item">
+                            <strong>Ozzo-Validation v4.3.0</strong><br>
                             <span>Request validation library</span>
                         </div>
                     </div>
@@ -441,15 +547,15 @@
                     <div class="library-category">
                         <h4>CLI & Configuration</h4>
                         <div class="library-item">
-                            <strong>Cobra</strong><br>
+                            <strong>Cobra v1.9.1</strong><br>
                             <span>CLI application framework</span>
                         </div>
                         <div class="library-item">
-                            <strong>Godotenv</strong><br>
+                            <strong>Godotenv v1.5.1</strong><br>
                             <span>Environment variable management</span>
                         </div>
                         <div class="library-item">
-                            <strong>Zerolog</strong><br>
+                            <strong>Zerolog v1.34.0</strong><br>
                             <span>Structured logging library</span>
                         </div>
                     </div>
@@ -457,7 +563,7 @@
                     <div class="library-category">
                         <h4>Documentation</h4>
                         <div class="library-item">
-                            <strong>Swaggo/Swag</strong><br>
+                            <strong>Swaggo/Swag v1.16.6</strong><br>
                             <span>Swagger documentation generator</span>
                         </div>
                         <div class="library-item">
@@ -469,16 +575,20 @@
                     <div class="library-category">
                         <h4>Utilities</h4>
                         <div class="library-item">
-                            <strong>UUID</strong><br>
+                            <strong>UUID v1.6.0</strong><br>
                             <span>UUID generation and management</span>
                         </div>
                         <div class="library-item">
-                            <strong>Gofakeit</strong><br>
+                            <strong>Gofakeit v7.3.0</strong><br>
                             <span>Data generation for testing</span>
                         </div>
                         <div class="library-item">
-                            <strong>Golang Crypto</strong><br>
+                            <strong>Golang Crypto v0.40.0</strong><br>
                             <span>Cryptographic functions</span>
+                        </div>
+                        <div class="library-item">
+                            <strong>Golang Sync v0.16.0</strong><br>
+                            <span>Concurrency utilities</span>
                         </div>
                     </div>
                 </div>
