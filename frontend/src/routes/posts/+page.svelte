@@ -148,18 +148,34 @@
 </svelte:head>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-	<header class="bg-white border-b border-gray-200 pb-6 mb-8">
-		<div class="flex justify-between items-center">
-			<h1 class="text-3xl font-bold text-gray-900">My Posts</h1>
-			<div class="flex gap-3">
-				<button class="btn btn-primary" on:click={openCreateModal}>
-					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
+	<header class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl shadow-sm mb-8 p-8">
+		<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+			<div class="flex-1">
+				<h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+					My Posts
+				</h1>
+				<p class="text-blue-600/70 text-lg font-medium">Manage and organize your content</p>
+			</div>
+			<div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+				<button 
+					class="btn bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 px-8 py-3 rounded-xl font-semibold flex items-center justify-center gap-2" 
+					on:click={openCreateModal}
+				>
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-white">
 						<line x1="12" y1="5" x2="12" y2="19"></line>
 						<line x1="5" y1="12" x2="19" y2="12"></line>
 					</svg>
 					New Post
 				</button>
-				<button class="btn btn-secondary" on:click={handleLogout}>
+				<button 
+					class="btn bg-white/80 hover:bg-white text-gray-700 hover:text-gray-900 border border-gray-200 hover:border-gray-300 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 px-6 py-3 rounded-xl font-medium" 
+					on:click={handleLogout}
+				>
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
+						<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+						<polyline points="16,17 21,12 16,7"></polyline>
+						<line x1="21" y1="12" x2="9" y2="12"></line>
+					</svg>
 					Logout
 				</button>
 			</div>
@@ -167,59 +183,70 @@
 	</header>
 
 	{#if error}
-		<div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 flex justify-between items-center">
-			<span>{error}</span>
-			<button class="text-red-400 hover:text-red-600 text-xl font-bold" on:click={() => error = ''}>×</button>
+		<div class="bg-red-50/80 border border-red-200/50 text-red-700 px-6 py-4 rounded-xl mb-6 flex justify-between items-center backdrop-blur-sm shadow-sm">
+			<span class="font-medium">{error}</span>
+			<button class="text-red-400 hover:text-red-600 text-xl font-bold transition-colors duration-200" on:click={() => error = ''}>×</button>
 		</div>
 	{/if}
 
 	<main class="min-h-96">
 		{#if isLoading}
-			<div class="flex flex-col items-center justify-center py-16">
-				<div class="animate-spin w-10 h-10 border-4 border-gray-200 border-t-primary-600 rounded-full mb-4"></div>
-				<p class="text-gray-600">Loading posts...</p>
+			<div class="flex flex-col items-center justify-center py-20">
+				<div class="animate-spin w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full mb-6"></div>
+				<p class="text-blue-600 text-lg font-medium">Loading posts...</p>
 			</div>
 		{:else if posts.length === 0}
-			<div class="text-center py-16">
-				<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="mx-auto mb-4 text-gray-400">
-					<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-					<polyline points="14,2 14,8 20,8"></polyline>
-					<line x1="16" y1="13" x2="8" y2="13"></line>
-					<line x1="16" y1="17" x2="8" y2="17"></line>
-					<polyline points="10,9 9,9 8,9"></polyline>
-				</svg>
-				<h2 class="text-2xl font-semibold text-gray-900 mb-2">No posts yet</h2>
-				<p class="text-gray-600 mb-6">Create your first post to get started!</p>
-				<button class="btn btn-primary" on:click={openCreateModal}>Create Post</button>
+			<div class="text-center py-20">
+				<div class="bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
+					<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-blue-600">
+						<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+						<polyline points="14,2 14,8 20,8"></polyline>
+						<line x1="16" y1="13" x2="8" y2="13"></line>
+						<line x1="16" y1="17" x2="8" y2="17"></line>
+						<polyline points="10,9 9,9 8,9"></polyline>
+					</svg>
+				</div>
+				<h2 class="text-3xl font-bold text-gray-800 mb-3">No posts yet</h2>
+				<p class="text-gray-600 text-lg mb-8 max-w-md mx-auto">Create your first post to get started and share your thoughts with the world!</p>
+				<button 
+					class="btn bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 px-8 py-4 rounded-xl font-semibold text-lg" 
+					on:click={openCreateModal}
+				>
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="mr-2">
+						<line x1="12" y1="5" x2="12" y2="19"></line>
+						<line x1="5" y1="12" x2="19" y2="12"></line>
+					</svg>
+					Create Your First Post
+				</button>
 			</div>
 		{:else}
-			<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+			<div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-blue-100/50 overflow-hidden">
 				<div class="overflow-x-auto">
-					<table class="min-w-full divide-y divide-gray-200">
-						<thead class="bg-gray-50">
+					<table class="min-w-full divide-y divide-blue-100/50">
+						<thead class="bg-gradient-to-r from-blue-50 to-indigo-50">
 							<tr>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+								<th class="px-6 py-4 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
 									Title
 								</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+								<th class="px-6 py-4 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
 									Content
 								</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+								<th class="px-6 py-4 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
 									Created
 								</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+								<th class="px-6 py-4 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
 									Updated
 								</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+								<th class="px-6 py-4 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
 									Actions
 								</th>
 							</tr>
 						</thead>
-						<tbody class="bg-white divide-y divide-gray-200">
+						<tbody class="bg-white/60 divide-y divide-blue-100/30">
 							{#each posts as post (post.uuid)}
-								<tr class="hover:bg-gray-50 transition-colors duration-150">
+								<tr class="hover:bg-blue-50/50 transition-all duration-200">
 									<td class="px-6 py-4 whitespace-nowrap">
-										<div class="text-sm font-medium text-gray-900 max-w-xs truncate" title={post.title}>
+										<div class="text-sm font-semibold text-gray-800 max-w-xs truncate" title={post.title}>
 											{post.title}
 										</div>
 									</td>
@@ -229,23 +256,23 @@
 										</div>
 									</td>
 									<td class="px-6 py-4 whitespace-nowrap">
-										<div class="text-sm text-gray-500">
+										<div class="text-sm text-blue-600 font-medium">
 											{formatDate(post.created_at)}
 										</div>
 									</td>
 									<td class="px-6 py-4 whitespace-nowrap">
-										<div class="text-sm text-gray-500">
+										<div class="text-sm text-blue-600 font-medium">
 											{#if post.updated_at !== post.created_at}
 												{formatDate(post.updated_at)}
 											{:else}
-												<span class="text-gray-400">-</span>
+												<span class="text-gray-400 italic">-</span>
 											{/if}
 										</div>
 									</td>
 									<td class="px-6 py-4 whitespace-nowrap">
 										<div class="flex gap-2">
 											<button 
-												class="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors" 
+												class="p-2.5 text-blue-500 hover:text-blue-700 hover:bg-blue-100 rounded-xl transition-all duration-200 transform hover:scale-110" 
 												on:click={() => openEditModal(post)} 
 												title="Edit"
 											>
@@ -255,7 +282,7 @@
 												</svg>
 											</button>
 											<button 
-												class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors" 
+												class="p-2.5 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-xl transition-all duration-200 transform hover:scale-110" 
 												on:click={() => handleDeletePost(post)} 
 												title="Delete"
 											>
