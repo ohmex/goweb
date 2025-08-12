@@ -82,89 +82,21 @@
 	<title>Authenticating... - GoWeb</title>
 </svelte:head>
 
-<div class="container">
-	<div class="loading-container">
-		<div class="card">
-			<div class="text-center">
-				<h2>Social Login Callback</h2>
-				<p>This page should be accessible at /auth/callback</p>
-				{#if isLoading}
-					<div class="spinner"></div>
-					<h3>Authenticating...</h3>
-					<p>Please wait while we complete your authentication.</p>
-				{:else if error}
-					<div class="error-icon">⚠️</div>
-					<h3>Authentication Failed</h3>
-					<p>{error}</p>
-					<a href="/login" class="btn btn-primary">Back to Login</a>
-				{/if}
-			</div>
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+	<div class="max-w-md w-full">
+		<div class="bg-white py-8 px-6 shadow-xl rounded-xl text-center">
+			<h2 class="text-2xl font-semibold text-gray-900 mb-2">Social Login Callback</h2>
+			<p class="text-gray-600 mb-6">This page should be accessible at /auth/callback</p>
+			{#if isLoading}
+				<div class="animate-spin w-10 h-10 border-4 border-gray-200 border-t-primary-600 rounded-full mx-auto mb-4"></div>
+				<h3 class="text-lg font-medium text-gray-900 mb-2">Authenticating...</h3>
+				<p class="text-gray-600">Please wait while we complete your authentication.</p>
+			{:else if error}
+				<div class="text-5xl mb-4">⚠️</div>
+				<h3 class="text-lg font-medium text-gray-900 mb-2">Authentication Failed</h3>
+				<p class="text-gray-600 mb-6">{error}</p>
+				<a href="/login" class="btn btn-primary">Back to Login</a>
+			{/if}
 		</div>
 	</div>
 </div>
-
-<style>
-	.loading-container {
-		min-height: 100vh;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding: 2rem 0;
-	}
-
-	.card {
-		width: 100%;
-		max-width: 400px;
-		text-align: center;
-	}
-
-	h2 {
-		font-size: 1.5rem;
-		font-weight: 600;
-		color: #1a202c;
-		margin-bottom: 0.5rem;
-	}
-
-	p {
-		color: #718096;
-		margin-bottom: 1.5rem;
-	}
-
-	.spinner {
-		width: 40px;
-		height: 40px;
-		border: 4px solid #e2e8f0;
-		border-top: 4px solid #667eea;
-		border-radius: 50%;
-		animation: spin 1s linear infinite;
-		margin: 0 auto 1rem;
-	}
-
-	.error-icon {
-		font-size: 3rem;
-		margin-bottom: 1rem;
-	}
-
-	@keyframes spin {
-		0% { transform: rotate(0deg); }
-		100% { transform: rotate(360deg); }
-	}
-
-	.btn {
-		display: inline-block;
-		padding: 0.75rem 1.5rem;
-		border-radius: 8px;
-		text-decoration: none;
-		font-weight: 500;
-		transition: all 0.2s;
-	}
-
-	.btn-primary {
-		background: #667eea;
-		color: white;
-	}
-
-	.btn-primary:hover {
-		background: #5a67d8;
-	}
-</style>

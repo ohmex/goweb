@@ -47,13 +47,6 @@
 	}
 </script>
 
-<main>
+<main class="min-h-screen bg-gradient-to-br from-primary-600 to-primary-800">
 	<slot />
 </main>
-
-<style>
-	main {
-		min-height: 100vh;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-	}
-</style>
