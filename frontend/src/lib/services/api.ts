@@ -25,6 +25,13 @@ export interface UpdatePostRequest {
 	content: string;
 }
 
+export interface User {
+	id: number;
+	email: string;
+	name: string;
+	domains: Array<{ UUID: string; name: string }>;
+}
+
 class ApiService {
 	private baseUrl = '/api';
 
@@ -33,11 +40,17 @@ class ApiService {
 		options: RequestInit = {}
 	): Promise<T> {
 		const url = `${this.baseUrl}${endpoint}`;
-		const headers = {
+		const headers: Record<string, string> = {
 			'Content-Type': 'application/json',
-			...authActions.getAuthHeaders(),
-			...options.headers
+			...authActions.getAuthHeaders()
 		};
+		
+		// Safely merge headers from options
+		if (options.headers) {
+			if (typeof options.headers === 'object' && !Array.isArray(options.headers)) {
+				Object.assign(headers, options.headers);
+			}
+		}
 
 		console.log('API Service - Making request to:', url);
 		console.log('API Service - Headers:', headers);
@@ -75,11 +88,18 @@ class ApiService {
 				const refreshed = await authActions.refreshToken();
 				if (refreshed) {
 					// Retry the request with new token
-					const retryHeaders = {
+					const retryHeaders: Record<string, string> = {
 						'Content-Type': 'application/json',
-						...authActions.getAuthHeaders(),
-						...options.headers
+						...authActions.getAuthHeaders()
 					};
+					
+					// Safely merge headers from options
+					if (options.headers) {
+						if (typeof options.headers === 'object' && !Array.isArray(options.headers)) {
+							Object.assign(retryHeaders, options.headers);
+						}
+					}
+					
 					const retryResponse = await fetch(url, {
 						...options,
 						headers: retryHeaders
@@ -136,7 +156,7 @@ class ApiService {
 	}
 
 	// User API
-	async getCurrentUser(): Promise<any> {
+	async getCurrentUser(): Promise<User> {
 		// This endpoint doesn't exist in the backend yet
 		// For now, return the user data from the JWT token
 		const token = localStorage.getItem('accessToken');
