@@ -125,7 +125,15 @@
 	}
 
 	function formatDate(dateString: string) {
-		return new Date(dateString).toLocaleDateString('en-US', {
+		if (!dateString) return '-';
+		
+		const date = new Date(dateString);
+		if (isNaN(date.getTime())) {
+			console.warn('Invalid date string:', dateString);
+			return '-';
+		}
+		
+		return date.toLocaleDateString('en-US', {
 			year: 'numeric',
 			month: 'short',
 			day: 'numeric',
@@ -185,45 +193,84 @@
 				<button class="btn btn-primary" on:click={openCreateModal}>Create Post</button>
 			</div>
 		{:else}
-			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-				{#each posts as post (post.uuid)}
-					<article class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
-						<div class="flex justify-between items-start mb-4">
-							<h3 class="text-xl font-semibold text-gray-900 flex-1 mr-3">{post.title}</h3>
-							<div class="flex gap-2">
-								<button 
-									class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors" 
-									on:click={() => openEditModal(post)} 
-									title="Edit"
-								>
-									<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-										<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-										<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-									</svg>
-								</button>
-								<button 
-									class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" 
-									on:click={() => handleDeletePost(post)} 
-									title="Delete"
-								>
-									<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-										<polyline points="3,6 5,6 21,6"></polyline>
-										<path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
-									</svg>
-								</button>
-							</div>
-						</div>
-						<div class="mb-4">
-							<p class="text-gray-600 leading-relaxed">{post.content}</p>
-						</div>
-						<div class="flex justify-between items-center pt-4 border-t border-gray-100">
-							<small class="text-gray-500 text-sm">Created: {formatDate(post.createdAt)}</small>
-							{#if post.updatedAt !== post.createdAt}
-								<small class="text-gray-500 text-sm">Updated: {formatDate(post.updatedAt)}</small>
-							{/if}
-						</div>
-					</article>
-				{/each}
+			<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+				<div class="overflow-x-auto">
+					<table class="min-w-full divide-y divide-gray-200">
+						<thead class="bg-gray-50">
+							<tr>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									Title
+								</th>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									Content
+								</th>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									Created
+								</th>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									Updated
+								</th>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									Actions
+								</th>
+							</tr>
+						</thead>
+						<tbody class="bg-white divide-y divide-gray-200">
+							{#each posts as post (post.uuid)}
+								<tr class="hover:bg-gray-50 transition-colors duration-150">
+									<td class="px-6 py-4 whitespace-nowrap">
+										<div class="text-sm font-medium text-gray-900 max-w-xs truncate" title={post.title}>
+											{post.title}
+										</div>
+									</td>
+									<td class="px-6 py-4">
+										<div class="text-sm text-gray-600 max-w-xs truncate" title={post.content}>
+											{post.content}
+										</div>
+									</td>
+									<td class="px-6 py-4 whitespace-nowrap">
+										<div class="text-sm text-gray-500">
+											{formatDate(post.created_at)}
+										</div>
+									</td>
+									<td class="px-6 py-4 whitespace-nowrap">
+										<div class="text-sm text-gray-500">
+											{#if post.updated_at !== post.created_at}
+												{formatDate(post.updated_at)}
+											{:else}
+												<span class="text-gray-400">-</span>
+											{/if}
+										</div>
+									</td>
+									<td class="px-6 py-4 whitespace-nowrap">
+										<div class="flex gap-2">
+											<button 
+												class="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors" 
+												on:click={() => openEditModal(post)} 
+												title="Edit"
+											>
+												<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+													<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+													<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+												</svg>
+											</button>
+											<button 
+												class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors" 
+												on:click={() => handleDeletePost(post)} 
+												title="Delete"
+											>
+												<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+													<polyline points="3,6 5,6 21,6"></polyline>
+													<path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
+												</svg>
+											</button>
+										</div>
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
 			</div>
 		{/if}
 	</main>
