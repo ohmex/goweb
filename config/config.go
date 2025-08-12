@@ -13,7 +13,7 @@ type Config struct {
 }
 
 func NewConfig() *Config {
-	err := godotenv.Load()
+	err := godotenv.Load(".env", ".env_secrets")
 	if err != nil {
 		log.Info().Msg("Error loading .env file")
 	}

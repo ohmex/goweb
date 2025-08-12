@@ -51,6 +51,7 @@ func ConfigureRoutes(server *server.Server) {
 	// Global Handlers
 	authHandler := handlers.NewAuthHandler(server)
 	registerHandler := handlers.NewRegisterHandler(server)
+	socialHandler := handlers.NewSocialHandler(server)
 
 	// Public routes
 	server.Echo.GET("/", func(ctx echo.Context) error {
@@ -94,6 +95,12 @@ func ConfigureRoutes(server *server.Server) {
 	server.Echo.POST("/login", authHandler.Login)
 	server.Echo.POST("/register", registerHandler.Register)
 	server.Echo.POST("/refresh", authHandler.RefreshToken)
+
+	// Social login routes
+	server.Echo.GET("/auth/google", socialHandler.GoogleLogin)
+	server.Echo.GET("/auth/google/callback", socialHandler.GoogleCallback)
+	server.Echo.GET("/auth/github", socialHandler.GitHubLogin)
+	server.Echo.GET("/auth/github/callback", socialHandler.GitHubCallback)
 
 	// Protected routes group
 	protected := server.Echo.Group("")

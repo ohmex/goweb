@@ -57,6 +57,9 @@ func addPerformanceIndexes(db *gorm.DB) {
 	// User table indexes
 	db.Exec("CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)")
 	db.Exec("CREATE INDEX IF NOT EXISTS idx_users_uuid ON users(uuid)")
+	db.Exec("CREATE INDEX IF NOT EXISTS idx_users_provider ON users(provider)")
+	db.Exec("CREATE INDEX IF NOT EXISTS idx_users_provider_id ON users(provider_id)")
+	db.Exec("CREATE INDEX IF NOT EXISTS idx_users_provider_provider_id ON users(provider, provider_id)")
 
 	// Domain table indexes
 	db.Exec("CREATE INDEX IF NOT EXISTS idx_domains_uuid ON domains(uuid)")

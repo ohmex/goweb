@@ -57,6 +57,8 @@ definitions:
     type: object
   models.User:
     properties:
+      avatar:
+        type: string
       created_at:
         type: string
       domains:
@@ -65,15 +67,29 @@ definitions:
         type: array
       email:
         type: string
+      is_verified:
+        description: Email verification status
+        type: boolean
       name:
         type: string
       posts:
         items:
           $ref: '#/definitions/models.Post'
         type: array
+      provider:
+        description: local, google, github, etc.
+        type: string
+      provider_id:
+        description: ID from the OAuth provider
+        type: string
       updated_at:
         type: string
       uuid:
+        type: string
+    type: object
+  requests.CreateDomainRequest:
+    properties:
+      name:
         type: string
     type: object
   requests.CreatePostRequest:
@@ -200,13 +216,28 @@ paths:
     post:
       consumes:
       - application/json
-      description: Not implemented.
+      description: Creates a new domain with automatic partition creation.
       operationId: domain-create
+      parameters:
+      - description: Domain creation request
+        in: body
+        name: domain
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateDomainRequest'
       produces:
       - application/json
       responses:
-        "404":
-          description: Not Found
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/api.Response'
       security:
@@ -740,6 +771,132 @@ paths:
       summary: Update user
       tags:
       - User Management
+  /auth/github:
+    get:
+      consumes:
+      - application/json
+      description: Redirects user to GitHub OAuth for authentication
+      operationId: github-login
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response'
+      summary: Initiate GitHub OAuth login
+      tags:
+      - Social Login
+  /auth/github/callback:
+    get:
+      consumes:
+      - application/json
+      description: Processes the OAuth callback from GitHub and authenticates the
+        user
+      operationId: github-callback
+      parameters:
+      - description: Authorization code from GitHub
+        in: query
+        name: code
+        required: true
+        type: string
+      - description: State parameter
+        in: query
+        name: state
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response'
+      summary: Handle GitHub OAuth callback
+      tags:
+      - Social Login
+  /auth/google:
+    get:
+      consumes:
+      - application/json
+      description: Redirects user to Google OAuth for authentication
+      operationId: google-login
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response'
+      summary: Initiate Google OAuth login
+      tags:
+      - Social Login
+  /auth/google/callback:
+    get:
+      consumes:
+      - application/json
+      description: Processes the OAuth callback from Google and authenticates the
+        user
+      operationId: google-callback
+      parameters:
+      - description: Authorization code from Google
+        in: query
+        name: code
+        required: true
+        type: string
+      - description: State parameter
+        in: query
+        name: state
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response'
+      summary: Handle Google OAuth callback
+      tags:
+      - Social Login
   /login:
     post:
       consumes:
