@@ -34,6 +34,12 @@ func ConfigureRoutes(server *server.Server) {
 
 	// Global middleware
 	server.Echo.Use(middleware.Recover())
+	server.Echo.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     []string{"http://localhost:3000", "http://127.0.0.1:3000"},
+		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions},
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
+		AllowCredentials: true,
+	}))
 	server.Echo.Use(middleware.GzipWithConfig(middleware.GzipConfig{
 		Skipper:   util.GzipSkipper,
 		Level:     2,

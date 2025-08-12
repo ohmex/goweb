@@ -1,9 +1,9 @@
 package handlers
 
 import (
+	"fmt"
 	"goweb/api"
 	"goweb/models"
-	"goweb/responses"
 	"goweb/server"
 	"goweb/services"
 	"net/http"
@@ -30,15 +30,21 @@ func NewSocialHandler(server *server.Server) *SocialHandler {
 	}
 }
 
-// Helper to generate token pair and return response
+// Helper to generate token pair and redirect to frontend
 func (h *SocialHandler) respondWithTokenPair(c echo.Context, user *models.User) error {
-	accessToken, refreshToken, exp, err := h.tokenService.GenerateTokenPair(user)
+	accessToken, refreshToken, _, err := h.tokenService.GenerateTokenPair(user)
 	if err != nil {
 		log.Error().Str("event", "token_generation_failed").Err(err).Uint64("user_id", uint64(user.ID)).Msg("Failed to generate authentication tokens")
 		return api.WebResponse(c, http.StatusInternalServerError, api.INTERNAL_SERVICE_ERROR("Failed to generate authentication tokens"))
 	}
-	res := responses.NewLoginResponse(accessToken, refreshToken, exp)
-	return api.WebResponse(c, http.StatusOK, res)
+
+	// Redirect to frontend with tokens as URL parameters
+	frontendURL := h.server.Config.HTTP.FrontendURL
+	if frontendURL == "" {
+		frontendURL = "http://localhost:3000" // fallback for development
+	}
+	redirectURL := fmt.Sprintf("%s/auth/callback?access_token=%s&refresh_token=%s", frontendURL, accessToken, refreshToken)
+	return c.Redirect(http.StatusTemporaryRedirect, redirectURL)
 }
 
 // GoogleLogin godoc
