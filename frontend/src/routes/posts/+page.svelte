@@ -147,18 +147,18 @@
 	<title>Posts - GoWeb</title>
 </svelte:head>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-	<header class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl shadow-sm mb-8 p-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gradient-to-br from-blue-50 via-blue-25 to-indigo-50">
+	<header class="bg-gradient-to-r from-blue-600 to-blue-700 border border-blue-500 rounded-2xl shadow-lg mb-8 p-8">
 		<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
 			<div class="flex-1">
-				<h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+				<h1 class="text-4xl font-bold text-white mb-2">
 					My Posts
 				</h1>
-				<p class="text-blue-600/70 text-lg font-medium">Manage and organize your content</p>
+				<p class="text-blue-100 text-lg font-medium">Manage and organize your content</p>
 			</div>
 			<div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
 				<button 
-					class="btn bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 px-8 py-3 rounded-xl font-semibold flex items-center justify-center gap-2" 
+					class="btn bg-gradient-to-r from-blue-400 to-indigo-400 hover:from-blue-500 hover:to-indigo-500 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 px-8 py-3 rounded-xl font-semibold flex items-center justify-center gap-2" 
 					on:click={openCreateModal}
 				>
 					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-white">
@@ -168,7 +168,7 @@
 					New Post
 				</button>
 				<button 
-					class="btn bg-white/80 hover:bg-white text-gray-700 hover:text-gray-900 border border-gray-200 hover:border-gray-300 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 px-6 py-3 rounded-xl font-medium" 
+					class="btn bg-white/90 hover:bg-white text-blue-700 hover:text-blue-800 border border-blue-300 hover:border-blue-400 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 px-6 py-3 rounded-xl font-medium" 
 					on:click={handleLogout}
 				>
 					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
@@ -183,21 +183,21 @@
 	</header>
 
 	{#if error}
-		<div class="bg-red-50/80 border border-red-200/50 text-red-700 px-6 py-4 rounded-xl mb-6 flex justify-between items-center backdrop-blur-sm shadow-sm">
+		<div class="bg-blue-100/90 border border-blue-200 text-blue-800 px-6 py-4 rounded-xl mb-6 flex justify-between items-center backdrop-blur-sm shadow-sm">
 			<span class="font-medium">{error}</span>
-			<button class="text-red-400 hover:text-red-600 text-xl font-bold transition-colors duration-200" on:click={() => error = ''}>×</button>
+			<button class="text-blue-600 hover:text-blue-700 text-xl font-bold transition-colors duration-200" on:click={() => error = ''}>×</button>
 		</div>
 	{/if}
 
 	<main class="min-h-96">
 		{#if isLoading}
 			<div class="flex flex-col items-center justify-center py-20">
-				<div class="animate-spin w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full mb-6"></div>
+				<div class="animate-spin w-12 h-12 border-4 border-blue-200 border-t-blue-500 rounded-full mb-6"></div>
 				<p class="text-blue-600 text-lg font-medium">Loading posts...</p>
 			</div>
 		{:else if posts.length === 0}
 			<div class="text-center py-20">
-				<div class="bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
+				<div class="bg-gradient-to-r from-blue-100 to-blue-150 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
 					<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-blue-600">
 						<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
 						<polyline points="14,2 14,8 20,8"></polyline>
@@ -220,31 +220,31 @@
 				</button>
 			</div>
 		{:else}
-			<div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-blue-100/50 overflow-hidden">
+			<div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-blue-200 overflow-hidden">
 				<div class="overflow-x-auto">
-					<table class="min-w-full divide-y divide-blue-100/50">
-						<thead class="bg-gradient-to-r from-blue-50 to-indigo-50">
+					<table class="min-w-full divide-y divide-blue-200">
+						<thead class="bg-gradient-to-r from-blue-100 to-blue-150">
 							<tr>
-								<th class="px-6 py-4 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
+								<th class="px-6 py-4 text-left text-xs font-semibold text-blue-800 uppercase tracking-wider">
 									Title
 								</th>
-								<th class="px-6 py-4 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
+								<th class="px-6 py-4 text-left text-xs font-semibold text-blue-800 uppercase tracking-wider">
 									Content
 								</th>
-								<th class="px-6 py-4 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
+								<th class="px-6 py-4 text-left text-xs font-semibold text-blue-800 uppercase tracking-wider">
 									Created
 								</th>
-								<th class="px-6 py-4 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
+								<th class="px-6 py-4 text-left text-xs font-semibold text-blue-800 uppercase tracking-wider">
 									Updated
 								</th>
-								<th class="px-6 py-4 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">
+								<th class="px-6 py-4 text-left text-xs font-semibold text-blue-800 uppercase tracking-wider">
 									Actions
 								</th>
 							</tr>
 						</thead>
-						<tbody class="bg-white/60 divide-y divide-blue-100/30">
+						<tbody class="bg-white/80 divide-y divide-blue-150">
 							{#each posts as post (post.uuid)}
-								<tr class="hover:bg-blue-50/50 transition-all duration-200">
+								<tr class="hover:bg-blue-100/50 transition-all duration-200">
 									<td class="px-6 py-4 whitespace-nowrap">
 										<div class="text-sm font-semibold text-gray-800 max-w-xs truncate" title={post.title}>
 											{post.title}
@@ -256,12 +256,12 @@
 										</div>
 									</td>
 									<td class="px-6 py-4 whitespace-nowrap">
-										<div class="text-sm text-blue-600 font-medium">
+										<div class="text-sm text-blue-700 font-medium">
 											{formatDate(post.created_at)}
 										</div>
 									</td>
 									<td class="px-6 py-4 whitespace-nowrap">
-										<div class="text-sm text-blue-600 font-medium">
+										<div class="text-sm text-blue-700 font-medium">
 											{#if post.updated_at !== post.created_at}
 												{formatDate(post.updated_at)}
 											{:else}

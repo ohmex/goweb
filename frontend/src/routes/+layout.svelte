@@ -47,6 +47,6 @@
 	}
 </script>
 
-<main class="min-h-screen bg-gradient-to-br from-primary-600 to-primary-800">
+<main class="min-h-screen bg-gradient-to-br from-blue-50 via-blue-25 to-indigo-50">
 	<slot />
 </main>
