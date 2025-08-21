@@ -1,10 +1,12 @@
 module goweb
 
-go 1.23.3
+go 1.24.0
+
+toolchain go1.24.4
 
 require (
-	github.com/brianvoe/gofakeit/v7 v7.3.0
-	github.com/casbin/casbin/v2 v2.119.0
+	github.com/brianvoe/gofakeit/v7 v7.4.0
+	github.com/casbin/casbin/v2 v2.120.0
 	github.com/casbin/gorm-adapter/v3 v3.36.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/golang-jwt/jwt/v5 v5.3.0
@@ -62,7 +64,7 @@ require (
 	github.com/spf13/pflag v1.0.7 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	golang.org/x/exp v0.0.0-20250811191247-51f88131bc50 // indirect
+	golang.org/x/exp v0.0.0-20250819193227-8b4c13bb791b // indirect
 	golang.org/x/mod v0.27.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
