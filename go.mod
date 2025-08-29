@@ -5,8 +5,8 @@ go 1.24.0
 toolchain go1.24.4
 
 require (
-	github.com/brianvoe/gofakeit/v7 v7.4.0
-	github.com/casbin/casbin/v2 v2.120.0
+	github.com/brianvoe/gofakeit/v7 v7.5.0
+	github.com/casbin/casbin/v2 v2.121.0
 	github.com/casbin/gorm-adapter/v3 v3.36.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/golang-jwt/jwt/v5 v5.3.0
@@ -23,7 +23,7 @@ require (
 	golang.org/x/sync v0.16.0
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/driver/postgres v1.6.0
-	gorm.io/gorm v1.30.1
+	gorm.io/gorm v1.30.2
 )
 
 require (
@@ -57,7 +57,7 @@ require (
 	github.com/mailru/easyjson v0.9.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/microsoft/go-mssqldb v1.9.2 // indirect
+	github.com/microsoft/go-mssqldb v1.9.3 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
@@ -74,7 +74,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/sqlserver v1.6.1 // indirect
 	gorm.io/plugin/dbresolver v1.6.2 // indirect
-	modernc.org/libc v1.66.7 // indirect
+	modernc.org/libc v1.66.8 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 	modernc.org/sqlite v1.38.2 // indirect
