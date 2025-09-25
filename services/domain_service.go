@@ -37,16 +37,16 @@ func (service *DomainService) CreateDomain(domain *models.Domain) error {
 	return nil
 }
 
-// createPartitionForDomain creates a PostgreSQL partition for the given domain
+// createPartitionForDomain creates a PostgreSQL/YugabyteDB partition for the given domain
 func (service *DomainService) createPartitionForDomain(domain *models.Domain) error {
 	// Check if partitioning is enabled
 	if !util.IsPartitioningEnabled() {
 		return nil // Partitioning not enabled, skip
 	}
 
-	// Check if we're using PostgreSQL
-	if service.DB.Dialector.Name() != "postgres" {
-		return nil // Only PostgreSQL supports partitioning
+	// Check if we're using PostgreSQL or YugabyteDB (both support partitioning)
+	if !util.IsDatabasePartitioningSupported(service.DB) {
+		return nil // Only PostgreSQL and YugabyteDB support partitioning
 	}
 
 	domainUUID := domain.UUID.String()
@@ -78,16 +78,16 @@ func (service *DomainService) DeleteDomain(domain *models.Domain) error {
 	return service.DB.Delete(domain).Error
 }
 
-// deletePartitionForDomain deletes the PostgreSQL partition for the given domain
+// deletePartitionForDomain deletes the PostgreSQL/YugabyteDB partition for the given domain
 func (service *DomainService) deletePartitionForDomain(domain *models.Domain) error {
 	// Check if partitioning is enabled
 	if !util.IsPartitioningEnabled() {
 		return nil // Partitioning not enabled, skip
 	}
 
-	// Check if we're using PostgreSQL
-	if service.DB.Dialector.Name() != "postgres" {
-		return nil // Only PostgreSQL supports partitioning
+	// Check if we're using PostgreSQL or YugabyteDB (both support partitioning)
+	if !util.IsDatabasePartitioningSupported(service.DB) {
+		return nil // Only PostgreSQL and YugabyteDB support partitioning
 	}
 
 	domainUUID := domain.UUID.String()
@@ -112,9 +112,9 @@ func (service *DomainService) CreatePartitionsForExistingDomains() error {
 		return nil // Partitioning not enabled, skip
 	}
 
-	// Check if we're using PostgreSQL
-	if service.DB.Dialector.Name() != "postgres" {
-		return nil // Only PostgreSQL supports partitioning
+	// Check if we're using PostgreSQL or YugabyteDB (both support partitioning)
+	if !util.IsDatabasePartitioningSupported(service.DB) {
+		return nil // Only PostgreSQL and YugabyteDB support partitioning
 	}
 
 	var domains []models.Domain

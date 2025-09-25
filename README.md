@@ -66,6 +66,7 @@ For comprehensive information about the partitioning system, see [docs/partition
 - **Database**: PostgreSQL or YugabyteDB (`DB_DRIVER=postgres` or `DB_DRIVER=yugabytedb`)
 - **Affected Tables**: Tables using `BaseResource` struct (currently `posts`)
 - **Partition Type**: LIST partitions by domain UUID
+- **Partitioning Support**: Both PostgreSQL and YugabyteDB support table partitioning
 
 ## Supported Databases
 
@@ -87,6 +88,7 @@ YugabyteDB is a distributed SQL database that is PostgreSQL-compatible. To use Y
    export DB_USER=yugabyte
    export DB_PASSWORD=yugabyte
    export DB_NAME=yugabyte
+   export DB_PARTITIONING_ENABLED=true  # Enable partitioning for multi-tenancy
    ```
 
 2. **Start YugabyteDB with Docker Compose**:
@@ -98,4 +100,9 @@ YugabyteDB is a distributed SQL database that is PostgreSQL-compatible. To use Y
    - YSQL (PostgreSQL-compatible): `localhost:5433`
    - Master Web UI: `localhost:7000`
    - TServer Web UI: `localhost:9000`
+
+4. **Partitioning Support**:
+   - YugabyteDB supports PostgreSQL-compatible table partitioning
+   - Automatic partition creation for each domain
+   - LIST partitioning by domain UUID for multi-tenant isolation
 

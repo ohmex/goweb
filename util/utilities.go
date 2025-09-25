@@ -106,7 +106,18 @@ func IsPartitioningEnabled() bool {
 
 // IsDatabasePartitioningSupported checks if the current database supports partitioning
 func IsDatabasePartitioningSupported(db *gorm.DB) bool {
-	return db.Dialector.Name() == "postgres"
+	return isPostgreSQLCompatible(db)
+}
+
+// isPostgreSQLCompatible checks if the database is PostgreSQL or YugabyteDB
+// Both support the same partitioning syntax
+func isPostgreSQLCompatible(db *gorm.DB) bool {
+	// Check both the dialector name and the configured driver name
+	dialectorName := db.Dialector.Name()
+	configuredDriver := os.Getenv("DB_DRIVER")
+	
+	// PostgreSQL dialector or YugabyteDB configured driver both support partitioning
+	return dialectorName == "postgres" || configuredDriver == "yugabytedb"
 }
 
 // DatabasePoolStats represents connection pool statistics
