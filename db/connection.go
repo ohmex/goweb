@@ -57,6 +57,20 @@ func InitDB(cfg *config.Config) *gorm.DB {
 			SkipDefaultTransaction: true, // Disable default transaction for better performance
 			PrepareStmt:            true, // Enable prepared statements
 		})
+	case "yugabytedb":
+		// YugabyteDB is PostgreSQL-compatible, so we can use the PostgreSQL driver
+		dataSourceName = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+			cfg.DB.Host,
+			cfg.DB.Port,
+			cfg.DB.User,
+			cfg.DB.Password,
+			cfg.DB.Name)
+		db, err = gorm.Open(postgres.Open(dataSourceName), &gorm.Config{
+			Logger: newLogger,
+			// Performance optimizations
+			SkipDefaultTransaction: true, // Disable default transaction for better performance
+			PrepareStmt:            true, // Enable prepared statements
+		})
 	default:
 		panic("unsupported database driver: " + cfg.DB.Driver)
 	}

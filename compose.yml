@@ -45,9 +45,28 @@ services:
     networks:
       - echo-demo-stack
 
+  echo_yugabytedb:
+    image: yugabytedb/yugabyte:latest
+    container_name: echo_yugabytedb
+    ports:
+      - "5433:5433"  # YSQL port
+      - "7000:7000"  # Master web UI
+      - "9000:9000"  # TServer web UI
+    environment:
+      - YB_MASTER_ADDRS=yugabytedb:7100
+    command: ["bin/yugabyted", "start", "--daemon=false", "--ui=false"]
+    volumes:
+      - yugabytedb_data:/mnt/master
+      - yugabytedb_data:/mnt/tserver
+    networks:
+      - echo-demo-stack
+
 volumes:
   database_mysql:
+  yugabytedb_data:
 
 networks:
   echo-demo-stack:
     driver: bridge
+
+# docker-compose up echo_yugabytedb

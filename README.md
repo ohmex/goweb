@@ -63,7 +63,39 @@ For comprehensive information about the partitioning system, see [docs/partition
 ## Configuration
 
 - **Environment Variable**: `DB_PARTITIONING_ENABLED=true`
-- **Database**: PostgreSQL only (`DB_DRIVER=postgres`)
+- **Database**: PostgreSQL or YugabyteDB (`DB_DRIVER=postgres` or `DB_DRIVER=yugabytedb`)
 - **Affected Tables**: Tables using `BaseResource` struct (currently `posts`)
 - **Partition Type**: LIST partitions by domain UUID
+
+## Supported Databases
+
+This application supports multiple database backends:
+
+- **MySQL**: `DB_DRIVER=mysql`
+- **PostgreSQL**: `DB_DRIVER=postgres`
+- **YugabyteDB**: `DB_DRIVER=yugabytedb` (PostgreSQL-compatible distributed SQL database)
+
+### YugabyteDB Setup
+
+YugabyteDB is a distributed SQL database that is PostgreSQL-compatible. To use YugabyteDB:
+
+1. **Set Environment Variables**:
+   ```bash
+   export DB_DRIVER=yugabytedb
+   export DB_HOST=localhost
+   export DB_PORT=5433
+   export DB_USER=yugabyte
+   export DB_PASSWORD=yugabyte
+   export DB_NAME=yugabyte
+   ```
+
+2. **Start YugabyteDB with Docker Compose**:
+   ```bash
+   docker-compose up echo_yugabytedb
+   ```
+
+3. **Access YugabyteDB**:
+   - YSQL (PostgreSQL-compatible): `localhost:5433`
+   - Master Web UI: `localhost:7000`
+   - TServer Web UI: `localhost:9000`
 

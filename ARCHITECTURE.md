@@ -52,7 +52,7 @@ This is a comprehensive Go web application built using the Echo framework with a
 
 ### 4. Data Access Layer
 - **GORM (v1.30.1)**: Object-Relational Mapping
-  - Support for MySQL, PostgreSQL, and SQLite
+  - Support for MySQL, PostgreSQL, YugabyteDB, and SQLite
   - Automatic migrations and schema management
   - Soft deletes and audit fields
   - Connection pooling and query optimization
@@ -142,6 +142,7 @@ Client Request → Echo Router → Middleware Chain → Handler → Service → 
 - **GORM v1.30.1**: Object-Relational Mapping library
 - **MySQL Driver v1.6.0**: MySQL database connectivity
 - **PostgreSQL Driver v1.6.0**: PostgreSQL database connectivity
+- **YugabyteDB Support**: PostgreSQL-compatible distributed SQL database
 - **SQLite Support**: Embedded database support
 - **Redis v9.12.0**: In-memory data structure store
 
@@ -228,7 +229,7 @@ gowebmvc/
 - API versioning and grouping
 
 ### Multi-Database Support
-- MySQL, PostgreSQL, and SQLite support
+- MySQL, PostgreSQL, YugabyteDB, and SQLite support
 - Database-agnostic ORM layer
 - Migration system for schema management
 - Connection pooling and optimization
