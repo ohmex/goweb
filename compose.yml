@@ -1,72 +1,74 @@
 services:
-  echo_app:
-    container_name: echo_demo
-    build: .
-    ports:
-      - ${EXPOSE_PORT}:${PORT}
-    restart: on-failure
-    volumes:
-      - ./:/app/
-    depends_on:
-      - echo_mysql
-    env_file:
-      - .env
-    environment:
-      - DB_CONNECTION=${DB_HOST}:${DB_PORT}
-      - WAIT_HOSTS=${DB_HOST}:${DB_PORT}
-      - WAIT_BEFORE_HOSTS=15
-      - WAIT_SLEEP_INTERVAL=3
-      - FRONTEND_URL=http://localhost:3000
-    networks:
-      - echo-demo-stack
+  # frontend:
+  #   container_name: frontend
+  #   build: .
+  #   ports:
+  #     - ${FRONTEND_PORT}:${FRONTEND_PORT}
+  #   restart: on-failure
+  #   volumes:
+  #     - ./:/app/
+  #   depends_on:
+  #     - echo_mysql
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - DB_CONNECTION=${DB_HOST}:${DB_PORT}
+  #     - WAIT_HOSTS=${DB_HOST}:${DB_PORT}
+  #     - WAIT_BEFORE_HOSTS=15
+  #     - WAIT_SLEEP_INTERVAL=3
+  #     - FRONTEND_URL=http://${HOST}:${FRONTEND_PORT}
+  #   networks:
+  #     - go-web-network
 
-  echo_mysql:
-    image: mysql:8.0
-    container_name: echo_db
-    ports:
-      - ${EXPOSE_DB_PORT}:${DB_PORT}
-    environment:
-      - MYSQL_ROOT_HOST=${DB_HOST}
-      - MYSQL_USER=${DB_USER}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
-      - MYSQL_DATABASE=${DB_NAME}
-      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
-    volumes:
-      - database_mysql:/var/lib/mysql
-    networks:
-      - echo-demo-stack
+  # mysql:
+  #   image: mysql:8.0
+  #   container_name: mysql
+  #   restart: unless-stopped
+  #   ports:
+  #     - ${DB_PORT}:${DB_PORT}
+  #   environment:
+  #     - MYSQL_ROOT_HOST=${DB_HOST}
+  #     - MYSQL_USER=${DB_USER}
+  #     - MYSQL_PASSWORD=${DB_PASSWORD}
+  #     - MYSQL_DATABASE=${DB_NAME}
+  #     - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+  #   volumes:
+  #     - mysql_data:/var/lib/mysql
+  #   networks:
+  #     - go-web-network
 
-  echo_redis:
-    image: redis
-    container_name: ${REDIS_HOST}
+  keydb:
+    image: eqalpha/keydb
+    container_name: keydb
     restart: unless-stopped
     ports:
-      - ${REDIS_EXPOSE_PORT}:${REDIS_PORT}
+      - ${REDIS_PORT}:${REDIS_PORT}
     networks:
-      - echo-demo-stack
+      - go-web-network
 
-  echo_yugabytedb:
+  yugabytedb:
     image: yugabytedb/yugabyte:latest
-    container_name: echo_yugabytedb
+    container_name: yugabyte01
+    hostname: yugabyte01
+    command: >
+      bin/yugabyted start
+      --base_dir=/home/yugabyte/yb_data
+      --background=false
     ports:
-      - "5433:5433"  # YSQL port
-      - "7000:7000"  # Master web UI
-      - "9000:9000"  # TServer web UI
-    environment:
-      - YB_MASTER_ADDRS=yugabytedb:7100
-    command: ["bin/yugabyted", "start", "--daemon=false", "--ui=false"]
+      - "5433:5433"   # YSQL (PostgreSQL-compatible) port.
+      - "9042:9042"   # YCQL (Cassandra-compatible) port.
+      - "15433:15433" # YugabyteDB Admin UI port.
+      - "7001:7000"   # YB-Master RPC port.
+      - "9000:9000"   # YB-TServer RPC port.
     volumes:
-      - yugabytedb_data:/mnt/master
-      - yugabytedb_data:/mnt/tserver
+      - yb_data:/home/yugabyte/yb_data
     networks:
-      - echo-demo-stack
+      - go-web-network
 
 volumes:
-  database_mysql:
-  yugabytedb_data:
+  mysql_data:
+  yb_data:
 
 networks:
-  echo-demo-stack:
+  go-web-network:
     driver: bridge
-
-# docker-compose up echo_yugabytedb
